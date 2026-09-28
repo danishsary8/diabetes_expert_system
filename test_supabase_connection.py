@@ -6,6 +6,7 @@ Usage: python test_supabase_connection.py
 
 import sys
 import os
+from pathlib import Path
 from urllib.parse import urlparse
 
 def test_connection():
@@ -16,9 +17,14 @@ def test_connection():
     print()
     
     # Get DATABASE_URL
-    database_url = input("Enter your DATABASE_URL (or press Enter to use env var): ").strip()
+    database_url = input("Enter your DATABASE_URL (or press Enter to use backend/.env): ").strip()
     
     if not database_url:
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(Path(__file__).resolve().parent / "backend" / ".env")
+        except ImportError:
+            pass
         database_url = os.getenv('DATABASE_URL')
         if not database_url:
             print("❌ No DATABASE_URL provided or found in environment")

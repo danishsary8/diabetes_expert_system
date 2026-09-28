@@ -80,6 +80,9 @@ secret, creates ignored demo environment files, and starts both applications.
 It refuses to overwrite a non-demo environment. Open http://127.0.0.1:5173
 after startup.
 
+See [DATABASE_SETUP.md](DATABASE_SETUP.md) to connect Supabase or a local
+PostgreSQL database and view it in pgAdmin.
+
 See [DEMO_MODE.md](DEMO_MODE.md) for the full database, local setup, cloud
 deployment, demo-account, and isolation instructions.
 
@@ -104,11 +107,16 @@ deployment, demo-account, and isolation instructions.
    ```
 
 3. **Initialize the Database:**
-   Apply migrations to build the schema in your Supabase database.
+   With `DB_AUTO_CREATE=1` (the default in `.env.example`) the first
+   `python run.py` creates the tables, records the migration version and
+   seeds demo data, so no extra command is needed. To apply migrations
+   manually instead:
    ```bash
    export FLASK_APP=run.py
    flask db upgrade
    ```
+   Step-by-step Supabase, local PostgreSQL and pgAdmin instructions are in
+   [DATABASE_SETUP.md](DATABASE_SETUP.md).
 
 4. **Run the API Server:**
    ```bash

@@ -26,6 +26,8 @@ from .routes.dashboard_routes import dashboard_bp
 from .utils.api_response import success_response
 from .utils.seed import seed_demo_data
 
+MIGRATIONS_DIR = Path(__file__).resolve().parents[1] / "migrations"
+
 
 def _configure_logging(app: Flask):
     """Configure structured logging for the application."""
@@ -104,6 +106,25 @@ def _register_cli_commands(app: Flask):
         except Exception as e:
             app.logger.error("Error during seeding: %s", e)
             db.session.rollback()
+
+
+def _stamp_new_schema_as_migrated():
+    """Mark a schema built by db.create_all() as being at the latest migration.
+
+    Without this, a later `flask db upgrade` replays the initial migration and
+    fails with "relation ... already exists".
+    """
+    from alembic.runtime.migration import MigrationContext
+    from alembic.script import ScriptDirectory
+
+    try:
+        script = ScriptDirectory(str(MIGRATIONS_DIR))
+        with db.engine.begin() as conn:
+            context = MigrationContext.configure(conn)
+            if not context.get_current_heads():
+                context.stamp(script, "head")
+    except Exception as e:
+        logging.getLogger(__name__).warning("Could not stamp migration version: %s", e)
 
 
 def _ensure_user_profile_columns():
@@ -196,7 +217,7 @@ def create_app(config_object=Config):
     _add_security_headers(app)
 
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, directory=str(MIGRATIONS_DIR))
     limiter.init_app(app)
 
     # Ensure models are imported before migration autogeneration.
@@ -204,7 +225,10 @@ def create_app(config_object=Config):
 
     with app.app_context():
         if app.config.get("DB_AUTO_CREATE", False):
+            existing_tables = set(inspect(db.engine).get_table_names())
             db.create_all()
+            if not existing_tables & set(db.metadata.tables):
+                _stamp_new_schema_as_migrated()
 
         _ensure_user_profile_columns()
         _ensure_fact_columns()
