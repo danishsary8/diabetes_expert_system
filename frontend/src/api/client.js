@@ -156,4 +156,16 @@ export function getApiErrorMessage(error, fallbackMessage = 'Request failed') {
   return fallbackMessage
 }
 
+// Files served by the backend (e.g. uploaded avatars) come back as "/api/..."
+// paths. Resolve them against the API host so they still load when the
+// backend runs on a different domain than the frontend (Railway + Vercel).
+export function resolveApiAssetUrl(url) {
+  if (typeof url !== 'string' || !url.startsWith('/api/')) return url
+  try {
+    return new URL(url, api.defaults.baseURL).href
+  } catch {
+    return url
+  }
+}
+
 export default api

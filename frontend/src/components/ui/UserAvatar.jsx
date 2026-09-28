@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+import { resolveApiAssetUrl } from '@/api/client'
 
 export const AVATAR_GRADIENTS = [
   'from-cyan-500 to-sky-600',
@@ -99,7 +100,7 @@ export function UserAvatar({
       <div className={cn("relative flex h-full w-full shrink-0 items-center justify-center overflow-hidden aspect-square bg-slate-100 dark:bg-slate-800", shapeClass)}>
         {src && !imgError ? (
           <img
-            src={src}
+            src={resolveApiAssetUrl(src)}
             alt={alt || name || 'User avatar'}
             onError={() => setImgError(true)}
             className={cn(
