@@ -4,6 +4,23 @@ A professional, full-stack web application designed to leverage an expert system
 
 ---
 
+## Project Lineage and Independent Deployment
+
+This application was originally developed collaboratively by the Git contributors **dev-vichea**, **Kiddd**, **Tisa7777**, and **nishthegreatest**. The original team repository is maintained separately at [dev-vichea/diabetes-expert-system-v2](https://github.com/dev-vichea/diabetes-expert-system-v2).
+
+This repository is an independently maintained continuation for personal upgrades and deployment. It preserves the collaborative Git history, expert-system knowledge, source code, migrations, tests, documentation, and versioned project assets so the original contributors and development work remain visible.
+
+The deployments are intentionally isolated:
+
+- The original team repository, frontend, backend, database, domains, and deployment services remain unchanged.
+- This repository connects only to its own GitHub repository and must use newly created frontend, backend, database, domains, OAuth configuration, and secrets.
+- Commits pushed here do not deploy the original team application. Updates to the team repository do not deploy this copy unless they are deliberately reviewed and merged.
+- Deployment credentials and provider-specific local project links are not committed. Use the checked-in `.env.example` files to configure each new environment.
+
+Only the project lineage and application knowledge are shared; the live infrastructure and data stores are separate.
+
+---
+
 ## 🎯 Key Features
 
 ### 🧠 Expert System Core
