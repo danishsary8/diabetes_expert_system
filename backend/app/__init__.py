@@ -301,6 +301,14 @@ def _resolve_startup_database(app: Flask):
     primary_uri = app.config.get("SQLALCHEMY_DATABASE_URI")
     app.config["DB_PRIMARY_DATABASE_URI"] = primary_uri
     app.config["DB_FALLBACK_ACTIVE"] = False
+    require_postgres = bool(app.config.get("REQUIRE_POSTGRES", False))
+
+    if require_postgres and make_url(primary_uri).get_backend_name() != "postgresql":
+        raise RuntimeError(
+            "REQUIRE_POSTGRES is enabled but DATABASE_URL is not a PostgreSQL URL "
+            f"(got {make_url(primary_uri).get_backend_name()}). Set DATABASE_URL in "
+            "backend/.env to your Supabase Session pooler URL."
+        )
 
     if str(primary_uri).startswith("sqlite"):
         app.config.pop("SQLALCHEMY_ENGINE_OPTIONS", None)
@@ -311,7 +319,7 @@ def _resolve_startup_database(app: Flask):
     try:
         _check_database_connection(primary_uri)
     except SQLAlchemyError as exc:
-        if not app.config.get("DB_FALLBACK_ENABLED", False):
+        if require_postgres or not app.config.get("DB_FALLBACK_ENABLED", False):
             raise
 
         fallback_uri = app.config.get("DB_FALLBACK_URL")

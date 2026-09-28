@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 # _resolve_secret_key / _resolve_database_url at import time, which
 # raise RuntimeError when FLASK_DEBUG and SECRET_KEY are absent.
 _backend_dir = Path(__file__).resolve().parents[1]
+# Tests run on temporary SQLite databases even when backend/.env requires PostgreSQL.
+os.environ.setdefault("REQUIRE_POSTGRES", "0")
 load_dotenv(_backend_dir / ".env")
 os.environ.setdefault("FLASK_DEBUG", "1")
 

@@ -126,7 +126,12 @@ Continue with **Step 3**.
    DATABASE_URL=postgresql+psycopg://postgres.abcdefghijklmnop:p%40ss%23word@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
    DB_POOL_SIZE=2
    DB_MAX_OVERFLOW=3
+   REQUIRE_POSTGRES=1
+   DB_FALLBACK_ENABLED=0
    ```
+
+   `REQUIRE_POSTGRES=1` makes the backend refuse to start if it would use
+   anything other than PostgreSQL, so data can never end up in a local file.
 
    The small pool keeps you under the free plan's connection limit.
 
@@ -218,7 +223,8 @@ Windows users can do Steps 1–3 in one go with
 | `prepared statement "_pg3_0" already exists` | Transaction pooler with prepared statements | Use port 6543 (auto-detected) or set `DB_DISABLE_PREPARED_STATEMENTS=1` |
 | `relation "..." already exists` on `flask db upgrade` | Tables were created by an older version of the app without a migration record | Run `flask --app run.py db stamp head` once, then `flask db upgrade` works |
 | `connection refused` on `127.0.0.1:5432` | Local PostgreSQL not running | Start the PostgreSQL service, or `docker compose up -d db` |
-| App shows data that is missing in Supabase | Backend is using another database (local PostgreSQL, or a SQLite file because `DATABASE_URL` was not read) | Open `http://127.0.0.1:5001/api/health`: `database_host` must be your `*.pooler.supabase.com` host. Fix `DATABASE_URL` in `backend/.env`, set `DB_FALLBACK_ENABLED=0`, restart |
+| App shows data that is missing in Supabase | Backend is using another database (local PostgreSQL, or a SQLite file because `DATABASE_URL` was not read) | Open `http://127.0.0.1:5001/api/health`: `database_host` must be your `*.pooler.supabase.com` host. Fix `DATABASE_URL` in `backend/.env` (only one such line), set `REQUIRE_POSTGRES=1` and `DB_FALLBACK_ENABLED=0`, restart |
+| `REQUIRE_POSTGRES is enabled but DATABASE_URL is not a PostgreSQL URL` | `DATABASE_URL` is missing, misspelled or commented out in `backend/.env` | Add your Supabase Session pooler URL as `DATABASE_URL=...` |
 | Supabase project "paused" | Free projects pause after inactivity | Click **Restore** in the Supabase dashboard |
 
 Never commit `backend/.env`; it contains your database password. It is already
