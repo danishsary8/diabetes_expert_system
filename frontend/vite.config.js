@@ -8,6 +8,10 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    // Always use the single React copy in frontend/node_modules. A second copy
+    // (e.g. from an accidental `npm install` in the repository root) crashes
+    // the app with "Cannot read properties of null (reading 'useState')".
+    dedupe: ['react', 'react-dom'],
   },
   server: {
     port: 5173,
