@@ -137,6 +137,8 @@ deployment, demo-account, and isolation instructions.
    cp .env.example .env
    ```
    Ensure `VITE_API_BASE_URL` points to your running backend (e.g., `http://127.0.0.1:5001/api`).
+   See [FRONTEND_SETUP.md](FRONTEND_SETUP.md) for connecting and deploying the
+   frontend and backend together.
 
 3. **Run the Development Server:**
    ```bash
