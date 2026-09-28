@@ -16,20 +16,43 @@ os.environ.setdefault("FLASK_DEBUG", "1")
 
 sys.path.insert(0, str(_backend_dir))
 
+from sqlalchemy import create_engine, text
+
 from app import create_app
-from app.config import Config
+from app.config import Config, _engine_options, _normalize_database_url
+from app.extensions import db
+
+# Optional: run the suite against a real PostgreSQL database (for example
+# through a transaction pooler) instead of SQLite. The database's public schema
+# is dropped and recreated before every test, so never point this at real data.
+_TEST_DATABASE_URL = _normalize_database_url(os.getenv("TEST_DATABASE_URL", ""))
+
+
+def _reset_postgres_schema(url: str) -> None:
+    engine = create_engine(url, connect_args={"prepare_threshold": None})
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("DROP SCHEMA IF EXISTS public CASCADE"))
+            conn.execute(text("CREATE SCHEMA public"))
+    finally:
+        engine.dispose()
 
 
 @pytest.fixture()
 def app(tmp_path):
-    db_path = tmp_path / "test.db"
+    if _TEST_DATABASE_URL:
+        _reset_postgres_schema(_TEST_DATABASE_URL)
+        database_url = _TEST_DATABASE_URL
+    else:
+        database_url = f"sqlite:///{tmp_path / 'test.db'}"
 
     class TestConfig(Config):
         TESTING = True
         DEMO_MODE = True
         SECRET_KEY = "test-secret-key"
         CORS_ORIGINS = ["*"]
-        SQLALCHEMY_DATABASE_URI = f"sqlite:///{db_path}"
+        SQLALCHEMY_DATABASE_URI = database_url
+        SQLALCHEMY_ENGINE_OPTIONS = _engine_options(database_url)
         DB_AUTO_CREATE = True
         SEED_DEMO_DATA = True
         RULES_SEED_VERSION = "v1"
@@ -38,6 +61,9 @@ def app(tmp_path):
 
     app = create_app(TestConfig)
     yield app
+    with app.app_context():
+        db.session.remove()
+        db.engine.dispose()
 
 
 @pytest.fixture()

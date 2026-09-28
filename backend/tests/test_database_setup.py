@@ -1,5 +1,6 @@
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
+from sqlalchemy.engine import make_url
 
 from app import MIGRATIONS_DIR
 from app.config import _engine_options
@@ -23,7 +24,8 @@ def test_session_pooler_keeps_prepared_statements():
     assert "connect_args" not in _engine_options(url)
 
 
-def test_health_reports_active_database(client):
+def test_health_reports_active_database(app, client):
     data = client.get("/api/health").get_json()["data"]
-    assert data["database"] == "sqlite"
+    expected = make_url(app.config["SQLALCHEMY_DATABASE_URI"]).get_backend_name()
+    assert data["database"] == expected
     assert data["database_fallback_active"] is False

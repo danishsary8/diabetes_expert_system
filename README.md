@@ -191,6 +191,13 @@ source .venv/bin/activate
 pytest
 ```
 
+To run the same suite against a real PostgreSQL database (for example
+through a transaction pooler), point `TEST_DATABASE_URL` at a **throwaway**
+database. Its `public` schema is dropped and recreated before every test:
+```bash
+TEST_DATABASE_URL=postgresql://user:pass@127.0.0.1:6543/test_db pytest tests
+```
+
 **Frontend Build:**
 ```bash
 cd frontend
