@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import api, { clearAuthStorage, getAccessToken, getApiData, getRefreshToken, setAuthTokens } from '../api/client'
+import api, { AUTH_EXPIRED_EVENT, clearAuthStorage, getAccessToken, getApiData, getRefreshToken, setAuthTokens } from '../api/client'
 
 const AuthContext = createContext(null)
 
@@ -22,6 +22,17 @@ export function AuthProvider({ children }) {
     if (user) localStorage.setItem('user', JSON.stringify(user))
     else localStorage.removeItem('user')
   }, [user])
+
+  // Session rejected by the API (e.g. stale token after a secret/database change):
+  // drop the user and send them to sign in again instead of looping on 401s.
+  useEffect(() => {
+    const onExpired = () => {
+      setUser(null)
+      if (window.location.pathname !== '/login') window.location.assign('/login')
+    }
+    window.addEventListener(AUTH_EXPIRED_EVENT, onExpired)
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onExpired)
+  }, [])
 
   // Keep the cached user in sync (e.g. profile_completed flips after onboarding,
   // or the cached copy predates that field existing).

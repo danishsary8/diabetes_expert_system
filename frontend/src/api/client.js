@@ -42,6 +42,15 @@ export function clearAuthStorage() {
   localStorage.removeItem('user')
 }
 
+export const AUTH_EXPIRED_EVENT = 'auth:expired'
+
+// Tokens were rejected and could not be refreshed: wipe them and tell the
+// AuthProvider so the in-memory user is dropped too.
+function expireSession() {
+  clearAuthStorage()
+  window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT))
+}
+
 api.interceptors.request.use((config) => {
   const token = getAccessToken()
   if (token) {
@@ -70,7 +79,7 @@ api.interceptors.response.use(
 
     const refreshToken = getRefreshToken()
     if (!refreshToken) {
-      clearAuthStorage()
+      expireSession()
       return Promise.reject(error)
     }
 
@@ -95,7 +104,7 @@ api.interceptors.response.use(
 
       return api(originalRequest)
     } catch (refreshError) {
-      clearAuthStorage()
+      expireSession()
       return Promise.reject(refreshError)
     } finally {
       refreshPromise = null
