@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -106,6 +107,28 @@ def _register_cli_commands(app: Flask):
         except Exception as e:
             app.logger.error("Error during seeding: %s", e)
             db.session.rollback()
+
+
+# Arbitrary application-wide key for pg_advisory_xact_lock.
+_STARTUP_LOCK_ID = 720391527
+
+
+@contextmanager
+def _startup_lock():
+    """Run schema creation and seeding in one process at a time.
+
+    Gunicorn starts several workers (and a host may start several instances)
+    that all run create_app() at once. Without this, workers race on an empty
+    database, fail with duplicate-key errors, and gunicorn halts the server.
+    A transaction-level lock is used because session-level advisory locks are
+    unsafe behind a transaction pooler such as Supabase port 6543.
+    """
+    if db.engine.dialect.name != "postgresql":
+        yield
+        return
+    with db.engine.connect() as conn, conn.begin():
+        conn.execute(text("SELECT pg_advisory_xact_lock(:id)"), {"id": _STARTUP_LOCK_ID})
+        yield
 
 
 def _stamp_new_schema_as_migrated():
@@ -224,7 +247,7 @@ def create_app(config_object=Config):
     # Ensure models are imported before migration autogeneration.
     from . import models  # noqa: F401
 
-    with app.app_context():
+    with app.app_context(), _startup_lock():
         if app.config.get("DB_AUTO_CREATE", False):
             existing_tables = set(inspect(db.engine).get_table_names())
             db.create_all()

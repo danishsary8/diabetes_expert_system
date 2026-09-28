@@ -77,25 +77,35 @@ To see the requests yourself, open browser DevTools (F12) → **Network** tab
 
 ### Step 1: Deploy the backend first
 
-Create a Railway service from this repository. The repository's Railway
-config (`railway.json` / `railway.toml`) builds the backend and runs it with
-gunicorn. Add these variables in Railway → **Variables**:
+1. Railway → **New Project → Deploy from GitHub repo** → pick this repository.
+2. Open the service → **Settings → Source → Root Directory** = `backend`.
+   Railway then uses `backend/railway.json`, which builds `backend/Dockerfile`
+   (gunicorn, PDF libraries and Khmer fonts included).
+3. **Variables** tab → add:
 
 ```env
-DATABASE_URL=<your Supabase Session pooler URL>
+DATABASE_URL=postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres
 SECRET_KEY=<python -c "import secrets; print(secrets.token_hex(32))">
 FLASK_DEBUG=false
 DEMO_MODE=true
-DB_AUTO_CREATE=true
-SEED_DEMO_DATA=true
-DB_FALLBACK_ENABLED=false
+REQUIRE_POSTGRES=1
+DB_FALLBACK_ENABLED=0
+DB_AUTO_CREATE=1
+SEED_DEMO_DATA=1
+RULES_SEED_VERSION=v3
 DB_POOL_SIZE=2
 DB_MAX_OVERFLOW=3
 CORS_ORIGINS=https://your-frontend.vercel.app
 ```
 
-Generate a public domain (Railway → **Settings → Networking**) and check
-`https://<backend-domain>/api/health` returns `"status": "ok"`.
+Use Supabase's **Transaction pooler (port 6543)** for the deployed backend:
+gunicorn runs 4 workers, which can exceed the free plan's Session pooler
+(port 5432) client limit. The backend detects port 6543 and turns off
+prepared statements automatically. Do not set `PORT`; Railway provides it.
+
+4. **Settings → Networking → Generate Domain**, then open
+   `https://<backend-domain>/api/health`. It must return `"status": "ok"`
+   and `"database": "postgresql"`.
 
 ### Step 2: Deploy the frontend
 
