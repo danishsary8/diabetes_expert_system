@@ -3,6 +3,7 @@ import { AppRouter } from './app/router'
 // ui/chart.jsx through the barrel — stays out of the eagerly-loaded entry chunk.
 import { Toaster } from '@/components/ui/sonner'
 import { DiabetesAssistant } from '@/features/diabetes-assistant/DiabetesAssistant'
+import { DemoModeBanner } from '@/components/DemoModeBanner'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRoleAccess } from '@/hooks/useRoleAccess'
 
@@ -14,6 +15,7 @@ function App() {
   return (
     <>
       <AppRouter />
+      <DemoModeBanner />
       {showPatientAssistant && <DiabetesAssistant />}
       <Toaster richColors />
     </>

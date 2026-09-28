@@ -1,18 +1,18 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: diabetes_postgres_dev
+    container_name: diabetes_personal_demo_postgres_dev
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-diabetes_db}
+      POSTGRES_DB: ${POSTGRES_DB:-diabetes_demo}
     ports:
       - "5432:5432"
     volumes:
-      - postgres_dev_data:/var/lib/postgresql/data
+      - postgres_personal_demo_dev_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-diabetes_db}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-diabetes_demo}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -21,7 +21,7 @@ services:
     build:
       context: ./backend
       target: development
-    container_name: diabetes_backend_dev
+    container_name: diabetes_personal_demo_backend_dev
     restart: unless-stopped
     ports:
       - "5001:5001"
@@ -29,11 +29,13 @@ services:
       - ./backend:/app
     environment:
       FLASK_DEBUG: 1
+      DEMO_MODE: "true"
       SECRET_KEY: ${SECRET_KEY:-dev-insecure-secret-key-for-local-docker}
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-diabetes_db}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-diabetes_demo}
       DB_AUTO_CREATE: "true"
       SEED_DEMO_DATA: "true"
-      RULES_SEED_VERSION: "v2"
+      RULES_SEED_VERSION: "v3"
+      DB_FALLBACK_ENABLED: "false"
       CORS_ORIGINS: "http://localhost:5173,http://127.0.0.1:5173,http://localhost"
     depends_on:
       db:
@@ -43,7 +45,7 @@ services:
     build:
       context: ./frontend
       target: development
-    container_name: diabetes_frontend_dev
+    container_name: diabetes_personal_demo_frontend_dev
     restart: unless-stopped
     ports:
       - "5173:5173"
@@ -52,8 +54,10 @@ services:
       - /app/node_modules
     environment:
       VITE_API_BASE_URL: "http://localhost:5001/api"
+      VITE_DEMO_MODE: "true"
+      VITE_DEMO_LABEL: "Independent Demo"
     depends_on:
       - backend
 
 volumes:
-  postgres_dev_data:
+  postgres_personal_demo_dev_data:

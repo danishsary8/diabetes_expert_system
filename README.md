@@ -66,42 +66,22 @@ Only the project lineage and application knowledge are shared; the live infrastr
 - Python (3.11+)
 - A [Supabase](https://supabase.com) account & PostgreSQL instance (or local PostgreSQL)
 
-### Windows local quick start (SQLite)
+### Independent demo quick start (Windows)
 
-Run these commands from the project directory in PowerShell. Python 3.11 or
-newer is required (`datetime.UTC` is used by the backend).
-
-```powershell
-cd backend
-py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-Copy-Item .env.example .env
-```
-
-In `backend/.env`, set `DATABASE_URL=sqlite:///dev_local.db`,
-`DB_AUTO_CREATE=true`, and `DB_FALLBACK_ENABLED=false`. Keep
-`FLASK_DEBUG=1` and `SEED_DEMO_DATA=1` for the local demo, and replace
-`SECRET_KEY` with a randomly generated value. Then start the API:
+Create a new PostgreSQL database or Supabase project that is not shared with
+the team deployment. Then run this command from the repository root:
 
 ```powershell
-.\.venv\Scripts\python.exe run.py
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\run-demo.ps1
 ```
 
-In a second PowerShell terminal, from the project directory:
+The launcher securely requests the new database URL, generates a new local
+secret, creates ignored demo environment files, and starts both applications.
+It refuses to overwrite a non-demo environment. Open http://127.0.0.1:5173
+after startup.
 
-```powershell
-cd frontend
-npm.cmd install
-Copy-Item .env.example .env
-npm.cmd run dev
-```
-
-Open http://localhost:5173. The API health endpoint is
-http://127.0.0.1:5001/api/health. The local database is stored in
-`backend/instance/dev_local.db`. Do not overwrite an existing `.env` when
-restarting; environment setup and installation are only needed initially.
-`backend/run.py` reads `backend/.env`; the root `.env` is used by `main.py`
-and Docker Compose.
+See [DEMO_MODE.md](DEMO_MODE.md) for the full database, local setup, cloud
+deployment, demo-account, and isolation instructions.
 
 ### 1. Backend Setup (PostgreSQL)
 
@@ -117,7 +97,7 @@ and Docker Compose.
    ```bash
    cp .env.example .env
    ```
-   Open `.env` and set your `DATABASE_URL` to your full **Supabase Session Pooler URL** (ensure you use `postgresql+psycopg://...`). Example:
+   Open `.env` and set your `DATABASE_URL` to the full **Session Pooler URL from a new personal Supabase project** (ensure you use `postgresql+psycopg://...`). Example:
    ```env
    DATABASE_URL=postgresql+psycopg://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
    FLASK_RUN_PORT=5001

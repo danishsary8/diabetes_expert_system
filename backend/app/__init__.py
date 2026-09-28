@@ -246,7 +246,12 @@ def create_app(config_object=Config):
     @app.get("/health")
     @app.get("/api/health")
     def health():
-        return success_response(data={"status": "ok"})
+        return success_response(
+            data={
+                "status": "ok",
+                "demo_mode": bool(app.config.get("DEMO_MODE", False)),
+            }
+        )
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(assessment_bp, url_prefix="/api/assessment")

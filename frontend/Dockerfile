@@ -27,6 +27,10 @@ COPY . .
 # In production Nginx deployment, API requests are reverse-proxied under /api
 ARG VITE_API_BASE_URL=/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ARG VITE_DEMO_MODE=true
+ENV VITE_DEMO_MODE=$VITE_DEMO_MODE
+ARG VITE_DEMO_LABEL="Independent Demo"
+ENV VITE_DEMO_LABEL=$VITE_DEMO_LABEL
 
 RUN npm run build
 

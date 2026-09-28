@@ -9,6 +9,9 @@ import { AuthShowcasePanel } from '@/components/auth/AuthShowcasePanel'
 import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton'
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+const demoMode = ['1', 'true', 'yes', 'on'].includes(
+  String(import.meta.env.VITE_DEMO_MODE || '').trim().toLowerCase()
+)
 
 export function LoginPage() {
   const { setUser, loginWithGoogle } = useAuth()
@@ -17,8 +20,8 @@ export function LoginPage() {
   const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
-    email: 'doctor@example.com',
-    password: 'doctor123',
+    email: demoMode ? 'doctor@example.com' : '',
+    password: demoMode ? 'doctor123' : '',
     rememberMe: false,
   })
   const [showPassword, setShowPassword] = useState(false)
@@ -207,6 +210,13 @@ export function LoginPage() {
           >
             {t('auth.loginPageSub', 'Sign in to continue to your clinical dashboard.')}
           </p>
+
+          {demoMode ? (
+            <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-100">
+              <span className="font-bold">Independent demo:</span>{' '}
+              sample doctor credentials are prefilled. All records in this environment must use the separate demo database.
+            </div>
+          ) : null}
 
           <form onSubmit={handleSubmit} className="space-y-3" style={{ fontFamily: 'var(--font-latin-sans)' }}>
             {/* Email Field */}

@@ -75,6 +75,7 @@ def _resolve_database_url() -> str:
 
 class Config:
     DEBUG = _as_bool(os.getenv("FLASK_DEBUG"), default=False)
+    DEMO_MODE = _as_bool(os.getenv("DEMO_MODE"), default=False)
 
     SECRET_KEY = _resolve_secret_key()
     JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")

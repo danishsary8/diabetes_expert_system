@@ -24,6 +24,7 @@ def app(tmp_path):
 
     class TestConfig(Config):
         TESTING = True
+        DEMO_MODE = True
         SECRET_KEY = "test-secret-key"
         CORS_ORIGINS = ["*"]
         SQLALCHEMY_DATABASE_URI = f"sqlite:///{db_path}"

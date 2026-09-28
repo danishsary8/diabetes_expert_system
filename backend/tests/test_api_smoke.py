@@ -5,6 +5,15 @@ def _auth_header(access_token: str) -> dict:
     return {"Authorization": f"Bearer {access_token}"}
 
 
+def test_health_reports_independent_demo_mode(client):
+    response = client.get("/api/health")
+
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["success"] is True
+    assert body["data"] == {"status": "ok", "demo_mode": True}
+
+
 def test_login_success(client):
     response = client.post(
         "/api/auth/login",
