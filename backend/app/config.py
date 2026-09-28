@@ -3,6 +3,8 @@ import secrets
 from pathlib import Path
 from typing import List
 
+from sqlalchemy.engine import make_url
+
 
 def _as_bool(value: str, default: bool = False) -> bool:
     if value is None:
@@ -73,6 +75,31 @@ def _resolve_database_url() -> str:
     )
 
 
+def _uses_transaction_pooler(url: str) -> bool:
+    """Supabase's transaction pooler (port 6543) cannot use prepared statements."""
+    if _as_bool(os.getenv("DB_DISABLE_PREPARED_STATEMENTS"), default=False):
+        return True
+    try:
+        return make_url(url).port == 6543
+    except Exception:
+        return False
+
+
+def _engine_options(url: str) -> dict:
+    if url.startswith("sqlite"):
+        return {}
+    options = {
+        "pool_size": int(os.getenv("DB_POOL_SIZE", "5")),
+        "pool_timeout": int(os.getenv("DB_POOL_TIMEOUT", "30")),
+        "pool_recycle": int(os.getenv("DB_POOL_RECYCLE", "1800")),
+        "max_overflow": int(os.getenv("DB_MAX_OVERFLOW", "10")),
+        "pool_pre_ping": True,
+    }
+    if _uses_transaction_pooler(url):
+        options["connect_args"] = {"prepare_threshold": None}
+    return options
+
+
 class Config:
     DEBUG = _as_bool(os.getenv("FLASK_DEBUG"), default=False)
     DEMO_MODE = _as_bool(os.getenv("DEMO_MODE"), default=False)
@@ -85,17 +112,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = _resolve_database_url()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = _as_bool(os.getenv("SQLALCHEMY_ECHO"), default=False)
-    SQLALCHEMY_ENGINE_OPTIONS = (
-        {}
-        if _resolve_database_url().startswith("sqlite")
-        else {
-            "pool_size": int(os.getenv("DB_POOL_SIZE", "5")),
-            "pool_timeout": int(os.getenv("DB_POOL_TIMEOUT", "30")),
-            "pool_recycle": int(os.getenv("DB_POOL_RECYCLE", "1800")),
-            "max_overflow": int(os.getenv("DB_MAX_OVERFLOW", "10")),
-            "pool_pre_ping": True,
-        }
-    )
+    SQLALCHEMY_ENGINE_OPTIONS = _engine_options(SQLALCHEMY_DATABASE_URI)
 
     CORS_ORIGINS = _as_list(
         os.getenv("CORS_ORIGINS"),

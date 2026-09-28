@@ -59,5 +59,27 @@ services:
     depends_on:
       - backend
 
+  # Optional database GUI. Start it with: docker compose --profile tools up -d pgadmin
+  # Then open http://localhost:5050 (login with PGADMIN_EMAIL / PGADMIN_PASSWORD).
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: diabetes_personal_demo_pgadmin
+    restart: unless-stopped
+    profiles: ["tools"]
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+      - pgadmin_personal_demo_data:/var/lib/pgadmin
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   postgres_personal_demo_dev_data:
+  pgadmin_personal_demo_data:
