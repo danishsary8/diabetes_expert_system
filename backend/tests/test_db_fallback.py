@@ -88,3 +88,27 @@ def test_primary_database_remains_active_when_reachable(tmp_path):
     assert login_response.status_code == 200
 
     assert Path(primary_db).exists()
+
+
+def test_require_postgres_rejects_sqlite(tmp_path):
+    BaseConfig = _base_config()
+
+    class SqliteConfig(BaseConfig):
+        SQLALCHEMY_DATABASE_URI = f'sqlite:///{tmp_path / "local.db"}'
+        REQUIRE_POSTGRES = True
+
+    with pytest.raises(RuntimeError, match='REQUIRE_POSTGRES'):
+        create_app(SqliteConfig)
+
+
+def test_require_postgres_disables_sqlite_fallback(tmp_path):
+    BaseConfig = _base_config()
+
+    class FallbackConfig(BaseConfig):
+        SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg://postgres:postgres@127.0.0.1:1/diabetes_expert_system'
+        REQUIRE_POSTGRES = True
+        DB_FALLBACK_ENABLED = True
+        DB_FALLBACK_URL = f'sqlite:///{tmp_path / "fallback.db"}'
+
+    with pytest.raises(OperationalError):
+        create_app(FallbackConfig)

@@ -131,6 +131,10 @@ class Config:
     # V3 is the merged rule set; v1 and v2 remain available for compatibility.
     RULES_SEED_VERSION = (os.getenv("RULES_SEED_VERSION", "v3").strip().lower() or "v3")
 
+    # Refuse to start unless DATABASE_URL is PostgreSQL (e.g. Supabase); never
+    # fall back to a local SQLite file.
+    REQUIRE_POSTGRES = _as_bool(os.getenv("REQUIRE_POSTGRES"), default=False)
+
     DB_FALLBACK_ENABLED = _as_bool(os.getenv("DB_FALLBACK_ENABLED"), default=False)
     DB_FALLBACK_URL = os.getenv("DB_FALLBACK_URL", _default_fallback_sqlite_url())
     DB_FALLBACK_AUTO_CREATE = _as_bool(os.getenv("DB_FALLBACK_AUTO_CREATE"), default=True)

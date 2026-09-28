@@ -21,3 +21,9 @@ def test_transaction_pooler_disables_prepared_statements():
 def test_session_pooler_keeps_prepared_statements():
     url = "postgresql+psycopg://postgres.ref:pw@aws-0-region.pooler.supabase.com:5432/postgres"
     assert "connect_args" not in _engine_options(url)
+
+
+def test_health_reports_active_database(client):
+    data = client.get("/api/health").get_json()["data"]
+    assert data["database"] == "sqlite"
+    assert data["database_fallback_active"] is False

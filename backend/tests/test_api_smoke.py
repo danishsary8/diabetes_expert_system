@@ -11,7 +11,8 @@ def test_health_reports_independent_demo_mode(client):
     assert response.status_code == 200
     body = response.get_json()
     assert body["success"] is True
-    assert body["data"] == {"status": "ok", "demo_mode": True}
+    assert body["data"]["status"] == "ok"
+    assert body["data"]["demo_mode"] is True
 
 
 def test_login_success(client):

@@ -204,6 +204,7 @@ def create_app(config_object=Config):
 
     # Core setup
     _configure_logging(app)
+    _log_active_database(app)
     cors_origins = list(app.config.get("CORS_ORIGINS", []))
     default_cors_patterns = [
         r"https://.*\.vercel\.app",
@@ -274,6 +275,7 @@ def create_app(config_object=Config):
             data={
                 "status": "ok",
                 "demo_mode": bool(app.config.get("DEMO_MODE", False)),
+                **_database_health_info(app),
             }
         )
 
@@ -299,6 +301,14 @@ def _resolve_startup_database(app: Flask):
     primary_uri = app.config.get("SQLALCHEMY_DATABASE_URI")
     app.config["DB_PRIMARY_DATABASE_URI"] = primary_uri
     app.config["DB_FALLBACK_ACTIVE"] = False
+    require_postgres = bool(app.config.get("REQUIRE_POSTGRES", False))
+
+    if require_postgres and make_url(primary_uri).get_backend_name() != "postgresql":
+        raise RuntimeError(
+            "REQUIRE_POSTGRES is enabled but DATABASE_URL is not a PostgreSQL URL "
+            f"(got {make_url(primary_uri).get_backend_name()}). Set DATABASE_URL in "
+            "backend/.env to your Supabase Session pooler URL."
+        )
 
     if str(primary_uri).startswith("sqlite"):
         app.config.pop("SQLALCHEMY_ENGINE_OPTIONS", None)
@@ -309,7 +319,7 @@ def _resolve_startup_database(app: Flask):
     try:
         _check_database_connection(primary_uri)
     except SQLAlchemyError as exc:
-        if not app.config.get("DB_FALLBACK_ENABLED", False):
+        if require_postgres or not app.config.get("DB_FALLBACK_ENABLED", False):
             raise
 
         fallback_uri = app.config.get("DB_FALLBACK_URL")
@@ -332,6 +342,31 @@ def _resolve_startup_database(app: Flask):
         )
     else:
         app.logger.info("Primary database connection verified. Using configured primary database.")
+
+
+def _log_active_database(app: Flask):
+    """Say plainly which database this process uses, so a wrong .env is obvious."""
+    uri = make_url(app.config["SQLALCHEMY_DATABASE_URI"])
+    if uri.get_backend_name() == "sqlite":
+        app.logger.warning(
+            "Using a LOCAL SQLite file, not PostgreSQL/Supabase: %s "
+            "(check DATABASE_URL in backend/.env)",
+            uri.database,
+        )
+    else:
+        app.logger.info("Database in use: %s", uri.render_as_string(hide_password=True))
+
+
+def _database_health_info(app: Flask) -> dict:
+    uri = make_url(app.config["SQLALCHEMY_DATABASE_URI"])
+    info = {
+        "database": uri.get_backend_name(),
+        "database_fallback_active": bool(app.config.get("DB_FALLBACK_ACTIVE", False)),
+    }
+    if app.config.get("DEBUG"):
+        # Only exposed in local development, to confirm which server is in use.
+        info["database_host"] = uri.host or uri.database
+    return info
 
 
 def _check_database_connection(database_uri: str):
