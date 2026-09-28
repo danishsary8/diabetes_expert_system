@@ -218,6 +218,7 @@ Windows users can do Steps 1–3 in one go with
 | `prepared statement "_pg3_0" already exists` | Transaction pooler with prepared statements | Use port 6543 (auto-detected) or set `DB_DISABLE_PREPARED_STATEMENTS=1` |
 | `relation "..." already exists` on `flask db upgrade` | Tables were created by an older version of the app without a migration record | Run `flask --app run.py db stamp head` once, then `flask db upgrade` works |
 | `connection refused` on `127.0.0.1:5432` | Local PostgreSQL not running | Start the PostgreSQL service, or `docker compose up -d db` |
+| App shows data that is missing in Supabase | Backend is using another database (local PostgreSQL, or a SQLite file because `DATABASE_URL` was not read) | Open `http://127.0.0.1:5001/api/health`: `database_host` must be your `*.pooler.supabase.com` host. Fix `DATABASE_URL` in `backend/.env`, set `DB_FALLBACK_ENABLED=0`, restart |
 | Supabase project "paused" | Free projects pause after inactivity | Click **Restore** in the Supabase dashboard |
 
 Never commit `backend/.env`; it contains your database password. It is already
