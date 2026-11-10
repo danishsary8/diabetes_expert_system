@@ -1,0 +1,11 @@
+{
+  "name": "diabetes-expert-system",
+  "version": "3.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix frontend install && npm --prefix frontend run build -- --outDir ../dist --emptyOutDir"
+  },
+  "dependencies": {
+    "@supabase/server": "^1.8.0"
+  }
+}

@@ -1,0 +1,93 @@
+import os
+import sys
+from pathlib import Path
+
+import pytest
+from dotenv import load_dotenv
+
+# Load .env before importing Config — its class-level attributes call
+# _resolve_secret_key / _resolve_database_url at import time, which
+# raise RuntimeError when FLASK_DEBUG and SECRET_KEY are absent.
+_backend_dir = Path(__file__).resolve().parents[1]
+# Tests run on temporary SQLite databases even when backend/.env requires PostgreSQL.
+os.environ.setdefault("REQUIRE_POSTGRES", "0")
+load_dotenv(_backend_dir / ".env")
+os.environ.setdefault("FLASK_DEBUG", "1")
+
+sys.path.insert(0, str(_backend_dir))
+
+from sqlalchemy import create_engine, text
+
+from app import create_app
+from app.config import Config, _engine_options, _normalize_database_url
+from app.extensions import db
+
+# Optional: run the suite against a real PostgreSQL database (for example
+# through a transaction pooler) instead of SQLite. The database's public schema
+# is dropped and recreated before every test, so never point this at real data.
+_TEST_DATABASE_URL = _normalize_database_url(os.getenv("TEST_DATABASE_URL", ""))
+
+
+def _reset_postgres_schema(url: str) -> None:
+    engine = create_engine(url, connect_args={"prepare_threshold": None})
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("DROP SCHEMA IF EXISTS public CASCADE"))
+            conn.execute(text("CREATE SCHEMA public"))
+    finally:
+        engine.dispose()
+
+
+@pytest.fixture()
+def app(tmp_path):
+    if _TEST_DATABASE_URL:
+        _reset_postgres_schema(_TEST_DATABASE_URL)
+        database_url = _TEST_DATABASE_URL
+    else:
+        database_url = f"sqlite:///{tmp_path / 'test.db'}"
+
+    class TestConfig(Config):
+        TESTING = True
+        DEMO_MODE = True
+        SECRET_KEY = "test-secret-key"
+        CORS_ORIGINS = ["*"]
+        SQLALCHEMY_DATABASE_URI = database_url
+        SQLALCHEMY_ENGINE_OPTIONS = _engine_options(database_url)
+        DB_AUTO_CREATE = True
+        SEED_DEMO_DATA = True
+        RULES_SEED_VERSION = "v1"
+        JWT_ACCESS_EXPIRES_SECONDS = 300
+        JWT_REFRESH_EXPIRES_SECONDS = 1800
+
+    app = create_app(TestConfig)
+    yield app
+    with app.app_context():
+        db.session.remove()
+        db.engine.dispose()
+
+
+@pytest.fixture()
+def client(app):
+    return app.test_client()
+
+
+def login_and_get_auth(client, email: str, password: str) -> dict:
+    response = client.post("/api/auth/login", json={"email": email, "password": password})
+    assert response.status_code == 200
+    body = response.get_json()
+    return body["data"]
+
+
+@pytest.fixture()
+def doctor_auth(client):
+    return login_and_get_auth(client, "doctor@example.com", "doctor123")
+
+
+@pytest.fixture()
+def admin_auth(client):
+    return login_and_get_auth(client, "admin@example.com", "admin123")
+
+
+@pytest.fixture()
+def patient_auth(client):
+    return login_and_get_auth(client, "patient@example.com", "patient123")

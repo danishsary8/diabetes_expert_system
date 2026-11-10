@@ -1,0 +1,164 @@
+from io import BytesIO
+from flask import Blueprint, g, request, send_file
+
+from app.dependencies import get_diagnosis_service, get_conversational_assessment_service
+from app.utils.api_response import paginated_response, success_response
+from app.utils.auth import require_auth, optional_auth
+
+assessment_bp = Blueprint("assessment", __name__)
+
+
+# ============================================================================
+# Core Assessment & Diagnosis Endpoints
+# ============================================================================
+
+
+@assessment_bp.post("/")
+@assessment_bp.post("/evaluate")
+@require_auth(permissions=["diagnosis.run"])
+def evaluate_assessment():
+    """
+    Unified Assessment Endpoint - accepts ANY combination of facts and returns
+    intelligent diagnosis with confidence, evidence, missing facts analysis,
+    and recommendations.
+    """
+    payload = request.get_json(silent=True) or {}
+    result = get_diagnosis_service().evaluate(payload, current_user=g.current_user)
+    return success_response(data=result)
+
+
+@assessment_bp.post("/submit-to-care-team")
+@assessment_bp.post("/submit")
+@require_auth(permissions=["diagnosis.run"])
+def submit_assessment_to_care_team():
+    """
+    Official Care Team Submission Endpoint - persists diagnosis result, attaches
+    patient notes, and triggers care team alert.
+    """
+    payload = request.get_json(silent=True) or {}
+    result = get_diagnosis_service().submit_to_care_team(payload, current_user=g.current_user)
+    return success_response(data=result)
+
+
+@assessment_bp.get("/mine")
+@require_auth(permissions=["diagnosis.view_own"])
+def get_my_assessments():
+    """List assessment results for the current patient user."""
+    limit = min(max(1, request.args.get("limit", default=100, type=int)), 200)
+    results = get_diagnosis_service().list_my_results(g.current_user, limit=limit)
+    return success_response(data=results)
+
+
+@assessment_bp.get("/recent")
+@assessment_bp.get("/review")
+@require_auth(permissions=["diagnosis.review_any"])
+def get_recent_assessments():
+    """List recent assessments for clinical review."""
+    page = max(1, request.args.get("page", default=1, type=int))
+    limit = min(max(1, request.args.get("limit", default=100, type=int)), 300)
+    results, total = get_diagnosis_service().list_review_results(limit=limit, page=page)
+    return paginated_response(items=results, page=page, limit=limit, total=total)
+
+
+@assessment_bp.get("/<int:diagnosis_result_id>")
+@require_auth(permissions=["diagnosis.run"])
+def get_assessment_result(diagnosis_result_id: int):
+    """Retrieve a saved assessment result by ID."""
+    result = get_diagnosis_service().get_result(diagnosis_result_id, current_user=g.current_user)
+    return success_response(data=result)
+
+
+@assessment_bp.get("/<int:diagnosis_result_id>/report.pdf")
+@require_auth(permissions=["diagnosis.run"])
+def download_assessment_report(diagnosis_result_id: int):
+    """Generate and download PDF assessment report."""
+    lang = request.args.get("lang", "en").lower().strip()
+    pdf_bytes, file_name = get_diagnosis_service().generate_report_pdf(
+        diagnosis_result_id, current_user=g.current_user, lang=lang
+    )
+    return send_file(
+        BytesIO(pdf_bytes),
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=file_name,
+    )
+
+
+@assessment_bp.get("/rule-explanation/<path:rule_identifier>")
+@optional_auth
+def get_rule_explanation(rule_identifier: str):
+    """Retrieve explanation/doctor guidance for a rule by ID, code, or name."""
+    rule_info = get_diagnosis_service().get_rule_explanation(rule_identifier)
+    return success_response(data=rule_info)
+
+
+@assessment_bp.patch("/<int:diagnosis_result_id>/review")
+@require_auth(permissions=["diagnosis.review_any"])
+def review_assessment(diagnosis_result_id: int):
+    """Annotate / review a diagnosis result (clinician view)."""
+    payload = request.get_json(silent=True) or {}
+    result = get_diagnosis_service().review_result(
+        diagnosis_result_id=diagnosis_result_id,
+        payload=payload,
+        current_user=g.current_user,
+    )
+    return success_response(data=result, message="Diagnosis review updated.")
+
+
+# ============================================================================
+# Conversational Assessment Endpoints
+# ============================================================================
+
+
+@assessment_bp.get("/start")
+@assessment_bp.post("/start")
+@optional_auth
+def start_assessment():
+    """Start a new conversational assessment flow."""
+    service = get_conversational_assessment_service()
+    result = service.start_conversation()
+    return success_response(data=result)
+
+
+@assessment_bp.post("/next")
+@optional_auth
+def next_assessment_question():
+    """Get the next question in the assessment flow."""
+    payload = request.get_json(silent=True) or {}
+    answers = payload.get("answers", {})
+    if not answers:
+        answers = {
+            k: v for k, v in payload.items()
+            if k not in ["session_id", "answered", "skipped", "needs_patient"]
+        }
+
+    service = get_conversational_assessment_service()
+    if not answers:
+        result = service.start_conversation()
+        return success_response(data=result)
+
+    result = service.get_next_question(answers)
+    return success_response(data=result)
+
+
+@assessment_bp.post("/complete")
+@optional_auth
+def complete_assessment_endpoint():
+    """Complete assessment flow and return diagnosis."""
+    payload = request.get_json(silent=True) or {}
+    answers = payload.get("answers", {})
+    if not answers:
+        answers = {k: v for k, v in payload.items() if k not in ["session_id"]}
+
+    service = get_conversational_assessment_service()
+    current_user = getattr(g, "current_user", None)
+    result = service.complete_assessment(answers, current_user)
+    return success_response(data=result)
+
+
+@assessment_bp.get("/questions")
+def get_all_questions():
+    """Get all possible interview questions."""
+    service = get_conversational_assessment_service()
+    questions = service.get_all_questions()
+    return success_response(data={"questions": questions})

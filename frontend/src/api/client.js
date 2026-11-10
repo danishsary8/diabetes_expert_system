@@ -1,0 +1,180 @@
+import axios from 'axios'
+
+export const ACCESS_TOKEN_KEY = 'access_token'
+export const REFRESH_TOKEN_KEY = 'refresh_token'
+const DEFAULT_API_TIMEOUT_MS = 30000
+
+function resolveApiTimeout() {
+  const configuredTimeout = Number(import.meta.env.VITE_API_TIMEOUT_MS)
+  if (Number.isFinite(configuredTimeout) && configuredTimeout > 0) {
+    return configuredTimeout
+  }
+  return DEFAULT_API_TIMEOUT_MS
+}
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001/api',
+  timeout: resolveApiTimeout(),
+})
+
+export function getAccessToken() {
+  return localStorage.getItem(ACCESS_TOKEN_KEY) || localStorage.getItem('token')
+}
+
+export function getRefreshToken() {
+  return localStorage.getItem(REFRESH_TOKEN_KEY)
+}
+
+export function setAuthTokens(accessToken, refreshToken) {
+  if (accessToken) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+    localStorage.removeItem('token')
+  }
+  if (refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+  }
+}
+
+export function clearAuthStorage() {
+  localStorage.removeItem(ACCESS_TOKEN_KEY)
+  localStorage.removeItem(REFRESH_TOKEN_KEY)
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+}
+
+export const AUTH_EXPIRED_EVENT = 'auth:expired'
+
+// Tokens were rejected and could not be refreshed: wipe them and tell the
+// AuthProvider so the in-memory user is dropped too.
+function expireSession() {
+  clearAuthStorage()
+  window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT))
+}
+
+api.interceptors.request.use((config) => {
+  const token = getAccessToken()
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+let refreshPromise = null
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error?.config
+    const status = error?.response?.status
+
+    if (!originalRequest || status !== 401) {
+      return Promise.reject(error)
+    }
+
+    const requestUrl = originalRequest.url || ''
+    const isAuthEndpoint = requestUrl.includes('/auth/login') || requestUrl.includes('/auth/refresh')
+    if (originalRequest._retry || isAuthEndpoint) {
+      return Promise.reject(error)
+    }
+
+    const refreshToken = getRefreshToken()
+    if (!refreshToken) {
+      expireSession()
+      return Promise.reject(error)
+    }
+
+    originalRequest._retry = true
+
+    try {
+      if (!refreshPromise) {
+        refreshPromise = axios.post(`${api.defaults.baseURL}/auth/refresh`, { refresh_token: refreshToken })
+      }
+
+      const refreshResponse = await refreshPromise
+      const refreshData = getApiData(refreshResponse)
+      setAuthTokens(refreshData.access_token, refreshData.refresh_token)
+      if (refreshData.user) {
+        localStorage.setItem('user', JSON.stringify(refreshData.user))
+      }
+
+      const accessToken = getAccessToken()
+      if (accessToken) {
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`
+      }
+
+      return api(originalRequest)
+    } catch (refreshError) {
+      expireSession()
+      return Promise.reject(refreshError)
+    } finally {
+      refreshPromise = null
+    }
+  },
+)
+
+export function getApiData(response) {
+  if (!response || !response.data) {
+    return null
+  }
+
+  if (typeof response.data.success === 'boolean') {
+    return response.data.data
+  }
+
+  return response.data
+}
+
+export function getApiPaginated(response) {
+  if (!response || !response.data) {
+    return { data: [], page: 1, limit: 20, total: 0, totalPages: 1 }
+  }
+
+  const payload = response.data
+  const items = Array.isArray(payload.data)
+    ? payload.data
+    : Array.isArray(payload.data?.data)
+      ? payload.data.data
+      : Array.isArray(payload)
+        ? payload
+        : []
+
+  const limit = payload.limit || payload.data?.limit || items.length || 20
+  const total = payload.total ?? payload.data?.total ?? items.length
+  const totalPages = payload.total_pages || payload.data?.total_pages || Math.max(1, Math.ceil(total / limit))
+
+  return {
+    data: items,
+    page: payload.page || payload.data?.page || 1,
+    limit,
+    total,
+    totalPages,
+  }
+}
+
+export function getApiErrorMessage(error, fallbackMessage = 'Request failed') {
+  const serverMessage = error?.response?.data?.error?.message
+  const legacyMessage = error?.response?.data?.error
+  if (serverMessage) return serverMessage
+  if (legacyMessage) return legacyMessage
+  if (error?.code === 'ECONNABORTED') {
+    return 'Request timed out. Check that the backend server is running.'
+  }
+  if (error?.request && !error?.response) {
+    return `Cannot connect to the backend at ${api.defaults.baseURL}. Start the backend server and try again.`
+  }
+  return fallbackMessage
+}
+
+// Files served by the backend (e.g. uploaded avatars) come back as "/api/..."
+// paths. Resolve them against the API host so they still load when the
+// backend runs on a different domain than the frontend (Railway + Vercel).
+export function resolveApiAssetUrl(url) {
+  if (typeof url !== 'string' || !url.startsWith('/api/')) return url
+  try {
+    return new URL(url, api.defaults.baseURL).href
+  } catch {
+    return url
+  }
+}
+
+export default api
