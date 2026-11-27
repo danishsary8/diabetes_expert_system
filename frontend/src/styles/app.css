@@ -2080,3 +2080,15 @@ html.dark .admin-role-card:hover {
       radial-gradient(40% 35% at 100% 100%, rgb(16 185 129 / 0.12), transparent 70%);
   }
 }
+
+/* ── Touch devices ─────────────────────────────────────────────────────────
+   iOS Safari zooms the whole page when a field under 16px gets focus, and
+   leaves the user pinching back out. Text fields on touch screens therefore
+   use 16px; desktop keeps the compact sizes set by each component. */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

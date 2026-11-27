@@ -322,9 +322,9 @@ export function DiabetesGuidePage() {
                   </h3>
                   <div className="mt-2 divide-y divide-slate-100 rounded-xl border border-slate-100 dark:divide-slate-800 dark:border-slate-800 text-xs">
                     {type.biomarkers.map((bio, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2.5">
-                        <span className="font-medium text-slate-600 dark:text-slate-400">{bio.label}</span>
-                        <span className="font-bold text-slate-900 dark:text-slate-200">{bio.value}</span>
+                      <div key={idx} className="flex items-center justify-between gap-4 p-2.5">
+                        <span className="min-w-0 font-medium text-slate-600 dark:text-slate-400">{bio.label}</span>
+                        <span className="min-w-0 text-right font-bold text-slate-900 dark:text-slate-200">{bio.value}</span>
                       </div>
                     ))}
                   </div>

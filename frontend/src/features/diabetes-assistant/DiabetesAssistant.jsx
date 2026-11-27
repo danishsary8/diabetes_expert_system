@@ -427,6 +427,8 @@ export function DiabetesAssistant() {
   const [triggerPosition, setTriggerPosition] = useState(null)
   const [isTriggerDragging, setIsTriggerDragging] = useState(false)
   const [greetingIndex, setGreetingIndex] = useState(0)
+  // On phones the looping bubble covers page content; greet briefly, then hush.
+  const [greetingQuiet, setGreetingQuiet] = useState(false)
 
   const messageEndRef = useRef(null)
   const panelRef = useRef(null)
@@ -569,6 +571,12 @@ export function DiabetesAssistant() {
 
     return () => clearInterval(interval)
   }, [isOpen])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia?.('(max-width: 639px)').matches) return undefined
+    const timer = window.setTimeout(() => setGreetingQuiet(true), 9000)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   function appendSingleMessage(msg) {
     setConversation((prev) => ({
@@ -1161,7 +1169,7 @@ export function DiabetesAssistant() {
         aria-controls="diabetes-assistant-panel"
         title={isOpen ? 'Close Diabetes Assistant' : 'Open Diabetes Assistant'}
       >
-        {!isOpen && !isTriggerDragging && (
+        {!isOpen && !isTriggerDragging && !greetingQuiet && (
           <span
             key={greetingIndex}
             className={`assistant-mascot-bubble ${

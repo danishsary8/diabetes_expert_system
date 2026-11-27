@@ -165,26 +165,26 @@ export function KnowledgeBaseDashboard() {
       ) : (
         <>
           {/* KPI cards */}
-          <div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 items-stretch gap-3 sm:gap-5 xl:grid-cols-4">
             {statsCards.map((card) => {
               const Icon = card.icon
               return (
                 <article
                   key={card.title}
-                  className="surface flex h-full flex-col p-5 cursor-default transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
+                  className="surface flex h-full min-w-0 flex-col p-3.5 sm:p-5 cursor-default transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{card.title}</h3>
-                      <p className="mt-1 text-xs text-slate-500">{card.description}</p>
+                      <p className="mt-1 text-[11px] leading-snug text-slate-500 sm:text-xs">{card.description}</p>
                     </div>
-                    <span className={`inline-flex rounded-lg p-2 ${card.iconClass}`}>
+                    <span className={`hidden shrink-0 rounded-lg p-2 sm:inline-flex ${card.iconClass}`}>
                       <Icon className="h-4 w-4" />
                     </span>
                   </div>
-                  <p className="mt-4 text-3xl font-bold text-slate-900 dark:text-white">{card.value}</p>
+                  <p className="mt-3 text-2xl font-bold text-slate-900 sm:mt-4 sm:text-3xl dark:text-white">{card.value}</p>
                   <p className={`mt-1 text-xs ${String(card.trend).startsWith('-') ? 'text-rose-500' : 'text-emerald-600'}`}>{card.trend}</p>
-                  <ChartContainer className="mt-auto h-16 w-full pt-4" config={{ value: { label: card.title, color: card.chartColor } }}>
+                  <ChartContainer className="mt-auto h-12 w-full pt-3 sm:h-16 sm:pt-4" config={{ value: { label: card.title, color: card.chartColor } }}>
                     <AreaChart data={card.chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
                       <Area type="monotone" dataKey="value" stroke={card.chartColor} fill={card.chartColor} fillOpacity={0.2} strokeWidth={2} />
                     </AreaChart>
@@ -229,7 +229,10 @@ export function KnowledgeBaseDashboard() {
                </div>
              </SectionCard>
 
-             <SectionCard title={t('kbDashboard.topTriggeredRules', 'Top Triggered Rules')} className="lg:col-span-2 overflow-hidden p-0">
+             <SectionCard title={t('kbDashboard.topTriggeredRules', 'Top Triggered Rules')} className="lg:col-span-2 overflow-hidden p-0 [&>div:first-child]:px-4 [&>div:first-child]:pt-4 sm:[&>div:first-child]:p-0">
+                {/* An empty wide table scrolls its own message out of view on
+                    phones, so show the message on its own until there is data. */}
+                {topRules.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[720px] text-sm">
                     <thead className="bg-slate-50 dark:bg-[#0c1024]">
@@ -264,6 +267,11 @@ export function KnowledgeBaseDashboard() {
                     </tbody>
                   </table>
                 </div>
+                ) : (
+                  <p className="border-t border-slate-100 px-4 py-8 text-center text-sm text-slate-500 sm:px-6 dark:border-slate-800 dark:text-slate-400">
+                    {t('kbDashboard.noTriggeredRules', 'No rules triggered yet in this timeframe.')}
+                  </p>
+                )}
              </SectionCard>
           </div>
 
@@ -278,6 +286,7 @@ export function KnowledgeBaseDashboard() {
                 {t('kbDashboard.recentCases.viewAll', 'View All')} <ArrowRight className="ml-1.5 h-3 w-3" />
               </Link>
             </header>
+            {stats?.recent_cases?.length ? (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[820px] text-sm">
                 <thead className="bg-slate-50 dark:bg-[#0c1024]">
@@ -328,6 +337,11 @@ export function KnowledgeBaseDashboard() {
                 </tbody>
               </table>
             </div>
+            ) : (
+              <p className="px-4 py-8 text-center text-sm text-slate-500 sm:px-6 dark:text-slate-400">
+                {t('kbDashboard.recentCases.noCases', 'No recent cases found in the selected timeframe.')}
+              </p>
+            )}
           </section>
         </>
       )}

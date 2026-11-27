@@ -293,7 +293,7 @@ export function DoctorWorkloadStrip({ workload, ready, rangeLabel, t }) {
           </span>
         </div>
 
-        <div className="dash-stagger grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="dash-stagger grid grid-cols-2 gap-3 xl:grid-cols-4">
           {tiles.map((tile) => {
             const Icon = tile.icon
             const style = WORKLOAD_TILE_STYLES[tile.key]
@@ -884,16 +884,16 @@ export function ClinicalDashboard({ activeRole }) {
                 : t('dashboard.hero.loading', 'Loading patient statistics…')}
             </p>
 
-            <div className="mt-5 flex flex-wrap gap-2.5">
-              <Link to="/review" className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white shadow-md shadow-primary-600/25 transition hover:-translate-y-0.5 hover:bg-primary-700 active:translate-y-0">
+            <div className="mt-5 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap">
+              <Link to="/review" className="col-span-2 inline-flex min-h-11 items-center sm:min-h-10 justify-center gap-2 rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white shadow-md shadow-primary-600/25 transition hover:-translate-y-0.5 hover:bg-primary-700 active:translate-y-0">
                 <ClipboardCheck className="h-4 w-4" aria-hidden />
                 {t('dashboard.focus.reviewQueue', 'Review patient queue')}
               </Link>
-              <Link to="/patients" className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-primary-200/80 bg-primary-100/70 px-4 text-sm font-semibold text-primary-700 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-100 active:translate-y-0 dark:border-primary-400/30 dark:bg-primary-400/15 dark:text-primary-200 dark:hover:bg-primary-400/25">
+              <Link to="/patients" className="inline-flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-xl border border-primary-200/80 bg-primary-100/70 px-3 text-center sm:min-h-10 sm:px-4 text-sm font-semibold text-primary-700 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-100 active:translate-y-0 dark:border-primary-400/30 dark:bg-primary-400/15 dark:text-primary-200 dark:hover:bg-primary-400/25">
                 <Search className="h-4 w-4" aria-hidden />
                 {t('dashboard.focus.findPatient', 'Find patient')}
               </Link>
-              <Link to="/rules" className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-primary-200/80 bg-primary-100/70 px-4 text-sm font-semibold text-primary-700 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-100 active:translate-y-0 dark:border-primary-400/30 dark:bg-primary-400/15 dark:text-primary-200 dark:hover:bg-primary-400/25">
+              <Link to="/rules" className="inline-flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-xl border border-primary-200/80 bg-primary-100/70 px-3 text-center sm:min-h-10 sm:px-4 text-sm font-semibold text-primary-700 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-100 active:translate-y-0 dark:border-primary-400/30 dark:bg-primary-400/15 dark:text-primary-200 dark:hover:bg-primary-400/25">
                 <BookOpen className="h-4 w-4" aria-hidden />
                 {t('dashboard.focus.knowledgeBase', 'Knowledge Base')}
               </Link>
@@ -1011,14 +1011,14 @@ export function ClinicalDashboard({ activeRole }) {
               </div>
 
               {/* The 4 cards - expanded to fill height */}
-              <div className="dash-stagger grid flex-1 items-stretch gap-3 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-4">
+              <div className="dash-stagger grid flex-1 grid-cols-2 items-stretch gap-2.5 p-3 sm:gap-3 sm:p-5 lg:grid-cols-4">
                 {patientMetrics.map((metric) => {
                   const Icon = metric.icon
                   return (
                     <Link
                       key={metric.key}
                       to={metric.href}
-                      className={`clinical-stat clinical-stat--${metric.tone} dash-fade-up group flex h-full min-h-[9.5rem] flex-col rounded-2xl border bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-[#080c1c]`}
+                      className={`clinical-stat clinical-stat--${metric.tone} dash-fade-up group flex h-full min-h-[8.5rem] min-w-0 flex-col rounded-2xl border bg-white p-3 shadow-sm sm:min-h-[9.5rem] sm:p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-[#080c1c]`}
                     >
                       <div className="flex items-center gap-2.5">
                         <span className="clinical-stat__icon inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-105">
@@ -1027,10 +1027,10 @@ export function ClinicalDashboard({ activeRole }) {
                         <p className="text-2xl font-bold tracking-tight text-slate-950 tabular-nums dark:text-white"><AnimatedNumber value={metric.value} /></p>
                       </div>
                       <div className="mt-auto pt-2">
-                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{metric.label}</p>
+                        <p className="text-[13px] font-semibold leading-snug text-slate-800 sm:text-sm dark:text-slate-100">{metric.label}</p>
                         <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">{metric.helper}</p>
                       </div>
-                      <span className="clinical-stat__action mt-2.5 inline-flex items-center justify-between rounded-lg px-3 py-1.5 text-xs font-semibold transition duration-200 group-hover:brightness-[0.98]">{metric.action}<ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden /></span>
+                      <span className="clinical-stat__action mt-2.5 inline-flex min-h-9 items-center justify-between gap-1 rounded-lg px-2.5 py-1.5 sm:min-h-0 sm:px-3 text-xs font-semibold transition duration-200 group-hover:brightness-[0.98]">{metric.action}<ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden /></span>
                     </Link>
                   )
                 })}
@@ -1151,7 +1151,11 @@ export function ClinicalDashboard({ activeRole }) {
                             fontSize={11}
                             className="fill-slate-600 dark:fill-slate-400 font-medium"
                           >
-                            {payload.value}
+                            {/* The axis column is 105px wide; long rule names would
+                                be clipped at the card edge, so shorten them and keep
+                                the full name as a tooltip. */}
+                            <title>{payload.value}</title>
+                            {String(payload.value).length > 15 ? `${String(payload.value).slice(0, 14).trimEnd()}…` : payload.value}
                           </text>
                         )}
                       />

@@ -152,10 +152,10 @@ export function LandingPage() {
 
       <canvas ref={canvasRef} style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none' }} />
 
-      <main ref={pageRef} style={{ position: 'relative', zIndex: 3, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem 6rem', textAlign: 'center', transition: 'opacity 0.6s ease' }}>
+      <main ref={pageRef} className="lp-main" style={{ position: 'relative', zIndex: 3, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem 6rem', textAlign: 'center', transition: 'opacity 0.6s ease' }}>
         
         {/* ── 1. Hero Logo ── */}
-        <div style={{ position: 'relative', width: 104, height: 104, marginBottom: '2.5rem', animation: 'lpFadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}>
+        <div className="lp-logo" style={{ position: 'relative', width: 104, height: 104, marginBottom: '2.5rem', animation: 'lpFadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}>
 
           {/* Rotating AI Ring */}
           <svg style={{ position: 'absolute', inset: -14, width: 132, height: 132, animation: 'spinSlow 15s linear infinite' }} viewBox="0 0 100 100">
@@ -193,7 +193,7 @@ export function LandingPage() {
         </p>
 
         {/* ── 3. Glassmorphism Badges ── */}
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '3.5rem' }}>
+        <div className="lp-badges" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '3.5rem' }}>
           {[
             { icon: Stethoscope, text: t('landing.badges.aiDiagnosis') },
             { icon: Activity, text: t('landing.badges.riskAnalysis') },
@@ -229,7 +229,7 @@ export function LandingPage() {
         </div>
 
         {/* ── 5. Elevated Team Cards ── */}
-        <div style={{ marginTop: '5rem', opacity: showTeam ? 1 : 0, transform: `translateY(${showTeam ? 0 : 20}px)`, transition: 'all 1s ease' }}>
+        <div className="lp-team" style={{ marginTop: '5rem', opacity: showTeam ? 1 : 0, transform: `translateY(${showTeam ? 0 : 20}px)`, transition: 'all 1s ease' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
             <div style={{ height: 1, width: 40, background: `linear-gradient(to right, transparent, ${C.tealBorder})` }} />
             <p style={{ fontSize: '0.7rem', letterSpacing: '3px', color: C.textSoft, textTransform: 'uppercase', margin: 0, fontWeight: 600 }}>{t('landing.developedBy')}</p>
@@ -269,7 +269,7 @@ export function LandingPage() {
         </div>
       </main>
 
-      <footer style={{ position: 'fixed', bottom: '1.5rem', width: '100%', textAlign: 'center', fontSize: '0.75rem', color: C.textFaint, fontWeight: 500, zIndex: 3 }}>
+      <footer className="lp-footer" style={{ position: 'fixed', bottom: '1.5rem', width: '100%', textAlign: 'center', fontSize: '0.75rem', color: C.textFaint, fontWeight: 500, zIndex: 3 }}>
         <p>{t('landing.footerVersion')}  <span style={{ margin: '0 0.5rem', color: C.tealBorder }}>|</span>  {t('landing.footerUniversity')}  <span style={{ margin: '0 0.5rem', color: C.tealBorder }}>—</span>  {t('landing.footerCity')}</p>
       </footer>
 
@@ -344,6 +344,18 @@ export function LandingPage() {
           transform: scale(1.05);
         }
         .prof-badge { transition: all 0.3s ease; cursor: default; }
+        /* Phones: tighter rhythm, and the footer sits after the content
+           instead of floating over the call-to-action. */
+        @media (max-width: 640px) {
+          .lp-main { padding: 3rem 1.25rem 2.5rem !important; }
+          .lp-logo { margin-bottom: 1.75rem !important; }
+          .landing-subtitle { font-size: 1rem !important; margin-bottom: 2rem !important; }
+          .lp-badges { gap: 0.5rem !important; margin-bottom: 2.25rem !important; }
+          .glass-badge { padding: 0.5rem 0.95rem !important; font-size: 0.85rem !important; }
+          .premium-btn { padding: 1rem 2.25rem; }
+          .lp-team { margin-top: 3rem !important; }
+          .lp-footer { position: static !important; padding: 0 1.25rem 3.5rem; line-height: 1.6; }
+        }
         .prof-badge:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(245,158,11,0.15) !important; background: rgba(255,255,255,0.95) !important; }
       `}</style>
     </div>

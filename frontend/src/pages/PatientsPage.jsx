@@ -236,15 +236,15 @@ export function PatientsPage() {
       <ErrorAlert message={error} />
 
       {/* Stat Cards Row */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         {statCards.map((card) => {
           const CardIcon = card.icon
           return (
             <div
               key={card.label}
-              className="group surface flex items-center gap-4 p-4 transition-all hover:shadow-md"
+              className="group surface flex min-w-0 items-center gap-3 p-3 transition-all hover:shadow-md sm:gap-4 sm:p-4"
             >
-              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${card.color}`}>
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl sm:h-11 sm:w-11 ${card.color}`}>
                 <CardIcon className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">

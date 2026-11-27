@@ -72,7 +72,7 @@ function ClinicalReviewWorkspace({ t, tExact, selectedResult, selectedResultId, 
         </div>
       </aside>
 
-      <main className="min-w-0 flex-1 overflow-y-auto rounded-[1.5rem] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-[#070b1b]">
+      <main id="review-detail" className={`min-w-0 flex-1 scroll-mt-4 overflow-y-auto rounded-[1.5rem] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-[#070b1b] ${selectedResult || error ? '' : 'hidden xl:block'}`}>
         {error && <ErrorAlert message={error} className="m-4 border-rose-200" />}
         {!selectedResult ? <div className="flex min-h-[560px] items-center justify-center p-8"><EmptyState icon={FileText} title="No Patient Selected" description="Select a patient from the queue to review the clinical output." /></div> : <div className="p-5 sm:p-8">
           <header className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between dark:border-slate-800"><div className="flex min-w-0 items-center gap-3.5"><UserAvatar name={selectedResult.patient_name} size="lg" /><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h1 className="truncate text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">{selectedResult.patient_name || 'Patient'}</h1><span className={selectedResult.reviewed_at ? 'rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700' : 'rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700'}>{selectedResult.reviewed_at ? 'Reviewed' : 'Pending review'}</span></div><p className="mt-1 text-xs text-slate-500">Record #{selectedResult.id} · {formatDateTime(selectedResult.created_at)}</p></div></div><div className="flex items-center gap-1"><button type="button" onClick={() => handleDownloadPdf(selectedResult.id)} disabled={downloadingPdf} className="inline-flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold text-slate-500 hover:bg-slate-100"><Download className="h-4 w-4" /> PDF</button>{selectedResult.patient_id && <Link to={'/patients/' + selectedResult.patient_id} className="inline-flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold text-slate-500 hover:bg-slate-100"><User className="h-4 w-4" /> Records</Link>}</div></header>
@@ -191,6 +191,14 @@ export function ReviewPage() {
     setReviewNote(result.review_note || '')
     setIsUrgent(Boolean(result.is_urgent))
     setUrgentReason(result.urgent_reason || '')
+    // Below xl the detail panel stacks under the queue, so bring it into view
+    // after a tap instead of leaving the reviewer to scroll and find it.
+    if (typeof window !== 'undefined' && window.matchMedia?.('(max-width: 1279px)').matches) {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      window.requestAnimationFrame(() => {
+        document.getElementById('review-detail')?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' })
+      })
+    }
   }
 
   function selectPatientGroup(group) {

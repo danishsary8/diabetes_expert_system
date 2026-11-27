@@ -426,7 +426,7 @@ export function PatientHistoryPage() {
             </div>
           </div>
 
-          <div className="mt-2 flex items-end justify-between gap-3 sm:gap-4">
+          <div className="mt-2 flex flex-wrap items-end justify-between gap-3 sm:flex-nowrap sm:gap-4">
             <div className="flex items-end gap-5 sm:gap-6 shrink-0">
               <div>
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-[#4f46e5] dark:text-indigo-400 leading-none">
@@ -447,7 +447,7 @@ export function PatientHistoryPage() {
             </div>
 
             {/* Heatmap Grid */}
-            <div className="overflow-x-auto no-scrollbar py-0.5 shrink-0">
+            <div className="max-w-full overflow-x-auto no-scrollbar py-0.5 sm:shrink-0">
               <div className="grid grid-rows-5 grid-flow-col gap-1 sm:gap-1.5">
                 {HEATMAP_MATRIX.map((row, rIdx) =>
                   row.map((val, cIdx) => (
