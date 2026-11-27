@@ -53,7 +53,7 @@ export function PlainSummaryStrip({ result }) {
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         {summaryItems.map(({ title, text, icon: Icon, tone }) => (
-          <article key={title} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800/70 dark:bg-[#070b15] sm:p-5">
+          <article key={title} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs dark:border-slate-800/70 dark:bg-night-surface sm:p-5">
             <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${tone}`}>
               <Icon className="h-[18px] w-[18px]" />
             </div>

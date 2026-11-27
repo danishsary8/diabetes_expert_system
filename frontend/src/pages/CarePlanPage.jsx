@@ -4,7 +4,6 @@ import {
   Activity,
   AlertCircle,
   AlertTriangle,
-  ArrowRight,
   Calendar,
   CalendarClock,
   CheckCircle2,
@@ -249,71 +248,70 @@ export function CarePlanPage() {
       <ErrorAlert message={error} />
 
       {/* ==================================================================== */}
-      {/* 1. TOP HERO: Clean Status Banner (Pure White, Crisp Border, Brand)    */}
+      {/* 1. HERO — matches the pine "today" panel on the patient home page    */}
       {/* ==================================================================== */}
-      <section className="relative flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all duration-200 dark:border-slate-800 dark:bg-slate-900">
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">
-              Personal Care Plan • {formattedToday}
-            </span>
+      <section className="relative overflow-hidden rounded-[28px] bg-primary-900 p-6 text-white shadow-lift sm:p-8 lg:p-10 dark:bg-night-elevated dark:ring-1 dark:ring-night-border">
+        <svg viewBox="0 0 1200 160" preserveAspectRatio="none" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-32 w-full text-primary-700/70 dark:text-primary-900/80">
+          <path d="M0 120 C 120 120, 160 60, 260 70 S 400 140, 520 110 S 680 30, 800 60 S 980 130, 1080 100 S 1160 80, 1200 84" fill="none" stroke="currentColor" strokeWidth="2" />
+        </svg>
 
+        <div className="relative">
+          <div className="flex flex-wrap items-center gap-2.5 text-sm text-primary-100/80">
+            <span>{formattedToday}</span>
+            <span aria-hidden="true" className="h-1 w-1 rounded-full bg-primary-300/60" />
             {isUrgent ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200/90 bg-rose-50/90 px-3 py-1 text-xs font-semibold text-rose-700 shadow-2xs dark:border-rose-800/70 dark:bg-rose-950/60 dark:text-rose-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
-                Attention Required
+              <span className="inline-flex items-center gap-1.5 font-semibold text-rose-200">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-300" />
+                {t('carePlanHero.attention', 'Needs your attention')}
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/90 bg-emerald-50/90 px-3 py-1 text-xs font-semibold text-emerald-700 shadow-2xs dark:border-emerald-800/70 dark:bg-emerald-950/60 dark:text-emerald-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                Optimal • Routine Monitoring
+              <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-200">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                {t('carePlanHero.routine', 'Routine monitoring')}
               </span>
             )}
           </div>
 
-          <h1 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">
-            Care Protocol for {firstName}
+          <h1 className="mt-4 font-display text-[2.1rem] font-bold leading-[1.05] text-white sm:text-5xl">
+            {t('carePlanHero.title', 'Your care plan, {{name}}', { name: firstName })}
           </h1>
 
-          <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300 max-w-2xl font-normal">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-primary-50/85">
             {latestResult?.diagnosis
-              ? `Personalized diabetes care plan formulated for: ${latestResult.diagnosis}. Follow your daily glycemic targets, prescribed pharmacotherapy, and exercise regimen.`
-              : 'Evidence-based personalized treatment protocol, daily health targets, and medication schedule tailored to your glycemic baseline.'}
+              ? t('carePlanHero.withResult', 'Built around your latest result: {{diagnosis}}. Work through today’s goals, take your medication on time, and keep your appointments.', { diagnosis: latestResult.diagnosis })
+              : t('carePlanHero.noResult', 'Daily goals, medication times and appointments in one place. Take a health check to tailor it to you.')}
           </p>
-        </div>
 
-        <div className="mt-6 pt-3 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Link
-              to="/diagnosis"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-700 hover:shadow active:scale-[0.98] dark:bg-primary-500 dark:hover:bg-primary-600"
-            >
-              <PlusCircle className="h-4 w-4" />
-              <span>Start Assessment</span>
-            </Link>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setActiveTab('Treatment Plan')}
+                className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-5 py-3 text-sm font-bold text-navy-deep shadow-[0_8px_24px_-10px_rgba(247,165,62,0.9)] transition-transform hover:-translate-y-0.5 hover:bg-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+              >
+                <Stethoscope className="h-4.5 w-4.5" />
+                {t('carePlanHero.treatmentPlan', 'See my doctor’s plan')}
+              </button>
+              <Link
+                to={latestResult?.id ? `/diagnosis/result?diagnosis_result_id=${latestResult.id}` : '/my-results'}
+                className="inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white ring-1 ring-inset ring-white/25 transition-colors hover:bg-white/10"
+              >
+                <FileText className="h-4 w-4" />
+                {t('carePlanHero.report', 'Open my report')}
+              </Link>
+              <Link
+                to="/diagnosis"
+                className="inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white/85 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <PlusCircle className="h-4 w-4" />
+                {t('carePlanHero.newCheck', 'New health check')}
+              </Link>
+            </div>
 
-            <Link
-              to={latestResult?.id ? `/diagnosis/result?diagnosis_result_id=${latestResult.id}` : '/my-results'}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200/90 bg-slate-50 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 shadow-2xs transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-[0.98] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-            >
-              <FileText className="h-4 w-4 text-slate-400" />
-              <span>View Full Report</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('Treatment Plan')}
-              className="inline-flex items-center gap-2 rounded-xl border border-primary-200/90 bg-primary-50/80 px-4 py-2.5 text-xs sm:text-sm font-semibold text-primary-700 shadow-2xs transition-all hover:bg-primary-100 hover:text-primary-800 active:scale-[0.98] dark:border-primary-900/60 dark:bg-primary-950/50 dark:text-primary-300 dark:hover:bg-primary-900/60"
-            >
-              <Stethoscope className="h-4 w-4" />
-              <span>Doctor's Treatment Plan</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
-            <CalendarClock className="h-3.5 w-3.5" />
-            <span>Last check: {lastCheckDate}</span>
+            <div className="flex items-center gap-2 text-sm text-primary-100/75">
+              <CalendarClock className="h-4 w-4" />
+              <span>{t('carePlanHero.lastCheck', 'Last check: {{date}}', { date: lastCheckDate })}</span>
+            </div>
           </div>
         </div>
       </section>
@@ -334,7 +332,7 @@ export function CarePlanPage() {
                 className={cn(
                   'rounded-xl px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all',
                   isActive
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
+                    ? 'bg-primary-800 text-white shadow-sm dark:bg-primary-400 dark:text-navy-deep'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'
                 )}
               >

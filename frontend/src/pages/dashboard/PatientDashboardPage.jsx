@@ -4,10 +4,6 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
-  PolarAngleAxis,
-  PolarGrid,
-  Radar,
-  RadarChart,
   ReferenceArea,
   ReferenceLine,
   ResponsiveContainer,
@@ -32,6 +28,7 @@ import {
   HeartPulse,
   Pill,
   PlusCircle,
+  Ruler,
   Scale,
   Sparkles,
   Stethoscope,
@@ -42,6 +39,8 @@ import { ErrorAlert, DashboardSkeleton } from '@/components/ui'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { cn } from '@/lib/utils'
+import { RANGE_PRESETS, RangeRibbon, getRangeSegment } from '@/components/patient/RangeRibbon'
+import { useChartPalette } from '@/components/patient/patient-palette'
 
 // ============================================================================
 // CONSTANTS & TARGET CLINICAL THRESHOLDS
@@ -127,92 +126,14 @@ function toNumber(val) {
   return Number.isNaN(num) ? null : num
 }
 
-function getGreeting(name) {
+function getGreeting(name, t) {
   const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+  const greeting = hour < 12
+    ? t('patientHome.greeting.morning', 'Good morning')
+    : hour < 17
+      ? t('patientHome.greeting.afternoon', 'Good afternoon')
+      : t('patientHome.greeting.evening', 'Good evening')
   return name ? `${greeting}, ${name}` : greeting
-}
-
-/** Generates smooth, organic biometric trend series */
-function generateSmoothTrend(baseVal, variancePercent = 0.04, numPoints = 8) {
-  const pts = []
-  for (let i = 0; i < numPoints; i++) {
-    const t = i / (numPoints - 1)
-    const sin1 = Math.sin(t * Math.PI * 1.6) * variancePercent * baseVal
-    const sin2 = Math.cos(t * Math.PI * 2.2) * (variancePercent * 0.3) * baseVal
-    const val = baseVal + sin1 + sin2
-    pts.push(Number(val.toFixed(2)))
-  }
-  pts[numPoints - 1] = baseVal
-  return pts
-}
-
-/** SVG Sparkline: Ultra-smooth cubic Bezier spline with subpixel precision */
-function MiniSparkline({ points = [], strokeColor = '#3b82f6', fillColor = '#3b82f6' }) {
-  const width = 100
-  const height = 30
-  const padX = 2
-  const padY = 4
-
-  if (!points || points.length < 2) {
-    return <div className="h-[30px] w-full" />
-  }
-
-  const min = Math.min(...points)
-  const max = Math.max(...points)
-  const range = max - min || 1
-
-  const coords = points.map((val, idx) => {
-    const x = padX + (idx / (points.length - 1)) * (width - padX * 2)
-    const y = height - padY - ((val - min) / range) * (height - padY * 2)
-    return [x, y]
-  })
-
-  // Continuous cubic Bezier spline (Catmull-Rom formulation)
-  let linePath = `M ${coords[0][0].toFixed(1)} ${coords[0][1].toFixed(1)}`
-  const tension = 0.22
-
-  for (let i = 0; i < coords.length - 1; i++) {
-    const p0 = i > 0 ? coords[i - 1] : coords[i]
-    const p1 = coords[i]
-    const p2 = coords[i + 1]
-    const p3 = i < coords.length - 2 ? coords[i + 2] : p2
-
-    const cp1x = p1[0] + (p2[0] - p0[0]) * tension
-    const cp1y = p1[1] + (p2[1] - p0[1]) * tension
-    const cp2x = p2[0] - (p3[0] - p1[0]) * tension
-    const cp2y = p2[1] - (p3[1] - p1[1]) * tension
-
-    linePath += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`
-  }
-
-  const lastCoord = coords[coords.length - 1]
-  const firstCoord = coords[0]
-  const areaPath = `${linePath} L ${lastCoord[0].toFixed(1)} ${height} L ${firstCoord[0].toFixed(1)} ${height} Z`
-  const gradId = `sparkline-grad-${strokeColor.replace(/[^a-zA-Z0-9]/g, '')}`
-
-  return (
-    <div className="h-[30px] w-full select-none" aria-hidden="true">
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-full w-full overflow-visible" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={fillColor} stopOpacity={0.22} />
-            <stop offset="100%" stopColor={fillColor} stopOpacity={0.0} />
-          </linearGradient>
-        </defs>
-        <path d={areaPath} fill={`url(#${gradId})`} />
-        <path
-          d={linePath}
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx={lastCoord[0]} cy={lastCoord[1]} r="2.5" fill={strokeColor} stroke="#ffffff" strokeWidth="1" />
-      </svg>
-    </div>
-  )
 }
 
 /** Linear-style minimalist chart tooltip */
@@ -224,7 +145,7 @@ function ChartCustomTooltip({ active, payload }) {
   const isHigh = val > TARGET_GLUCOSE_MAX
 
   return (
-    <div className="rounded-xl border border-slate-200/80 bg-white/95 px-3 py-2 shadow-lg backdrop-blur-xs dark:border-slate-800 dark:bg-slate-900/95">
+    <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-lift dark:border-night-border dark:bg-night-elevated">
       <div className="flex items-center justify-between gap-3 text-xs">
         <span className="font-medium text-slate-500 dark:text-slate-400">{data.fullDate || data.day}</span>
         <span
@@ -233,15 +154,15 @@ function ChartCustomTooltip({ active, payload }) {
             inRange
               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/60 dark:text-emerald-300'
               : isHigh
-                ? 'bg-rose-50 text-rose-700 border border-rose-200/60 dark:bg-rose-950/60 dark:text-rose-300'
-                : 'bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/60 dark:text-amber-300'
+                ? 'bg-amber-50 text-amber-800 border border-amber-200/60 dark:bg-amber-950/60 dark:text-amber-300'
+                : 'bg-rose-50 text-rose-700 border border-rose-200/60 dark:bg-rose-950/60 dark:text-rose-300'
           )}
         >
-          {inRange ? 'In Target' : isHigh ? 'Above Target' : 'Below Target'}
+          {inRange ? 'In target' : isHigh ? 'Above target' : 'Below target'}
         </span>
       </div>
       <div className="mt-1.5 flex items-baseline gap-1">
-        <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{val}</span>
+        <span className="font-display text-xl font-bold text-slate-900 dark:text-slate-100">{val}</span>
         <span className="text-xs font-medium text-slate-400">mg/dL</span>
       </div>
     </div>
@@ -297,6 +218,22 @@ export function PatientDashboardPage() {
     }
   }, [t])
 
+  // Health profile (risk factors captured during profile setup)
+  const [profile, setProfile] = useState(null)
+  useEffect(() => {
+    let cancelled = false
+    api.get('/patients/mine')
+      .then((response) => {
+        if (!cancelled) setProfile(getApiData(response) || null)
+      })
+      .catch(() => {
+        // The risk-factor card simply stays hidden if the profile is unavailable.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   // Extract latest clinical facts
   const latestResult = patientResults[0]
   const facts = latestResult?.facts || {}
@@ -308,7 +245,12 @@ export function PatientDashboardPage() {
   const rawGlucose = toNumber(facts.fasting_glucose ?? facts.fasting_plasma_glucose)
   const glucose = rawGlucose !== null ? Math.round(rawGlucose) : 118
 
-  const rawBmi = toNumber(facts.bmi)
+  const profileBmi = (() => {
+    const h = toNumber(profile?.height_cm)
+    const w = toNumber(profile?.weight_kg)
+    return h && w ? w / ((h / 100) * (h / 100)) : null
+  })()
+  const rawBmi = toNumber(facts.bmi) ?? profileBmi
   const bmi = rawBmi !== null ? Number(rawBmi.toFixed(1)) : 23.5
 
   // High-risk assessment evaluation
@@ -316,18 +258,18 @@ export function PatientDashboardPage() {
 
   // User Greeting
   const firstName = (user?.name || '').trim().split(/\s+/)[0] || 'Patient'
-  const greeting = getGreeting(firstName)
+  const greeting = getGreeting(firstName, t)
 
   // 1-Sentence Diagnostic Note
   const diagnosticNote = useMemo(() => {
     if (!latestResult) {
-      return 'Complete your initial health assessment to establish your personal metabolic baseline and target metrics.'
+      return t('patientHome.note.none', 'Your first assessment takes about five minutes. It sets your personal baseline so this page can show your own numbers.')
     }
     if (isUrgent) {
-      return 'Your recent metabolic indicators exceed standard target thresholds. Prioritizing medication adherence and checking in with your doctor is recommended.'
+      return t('patientHome.note.urgent', 'Some of your recent numbers are above their target range. Keep taking your medication as prescribed and book a check-in with your doctor.')
     }
-    return 'Your latest metabolic indicators and fasting blood sugar levels remain stable within your personal target zones.'
-  }, [latestResult, isUrgent])
+    return t('patientHome.note.stable', 'Your latest readings are holding steady. Keep following today’s plan below.')
+  }, [latestResult, isUrgent, t])
 
   // Relative / formatted last assessment date
   const lastAssessmentDate = useMemo(() => {
@@ -378,11 +320,6 @@ export function PatientDashboardPage() {
     if (!trendData.length) return glucose
     return Math.round(trendData.reduce((acc, curr) => acc + curr.glucose, 0) / trendData.length)
   }, [trendData, glucose])
-
-  // Smooth sparkline series for vitals cards
-  const a1cTrendPoints = useMemo(() => generateSmoothTrend(a1c, 0.03, 8), [a1c])
-  const glucoseTrendPoints = useMemo(() => generateSmoothTrend(glucose, 0.05, 8), [glucose])
-  const bmiTrendPoints = useMemo(() => generateSmoothTrend(bmi, 0.015, 8), [bmi])
 
   // Dynamic 7-day calendar strip
   const calendarWeek = useMemo(() => {
@@ -485,20 +422,23 @@ export function PatientDashboardPage() {
     return idx === -1 ? filteredSchedule.length : idx
   }, [filteredSchedule, liveTime, isViewingToday])
 
-  // Metabolic Balance Radar Chart Data
-  const radarData = useMemo(() => [
-    { metric: 'Glucose Control', value: isUrgent ? 68 : 88, fullMark: 100 },
-    { metric: 'Diet Balance', value: 82, fullMark: 100 },
-    { metric: 'Activity', value: 74, fullMark: 100 },
-    { metric: 'Medication', value: 95, fullMark: 100 },
-    { metric: 'Sleep Quality', value: 80, fullMark: 100 },
-    { metric: 'Hydration', value: 85, fullMark: 100 },
-  ], [isUrgent])
+  const chart = useChartPalette()
+  const hasResult = Boolean(latestResult)
+  const reportHref = latestResult?.id ? `/diagnosis/result?diagnosis_result_id=${latestResult.id}` : '/my-results'
+  const glucoseSegment = getRangeSegment(RANGE_PRESETS.fastingGlucose, glucose)
+  const doneToday = DEFAULT_SCHEDULE.filter((item) => completedTasks.includes(item.id)).length
+  const dayProgress = Math.round((doneToday / DEFAULT_SCHEDULE.length) * 100)
+  const tr = (label) => t(`patientHome.range.${label}`, label)
+  // Assessments may store waist as a category code (1, 2, 3) rather than cm;
+  // only treat plausible centimetre values as a measurement.
+  const toWaistCm = (value) => {
+    const n = toNumber(value)
+    return n !== null && n >= 40 && n <= 200 ? n : null
+  }
+  const waist = toWaistCm(facts.waist_circumference) ?? toWaistCm(profile?.waist_circumference)
+  const isFemale = (profile?.gender || facts.gender) === 'female'
+  const waistPreset = isFemale ? RANGE_PRESETS.waistFemale : RANGE_PRESETS.waistMale
 
-  // Vitals status pills
-  const a1cStatus = a1c >= 6.5 ? { label: 'Elevated', color: 'rose', trend: '+0.2%' } : a1c >= 5.7 ? { label: 'Borderline', color: 'amber', trend: '+0.1%' } : { label: 'Optimal', color: 'emerald', trend: '-0.3%' }
-  const glucoseStatus = glucose >= 126 ? { label: 'High', color: 'rose', trend: '+14' } : glucose >= 100 ? { label: 'Pre-meal', color: 'amber', trend: '+6' } : { label: 'In Range', color: 'emerald', trend: '-8' }
-  const bmiStatus = bmi >= 30 ? { label: 'Obese', color: 'rose', trend: '+0.5' } : bmi >= 25 ? { label: 'Overweight', color: 'amber', trend: '+0.1' } : { label: 'Normal', color: 'emerald', trend: '-0.2' }
   if (loading && !patientResults.length) {
     return <DashboardSkeleton />
   }
@@ -507,737 +447,666 @@ export function PatientDashboardPage() {
     <div className="min-w-0 pb-10">
       <ErrorAlert message={error} />
 
-      {/* ==================================================================== */}
-      {/* 2-COLUMN MASTER LAYOUT: Left Content (72%) + Right Calendar Rail (28%) */}
-      {/* ==================================================================== */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-        
-        {/* ================================================================== */}
-        {/* LEFT COLUMN: Main Dashboard (Metrics, Charts, Clinical Summary)    */}
-        {/* ================================================================== */}
-        <div className="xl:col-span-8 space-y-6 min-w-0">
+      {/* ================================================================ */}
+      {/* TODAY HERO — greeting, next step, and the fasting-glucose ribbon  */}
+      {/* ================================================================ */}
+      <section
+        aria-labelledby="patient-today-heading"
+        className="relative overflow-hidden rounded-[28px] bg-primary-900 text-white shadow-lift dark:bg-night-elevated dark:ring-1 dark:ring-night-border"
+      >
+        <GlucoseWave className="pointer-events-none absolute inset-x-0 bottom-0 h-40 w-full text-primary-700/70 dark:text-primary-900/80" />
 
-          {/* 1. TOP HERO: Clean Status Banner (Pure White, Crisp Border, Brand Buttons) */}
-          <div
-            className="relative flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 transition-all duration-200 shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:border-slate-800 dark:bg-slate-900"
-          >
-            <div>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">
-                  {formattedToday}
+        <div className="relative grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-10 lg:p-10">
+          <div className="flex min-w-0 flex-col">
+            <div className="flex flex-wrap items-center gap-2.5 text-sm text-primary-100/80">
+              <span>{formattedToday}</span>
+              <span aria-hidden="true" className="h-1 w-1 rounded-full bg-primary-300/60" />
+              {isUrgent ? (
+                <span className="inline-flex items-center gap-1.5 font-semibold text-rose-200">
+                  <AlertCircle className="h-4 w-4" />
+                  {t('patientHome.status.attention', 'Needs your attention')}
                 </span>
-
-                {isUrgent ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200/90 bg-rose-50/90 px-3 py-1 text-xs font-semibold text-rose-700 shadow-2xs dark:border-rose-800/70 dark:bg-rose-950/60 dark:text-rose-300">
-                    <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
-                    Attention Required
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/90 bg-emerald-50/90 px-3 py-1 text-xs font-semibold text-emerald-700 shadow-2xs dark:border-emerald-800/70 dark:bg-emerald-950/60 dark:text-emerald-300">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    Optimal • Routine Monitoring
-                  </span>
-                )}
-              </div>
-
-              <h1 className="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">
-                {greeting}
-              </h1>
-
-              <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300 max-w-2xl font-normal">
-                {diagnosticNote}
-              </p>
-            </div>
-
-            <div className="mt-6 pt-3 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 dark:border-slate-800">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <Link
-                  to="/diagnosis"
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-700 hover:shadow active:scale-[0.98] dark:bg-primary-500 dark:hover:bg-primary-600"
-                >
-                  <PlusCircle className="h-4 w-4" />
-                  <span>Start Assessment</span>
-                </Link>
-
-                <Link
-                  to={
-                    latestResult?.id
-                      ? `/diagnosis/result?diagnosis_result_id=${latestResult.id}`
-                      : '/my-results'
-                  }
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200/90 bg-slate-50 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 shadow-2xs transition-all hover:bg-slate-100 hover:text-slate-900 active:scale-[0.98] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                >
-                  <FileText className="h-4 w-4 text-slate-400" />
-                  <span>View Full Report</span>
-                </Link>
-              </div>
-
-              {lastAssessmentDate && (
-                <span className="text-xs font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" />
-                  <span>Last check: {lastAssessmentDate}</span>
+              ) : hasResult ? (
+                <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-200">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {t('patientHome.status.onTrack', 'On track')}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 font-semibold text-amber-200">
+                  <Sparkles className="h-4 w-4" />
+                  {t('patientHome.status.gettingStarted', 'Getting started')}
                 </span>
               )}
             </div>
-          </div>
 
-          {/* 2. TOP METRICS ROW: 3 Modern Vitals Cards (Inspired by top metric cards in reference) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Metric 1: HbA1c */}
-            <div className="flex flex-col justify-between rounded-2xl border border-slate-200/70 bg-white p-4 sm:p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all duration-150 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">HbA1c Level</span>
-                <span
-                  className={cn(
-                    'rounded-full px-2 py-0.5 text-[11px] font-semibold',
-                    a1cStatus.color === 'rose' && 'bg-rose-50 text-rose-700 border border-rose-200/70 dark:bg-rose-950/60 dark:text-rose-300',
-                    a1cStatus.color === 'amber' && 'bg-amber-50 text-amber-700 border border-amber-200/70 dark:bg-amber-950/60 dark:text-amber-300',
-                    a1cStatus.color === 'emerald' && 'bg-emerald-50 text-emerald-700 border border-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300'
-                  )}
-                >
-                  {a1cStatus.trend}
-                </span>
-              </div>
+            <h1
+              id="patient-today-heading"
+              className="mt-4 font-display text-[2.1rem] font-bold leading-[1.05] text-white sm:text-5xl"
+            >
+              {greeting}
+            </h1>
 
-              <div className="mt-3 flex items-baseline gap-1">
-                <span className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                  {a1c.toFixed(1)}
-                </span>
-                <span className="text-sm font-medium text-slate-400">%</span>
-              </div>
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-primary-50/85">
+              {diagnosticNote}
+            </p>
 
-              <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
-                <span>Target: &lt; 5.7%</span>
-                <span className="font-medium text-slate-600 dark:text-slate-300">{a1cStatus.label}</span>
-              </div>
-
-              <div className="mt-3 border-t border-slate-100 pt-2 dark:border-slate-800">
-                <MiniSparkline
-                  points={a1cTrendPoints}
-                  strokeColor={a1cStatus.color === 'rose' ? '#f43f5e' : '#3b82f6'}
-                  fillColor={a1cStatus.color === 'rose' ? '#f43f5e' : '#3b82f6'}
-                />
-              </div>
-            </div>
-
-            {/* Metric 2: Fasting Blood Glucose */}
-            <div className="flex flex-col justify-between rounded-2xl border border-slate-200/70 bg-white p-4 sm:p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all duration-150 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Fasting Glucose</span>
-                <span
-                  className={cn(
-                    'rounded-full px-2 py-0.5 text-[11px] font-semibold',
-                    glucoseStatus.color === 'rose' && 'bg-rose-50 text-rose-700 border border-rose-200/70 dark:bg-rose-950/60 dark:text-rose-300',
-                    glucoseStatus.color === 'amber' && 'bg-amber-50 text-amber-700 border border-amber-200/70 dark:bg-amber-950/60 dark:text-amber-300',
-                    glucoseStatus.color === 'emerald' && 'bg-emerald-50 text-emerald-700 border border-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300'
-                  )}
-                >
-                  {glucoseStatus.trend}
-                </span>
-              </div>
-
-              <div className="mt-3 flex items-baseline gap-1">
-                <span className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                  {glucose}
-                </span>
-                <span className="text-xs font-medium text-slate-400">mg/dL</span>
-              </div>
-
-              <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
-                <span>Target: 70–99</span>
-                <span className="font-medium text-slate-600 dark:text-slate-300">{glucoseStatus.label}</span>
-              </div>
-
-              <div className="mt-3 border-t border-slate-100 pt-2 dark:border-slate-800">
-                <MiniSparkline
-                  points={glucoseTrendPoints}
-                  strokeColor="#3b82f6"
-                  fillColor="#3b82f6"
-                />
-              </div>
-            </div>
-
-            {/* Metric 3: BMI */}
-            <div className="flex flex-col justify-between rounded-2xl border border-slate-200/70 bg-white p-4 sm:p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all duration-150 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Body Mass Index</span>
-                <span
-                  className={cn(
-                    'rounded-full px-2 py-0.5 text-[11px] font-semibold',
-                    bmiStatus.color === 'rose' && 'bg-rose-50 text-rose-700 border border-rose-200/70 dark:bg-rose-950/60 dark:text-rose-300',
-                    bmiStatus.color === 'amber' && 'bg-amber-50 text-amber-700 border border-amber-200/70 dark:bg-amber-950/60 dark:text-amber-300',
-                    bmiStatus.color === 'emerald' && 'bg-emerald-50 text-emerald-700 border border-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300'
-                  )}
-                >
-                  {bmiStatus.trend}
-                </span>
-              </div>
-
-              <div className="mt-3 flex items-baseline gap-1">
-                <span className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                  {bmi.toFixed(1)}
-                </span>
-                <span className="text-xs font-medium text-slate-400">kg/m²</span>
-              </div>
-
-              <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
-                <span>Target: 18.5–24.9</span>
-                <span className="font-medium text-slate-600 dark:text-slate-300">{bmiStatus.label}</span>
-              </div>
-
-              <div className="mt-3 border-t border-slate-100 pt-2 dark:border-slate-800">
-                <MiniSparkline
-                  points={bmiTrendPoints}
-                  strokeColor="#10b981"
-                  fillColor="#10b981"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* 3. CHARTS ROW: 7-Day Glucose Trend + Metabolic Balance Radar (Matching the reference layout) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-            
-            {/* 7-Day Blood Glucose Trend (7 cols) */}
-            <div className="lg:col-span-7 min-w-0 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
-              <div>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3.5 dark:border-slate-800">
-                  <div>
-                    <h2 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-                      7-Day Glucose Trend
-                    </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Fasting readings vs ADA target range
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/70 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-300">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      80–130 mg/dL
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      Avg: <strong className="text-slate-800 dark:text-slate-200">{avgGlucose}</strong>
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-4 h-56 sm:h-64 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={trendData} margin={{ top: 12, right: 8, left: -22, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="glucoseMainGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.18} />
-                          <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.0} />
-                        </linearGradient>
-                      </defs>
-
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" className="dark:stroke-slate-800/60" />
-
-                      <XAxis
-                        dataKey="day"
-                        tickLine={false}
-                        axisLine={{ stroke: '#e2e8f0' }}
-                        tick={{ fontSize: 11, fill: '#94a3b8' }}
-                        dy={4}
-                      />
-
-                      <YAxis
-                        domain={[60, 180]}
-                        ticks={[80, 100, 130, 160]}
-                        tickLine={false}
-                        axisLine={false}
-                        tick={{ fontSize: 11, fill: '#94a3b8' }}
-                      />
-
-                      <Tooltip content={<ChartCustomTooltip />} />
-
-                      {/* Green Shaded Target Zone (80–130 mg/dL) */}
-                      <ReferenceArea
-                        y1={TARGET_GLUCOSE_MIN}
-                        y2={TARGET_GLUCOSE_MAX}
-                        fill="#10b981"
-                        fillOpacity={0.08}
-                        stroke="#10b981"
-                        strokeOpacity={0.25}
-                        strokeDasharray="3 3"
-                      />
-
-                      <ReferenceLine
-                        y={TARGET_GLUCOSE_MAX}
-                        stroke="#10b981"
-                        strokeDasharray="3 3"
-                        strokeOpacity={0.4}
-                      />
-
-                      <ReferenceLine
-                        y={TARGET_GLUCOSE_MIN}
-                        stroke="#10b981"
-                        strokeDasharray="3 3"
-                        strokeOpacity={0.4}
-                      />
-
-                      <Area
-                        type="monotone"
-                        dataKey="glucose"
-                        stroke="#3b82f6"
-                        strokeWidth={2}
-                        fill="url(#glucoseMainGradient)"
-                        dot={{
-                          r: 3.5,
-                          fill: '#3b82f6',
-                          strokeWidth: 2,
-                          stroke: '#ffffff',
-                        }}
-                        activeDot={{
-                          r: 5.5,
-                          fill: '#2563eb',
-                          stroke: '#ffffff',
-                          strokeWidth: 2,
-                        }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2.5 text-[11px] text-slate-400 dark:border-slate-800">
-                <span>Daily morning fasting log</span>
-                <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
-                  <span className="inline-block h-2 w-2 rounded-xs bg-emerald-500/20 border border-emerald-500/50" />
-                  Target zone (80–130)
-                </span>
-              </div>
-            </div>
-
-            {/* Metabolic Health Radar (5 cols - Inspired by Diagnoses Radar in reference) */}
-            <div className="lg:col-span-5 min-w-0 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3.5 dark:border-slate-800">
-                  <div>
-                    <h2 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-                      Health Balance
-                    </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Holistic diabetes management index
-                    </p>
-                  </div>
-                  <span className="text-xs font-bold text-primary-600 bg-primary-50 dark:bg-primary-950/50 px-2 py-0.5 rounded-md">
-                    84 / 100
-                  </span>
-                </div>
-
-                {/* Radar Chart */}
-                <div className="h-52 w-full mt-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                      <PolarGrid stroke="#e2e8f0" strokeOpacity={0.6} />
-                      <PolarAngleAxis
-                        dataKey="metric"
-                        tick={{ fill: '#64748b', fontSize: 10, fontWeight: 500 }}
-                      />
-                      <Radar
-                        name="Health Score"
-                        dataKey="value"
-                        stroke="#10b981"
-                        fill="#10b981"
-                        fillOpacity={0.25}
-                        strokeWidth={2}
-                      />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              {/* Metric Breakdown Strip */}
-              <div className="mt-2 grid grid-cols-3 gap-2 border-t border-slate-100 pt-3 text-center dark:border-slate-800">
-                <div className="rounded-lg bg-slate-50/70 dark:bg-slate-800/40 p-1.5">
-                  <p className="text-[10px] text-slate-400 uppercase font-bold">Glucose</p>
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{radarData[0].value}%</p>
-                </div>
-                <div className="rounded-lg bg-slate-50/70 dark:bg-slate-800/40 p-1.5">
-                  <p className="text-[10px] text-slate-400 uppercase font-bold">Diet</p>
-                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{radarData[1].value}%</p>
-                </div>
-                <div className="rounded-lg bg-slate-50/70 dark:bg-slate-800/40 p-1.5">
-                  <p className="text-[10px] text-slate-400 uppercase font-bold">Meds</p>
-                  <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{radarData[3].value}%</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 4. BOTTOM SECTION: Latest Assessment & Clinical Summary (Inspired by "Last visit details" card in reference image) */}
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-5 sm:p-6 shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:border-slate-800 dark:bg-slate-900">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
-              <div>
-                <h3 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-                  Latest Assessment Details
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Clinical expert system findings and physician notes
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-semibold text-slate-400 dark:text-slate-500">
-                  {latestResult?.id ? `#DIAG-${String(latestResult.id).slice(0, 8).toUpperCase()}` : '#DIAG-BASELINE'}
-                </span>
-                <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300">
-                  Complete
-                </span>
-              </div>
-            </div>
-
-            {/* Patient Header & Symptoms Pills */}
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                  {user?.name || 'Patient Profile'}
-                </h4>
-                <p className="text-xs text-slate-500">
-                  {facts.age ? `${facts.age} years` : 'Adult'} • {facts.gender === 'female' ? 'Female' : 'Male'}
-                </p>
-              </div>
-
-              {/* Symptom Tags */}
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  Fasting Glucose
-                </span>
-                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  HbA1c Screening
-                </span>
-                {isUrgent ? (
-                  <span className="rounded-full bg-rose-100 text-rose-700 px-2.5 py-0.5 text-xs font-semibold dark:bg-rose-950/60 dark:text-rose-300">
-                    High Risk
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-emerald-100 text-emerald-700 px-2.5 py-0.5 text-xs font-semibold dark:bg-emerald-950/60 dark:text-emerald-300">
-                    Routine Check
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Structured Medical Record Rows */}
-            <div className="mt-5 space-y-3.5 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-4 py-1">
-                <span className="sm:col-span-3 font-semibold text-slate-400">Last Checked</span>
-                <span className="sm:col-span-9 font-medium text-slate-800 dark:text-slate-200">
-                  Dr. Lina (Endocrinologist) on {lastAssessmentDate || 'Recent Baseline'}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-4 py-1 border-t border-slate-100 dark:border-slate-800/60">
-                <span className="sm:col-span-3 font-semibold text-slate-400">Observation</span>
-                <span className="sm:col-span-9 font-medium text-slate-800 dark:text-slate-200 leading-relaxed">
-                  Fasting plasma glucose recorded at {glucose} mg/dL. Recent HbA1c at {a1c}%. Calculated BMI is {bmi} kg/m².
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-4 py-1 border-t border-slate-100 dark:border-slate-800/60">
-                <span className="sm:col-span-3 font-semibold text-slate-400">Diagnosis</span>
-                <span className="sm:col-span-9 font-semibold text-slate-900 dark:text-slate-100">
-                  {latestResult?.diagnosis || 'Type 2 Diabetes Screening — Lifestyle Guidance Recommended'}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-4 py-1 border-t border-slate-100 dark:border-slate-800/60">
-                <span className="sm:col-span-3 font-semibold text-slate-400">Prescription</span>
-                <div className="sm:col-span-9 space-y-0.5 font-medium text-slate-800 dark:text-slate-200">
-                  <p>Metformin — 500mg daily with breakfast</p>
-                  <p className="text-slate-500">Lifestyle: 30-min brisk walk after lunch • Target 80–130 mg/dL glucose</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-4 py-1 border-t border-slate-100 dark:border-slate-800/60">
-                <span className="sm:col-span-3 font-semibold text-slate-400">Notes</span>
-                <span className="sm:col-span-9 text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Patient shows consistent compliance with morning logs. Maintain balanced low-glycemic meals and record weekly weight progress.
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <span className="text-xs text-slate-400">Updated automatically from clinical consultations</span>
+            <div className="mt-auto flex flex-wrap items-center gap-3 pt-8">
               <Link
-                to={latestResult?.id ? `/diagnosis/result?diagnosis_result_id=${latestResult.id}` : '/my-results'}
-                className="text-xs font-semibold text-slate-900 dark:text-slate-100 hover:underline inline-flex items-center gap-1"
+                to="/diagnosis"
+                className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-5 py-3 text-sm font-bold text-navy-deep shadow-[0_8px_24px_-10px_rgba(247,165,62,0.9)] transition-transform hover:-translate-y-0.5 hover:bg-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200 active:translate-y-0"
               >
-                <span>View Complete Clinical Documentation</span>
-                <ArrowRight className="h-3 w-3" />
+                <PlusCircle className="h-4.5 w-4.5" />
+                {hasResult
+                  ? t('patientHome.cta.newAssessment', 'Start a new assessment')
+                  : t('patientHome.cta.firstAssessment', 'Take your first assessment')}
+              </Link>
+              <Link
+                to={reportHref}
+                className="inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white ring-1 ring-inset ring-white/25 transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                <FileText className="h-4 w-4" />
+                {hasResult
+                  ? t('patientHome.cta.latestReport', 'Open my latest report')
+                  : t('patientHome.cta.myResults', 'My results')}
               </Link>
             </div>
           </div>
 
+          {/* Fasting glucose reading against its range */}
+          <div className="flex min-w-0 flex-col justify-between rounded-3xl bg-white/[0.07] p-5 ring-1 ring-inset ring-white/15 backdrop-blur-sm sm:p-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-primary-100">
+                  {t('patientHome.vitals.fastingGlucose', 'Fasting glucose')}
+                </p>
+                <p className="mt-0.5 text-xs text-primary-100/70">
+                  {hasResult && rawGlucose !== null && lastAssessmentDate
+                    ? t('patientHome.vitals.fromAssessment', 'From your assessment on {{date}}', { date: lastAssessmentDate })
+                    : t('patientHome.vitals.sample', 'Sample reading — add a blood test result to see yours')}
+                </p>
+              </div>
+              <Droplets className="h-5 w-5 shrink-0 text-primary-200" aria-hidden="true" />
+            </div>
+
+            <div className="mt-6 flex items-end gap-3">
+              <span className="font-display text-7xl font-bold leading-none tracking-tight text-white sm:text-8xl">
+                {glucose}
+              </span>
+              <span className="pb-2 text-sm font-medium text-primary-100/80">
+                mg/dL
+                {glucoseSegment && (
+                  <span className={cn('mt-1 block text-base font-bold', ribbonWordTone(glucoseSegment.tone))}>
+                    {tr(glucoseSegment.label)}
+                  </span>
+                )}
+              </span>
+            </div>
+
+            <RangeRibbon
+              preset={RANGE_PRESETS.fastingGlucose}
+              value={glucose}
+              size="lg"
+              onDark
+              showLabels
+              translateLabel={tr}
+              className="mt-6"
+            />
+            <p className="mt-3 text-xs text-primary-100/70">
+              {t('patientHome.vitals.normalRange', 'A normal fasting reading is 70–99 mg/dL.')}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_25rem]">
+        {/* ============================================================== */}
+        {/* LEFT: readings, weekly trend, risk factors, latest assessment   */}
+        {/* ============================================================== */}
+        <div className="min-w-0 space-y-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <VitalCard
+              icon={Activity}
+              label={t('patientHome.vitals.hba1c', 'HbA1c')}
+              value={a1c.toFixed(1)}
+              preset={RANGE_PRESETS.hba1c}
+              rawValue={a1c}
+              caption={t('patientHome.vitals.hba1cTarget', 'Normal is below 5.7%')}
+              sample={!hasResult || rawA1c === null}
+              t={t}
+              tr={tr}
+            />
+            {waist !== null ? (
+              <VitalCard
+                icon={Ruler}
+                label={t('patientHome.vitals.waist', 'Waist size')}
+                value={Math.round(waist)}
+                preset={waistPreset}
+                rawValue={waist}
+                caption={isFemale
+                  ? t('patientHome.vitals.waistTargetF', 'Lower risk is under 80 cm')
+                  : t('patientHome.vitals.waistTargetM', 'Lower risk is under 94 cm')}
+                sample={false}
+                t={t}
+                tr={tr}
+              />
+            ) : (
+              <VitalCard
+                icon={Droplets}
+                label={t('patientHome.vitals.fastingGlucose', 'Fasting glucose')}
+                value={glucose}
+                preset={RANGE_PRESETS.fastingGlucose}
+                rawValue={glucose}
+                caption={t('patientHome.vitals.glucoseTarget', 'Normal is 70–99 mg/dL')}
+                sample={!hasResult || rawGlucose === null}
+                t={t}
+                tr={tr}
+              />
+            )}
+            <VitalCard
+              icon={Scale}
+              label={t('patientHome.vitals.bmi', 'Body mass index')}
+              value={bmi.toFixed(1)}
+              preset={RANGE_PRESETS.bmi}
+              rawValue={bmi}
+              caption={t('patientHome.vitals.bmiTarget', 'Healthy is 18.5–24.9')}
+              sample={rawBmi === null}
+              t={t}
+              tr={tr}
+            />
+          </div>
+
+          {/* Weekly trend */}
+          <section className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">
+                  {t('patientHome.trend.title', 'Your week in glucose')}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  {t('patientHome.trend.subtitle', 'Morning readings against the 80–130 mg/dL target band')}
+                </p>
+              </div>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                  <span className="h-3 w-5 rounded-[4px] border border-emerald-500/50 bg-emerald-500/15" aria-hidden="true" />
+                  {t('patientHome.trend.targetBand', 'Target band')}
+                </span>
+                <span className="text-slate-500 dark:text-slate-400">
+                  {t('patientHome.trend.average', 'Average')}{' '}
+                  <strong className="font-display text-lg text-slate-900 dark:text-white">{avgGlucose}</strong>
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-5 h-60 w-full sm:h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData} margin={{ top: 12, right: 8, left: -22, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="patientGlucoseFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={chart.line} stopOpacity={0.22} />
+                      <stop offset="100%" stopColor={chart.line} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} stroke={chart.grid} />
+                  <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: chart.axis }} dy={6} />
+                  <YAxis domain={[60, 180]} ticks={[80, 130, 180]} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: chart.axis }} />
+                  <Tooltip content={<ChartCustomTooltip />} cursor={{ stroke: chart.axis, strokeDasharray: '3 3' }} />
+                  <ReferenceArea y1={TARGET_GLUCOSE_MIN} y2={TARGET_GLUCOSE_MAX} fill={chart.inRange} fillOpacity={0.1} stroke="none" />
+                  <ReferenceLine y={TARGET_GLUCOSE_MAX} stroke={chart.inRange} strokeOpacity={0.45} strokeDasharray="4 4" />
+                  <ReferenceLine y={TARGET_GLUCOSE_MIN} stroke={chart.inRange} strokeOpacity={0.45} strokeDasharray="4 4" />
+                  <Area
+                    type="monotone"
+                    dataKey="glucose"
+                    stroke={chart.line}
+                    strokeWidth={2.5}
+                    fill="url(#patientGlucoseFill)"
+                    dot={{ r: 4, fill: chart.line, strokeWidth: 2, stroke: chart.surface }}
+                    activeDot={{ r: 6, fill: chart.lineStrong, stroke: chart.surface, strokeWidth: 2 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+              {rawGlucose === null
+                ? t('patientHome.trend.sampleNote', 'Sample week shown. Add a fasting glucose result to an assessment to centre it on your own reading.')
+                : t('patientHome.trend.estimateNote', 'An illustration built around your latest reading of {{value}} mg/dL.', { value: glucose })}
+            </p>
+          </section>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <RiskFactorsCard profile={profile} t={t} />
+            <LatestAssessmentCard
+              result={latestResult}
+              dateLabel={lastAssessmentDate}
+              isUrgent={isUrgent}
+              reportHref={reportHref}
+              t={t}
+            />
+          </div>
         </div>
 
-        {/* ================================================================== */}
-        {/* RIGHT COLUMN: Interactive Calendar & Care Schedule Timeline        */}
-        {/* ================================================================== */}
-        <div className="xl:col-span-4 min-w-0 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:border-slate-800 dark:bg-slate-900">
-          
-          {/* 1. CALENDAR STRIP (Exact reference design: month with prev/next & 7 days) */}
-          <div>
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                {calendarWeek.monthName}
+        {/* ============================================================== */}
+        {/* RIGHT: today's plan — week strip + timeline                    */}
+        {/* ============================================================== */}
+        <aside
+          aria-labelledby="patient-plan-heading"
+          className="min-w-0 rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 id="patient-plan-heading" className="text-xl font-bold text-slate-900 dark:text-slate-50">
+                {t('patientHome.plan.title', 'Your day')}
               </h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                {t('patientHome.plan.progress', '{{done}} of {{total}} done', { done: doneToday, total: DEFAULT_SCHEDULE.length })}
+              </p>
+            </div>
+            <ProgressDial value={dayProgress} />
+          </div>
+
+          {/* Week strip */}
+          <div className="mt-6 rounded-2xl bg-slate-50 p-3 dark:bg-night-elevated">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{calendarWeek.monthName}</span>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => setWeekOffset((prev) => prev - 1)}
-                  className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
-                  aria-label="Previous week"
+                  className="rounded-full p-1.5 text-slate-500 transition-colors hover:bg-white hover:text-slate-900 dark:hover:bg-night-border dark:hover:text-white"
+                  aria-label={t('patientHome.plan.prevWeek', 'Previous week')}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setWeekOffset((prev) => prev + 1)}
-                  className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
-                  aria-label="Next week"
+                  className="rounded-full p-1.5 text-slate-500 transition-colors hover:bg-white hover:text-slate-900 dark:hover:bg-night-border dark:hover:text-white"
+                  aria-label={t('patientHome.plan.nextWeek', 'Next week')}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
             </div>
-
-            {/* 7-Day Week Strip */}
-            <div className="mt-4 grid grid-cols-7 gap-1 text-center">
+            <div className="mt-2 grid grid-cols-7 gap-1 text-center">
               {calendarWeek.days.map((item, idx) => {
                 const isSelected = idx === selectedDayIndex
-
                 return (
                   <button
                     key={item.dayName}
                     type="button"
                     onClick={() => setSelectedDayIndex(idx)}
-                    className="flex flex-col items-center gap-1.5 py-1 transition-all rounded-xl focus:outline-none"
+                    aria-pressed={isSelected}
+                    className={cn(
+                      'flex flex-col items-center gap-1 rounded-xl py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-500',
+                      isSelected
+                        ? 'bg-primary-700 text-white shadow-sm dark:bg-primary-500 dark:text-navy-deep'
+                        : 'text-slate-700 hover:bg-white dark:text-slate-300 dark:hover:bg-night-border'
+                    )}
                   >
-                    <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                    <span className={cn('text-[11px] font-medium', isSelected ? 'text-primary-100 dark:text-navy-deep/80' : 'text-slate-400')}>
                       {item.dayName}
                     </span>
-
+                    <span className="text-sm font-bold tabular-nums">{item.dayNum}</span>
                     <span
                       className={cn(
-                        'flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all',
-                        isSelected
-                          ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
-                          : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                        'h-1 w-1 rounded-full',
+                        item.isToday ? (isSelected ? 'bg-amber-300' : 'bg-primary-500') : 'bg-transparent'
                       )}
-                    >
-                      {item.dayNum}
-                    </span>
-
-                    {/* Today indicator dot if not currently selected */}
-                    {item.isToday && !isSelected && (
-                      <span className="h-1 w-1 rounded-full bg-primary-600 -mt-0.5" />
-                    )}
+                      aria-hidden="true"
+                    />
                   </button>
                 )
               })}
             </div>
           </div>
 
-          {/* 2. TIMELINE HEADER: Selected Date & Category Filter */}
-          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-              {selectedDateLabel}
-            </h3>
-
-            {/* Filter Dropdown */}
+          {/* Timeline header */}
+          <div className="mt-6 flex items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{selectedDateLabel}</h3>
             <div className="relative">
               <select
                 value={timelineFilter}
                 onChange={(e) => setTimelineFilter(e.target.value)}
-                className="appearance-none rounded-lg border border-slate-200/80 bg-slate-50 px-2.5 py-1 pr-6 text-xs font-semibold text-slate-700 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                aria-label={t('patientHome.plan.filter', 'Filter tasks')}
+                className="appearance-none rounded-full border border-slate-200 bg-white py-1.5 pl-3 pr-7 text-xs font-semibold text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 dark:border-night-border dark:bg-night-elevated dark:text-slate-200"
               >
-                <option value="all">All</option>
-                <option value="glucose">Glucose</option>
-                <option value="meds">Meds</option>
-                <option value="activity">Activity</option>
+                <option value="all">{t('patientHome.plan.filterAll', 'Everything')}</option>
+                <option value="glucose">{t('patientHome.plan.filterGlucose', 'Glucose')}</option>
+                <option value="meds">{t('patientHome.plan.filterMeds', 'Medication')}</option>
+                <option value="activity">{t('patientHome.plan.filterActivity', 'Activity')}</option>
               </select>
-              <ChevronDown className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
+              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-slate-400" />
             </div>
           </div>
 
-          {/* 3. VERTICAL TIMELINE RAIL (Dashed Line & Centered Node Dots) */}
-          <div className="mt-5 relative">
-            <div className="flex flex-col">
-              {/* If viewing today and live time is before the first scheduled item */}
-              {isViewingToday && liveTimeInsertionIndex === 0 && (
-                <div className="grid grid-cols-[48px_20px_1fr] gap-3 items-center pb-3 z-10 relative">
-                  <div className="text-right">
-                    <span className="inline-block rounded-md bg-slate-900 px-1.5 py-0.5 text-[10px] font-mono font-bold text-white shadow-xs dark:bg-white dark:text-slate-900">
-                      {liveTime}
+          {/* Timeline */}
+          <ol className="relative mt-4">
+            <span aria-hidden="true" className="absolute bottom-3 left-[3.25rem] top-3 w-px bg-slate-200 dark:bg-night-border" />
+            {isViewingToday && liveTimeInsertionIndex === 0 && <NowMarker time={liveTime} t={t} />}
+            {filteredSchedule.map((item, idx) => {
+              const isCompleted = completedTasks.includes(item.id)
+              const tone = CATEGORY_TONES[item.badgeTone] || CATEGORY_TONES.slate
+              const Icon = item.icon
+              const showLiveMarkerAfter = isViewingToday && liveTimeInsertionIndex === idx + 1
+              return (
+                <Fragment key={item.id}>
+                  <li className="relative grid grid-cols-[2.5rem_1.5rem_minmax(0,1fr)] items-start gap-2 pb-3">
+                    <span className="pt-3.5 text-right text-xs font-semibold tabular-nums text-slate-500 dark:text-slate-400">
+                      {item.time}
                     </span>
-                  </div>
-                  <div className="relative flex justify-center items-center h-6">
-                    <div className="absolute top-1/2 bottom-0 left-1/2 -translate-x-1/2 w-0 border-l-2 border-dashed border-slate-200 dark:border-slate-800" />
-                    <span className="relative z-10 h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-white ring-4 ring-white dark:ring-slate-900 animate-pulse" />
-                  </div>
-                  <div className="h-0 border-t border-dashed border-slate-200 dark:border-slate-800" />
-                </div>
-              )}
-
-              {/* Timeline Task Cards */}
-              {filteredSchedule.map((item, idx) => {
-                const isCompleted = completedTasks.includes(item.id)
-                const isFirstTask = idx === 0
-                const isLastTask = idx === filteredSchedule.length - 1
-                const isFirstOverall = isFirstTask && (!isViewingToday || liveTimeInsertionIndex > 0)
-                const isLastOverall = isLastTask && (!isViewingToday || liveTimeInsertionIndex <= filteredSchedule.length - 1)
-                const showLiveMarkerAfter = isViewingToday && liveTimeInsertionIndex === idx + 1
-
-                return (
-                  <Fragment key={item.id}>
-                    <div
-                      className="grid grid-cols-[48px_20px_1fr] gap-3 pb-4 last:pb-0 relative group"
-                    >
-                      {/* 1. Left Time Column (Fixed 48px, right-aligned) */}
-                      <div className="text-right pt-3">
-                        <span className="font-mono text-xs font-semibold text-slate-400 dark:text-slate-500 tabular-nums select-none">
-                          {item.time}
-                        </span>
-                      </div>
-
-                      {/* 2. Timeline Center Track & Node Dot (Exact Center Aligned) */}
-                      <div className="relative flex justify-center h-full pt-3.5">
-                        {/* Vertical Dashed Line centered via left-1/2 -translate-x-1/2 */}
-                        <div
-                          className={cn(
-                            'absolute left-1/2 -translate-x-1/2 w-0 border-l-2 border-dashed border-slate-200 dark:border-slate-800 pointer-events-none',
-                            isFirstOverall && isLastOverall
-                              ? 'top-3.5 h-0'
-                              : isFirstOverall
-                              ? 'top-3.5 bottom-0'
-                              : isLastOverall
-                              ? 'top-0 h-3.5'
-                              : 'top-0 bottom-0'
-                          )}
-                        />
-
-                        {/* Connector Dot directly on the dashed line */}
-                        <div
-                          className={cn(
-                            'relative z-10 h-3 w-3 rounded-full transition-all ring-4 ring-white dark:ring-slate-900',
-                            isCompleted
-                              ? 'bg-emerald-500 ring-emerald-50 dark:ring-emerald-950/60'
-                              : 'border-2 border-slate-900 bg-white dark:border-slate-100 dark:bg-slate-900 group-hover:scale-125'
-                          )}
-                        />
-                      </div>
-
-                      {/* 3. Event / Action Card */}
-                      <div
-                        onClick={() => toggleTask(item.id)}
+                    <span className="relative z-10 flex justify-center pt-3.5">
+                      <span
                         className={cn(
-                          'cursor-pointer rounded-2xl border p-4 transition-all duration-150 select-none shadow-2xs min-w-0',
-                          isCompleted
-                            ? 'border-slate-200/60 bg-slate-50/70 dark:border-slate-800 dark:bg-slate-800/40'
-                            : 'border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
+                          'h-3 w-3 rounded-full ring-4 ring-white dark:ring-night-surface',
+                          isCompleted ? 'bg-emerald-500' : 'border-2 border-slate-300 bg-white dark:border-slate-500 dark:bg-night-surface'
                         )}
+                      />
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleTask(item.id)}
+                      aria-pressed={isCompleted}
+                      className={cn(
+                        'group flex min-w-0 items-start gap-3 rounded-2xl border p-3 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-500',
+                        isCompleted
+                          ? 'border-transparent bg-slate-50 dark:bg-night-elevated/60'
+                          : 'border-slate-200/80 bg-white hover:border-primary-300 dark:border-night-border dark:bg-night-surface dark:hover:border-primary-700'
+                      )}
+                    >
+                      <span className={cn('mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl', tone.icon)}>
+                        <Icon className="h-4.5 w-4.5" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className={cn('block text-[11px] font-semibold', tone.text)}>
+                          {t(`patientHome.category.${item.category.toLowerCase()}`, item.category)}
+                        </span>
+                        <span
+                          className={cn(
+                            'block text-sm font-semibold leading-snug',
+                            isCompleted ? 'text-slate-400 line-through dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
+                          )}
+                        >
+                          {item.title}
+                        </span>
+                        <span className="mt-0.5 block text-xs leading-snug text-slate-500 line-clamp-2 dark:text-slate-400">
+                          {item.subtitle}
+                        </span>
+                      </span>
+                      <span
+                        className={cn(
+                          'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors',
+                          isCompleted
+                            ? 'border-emerald-500 bg-emerald-500 text-white'
+                            : 'border-slate-300 text-transparent group-hover:border-primary-400 dark:border-slate-600'
+                        )}
+                        aria-hidden="true"
                       >
-                        <div className="flex items-center justify-between gap-2">
-                          {/* Category Badge */}
-                          <span
-                            className={cn(
-                              'rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider',
-                              item.badgeTone === 'amber' && 'bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/60 dark:text-amber-300',
-                              item.badgeTone === 'sky' && 'bg-sky-50 text-sky-700 border border-sky-200/60 dark:bg-sky-950/60 dark:text-sky-300',
-                              item.badgeTone === 'emerald' && 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/60 dark:text-emerald-300',
-                              item.badgeTone === 'purple' && 'bg-purple-50 text-purple-700 border border-purple-200/60 dark:bg-purple-950/60 dark:text-purple-300',
-                              item.badgeTone === 'slate' && 'bg-slate-100 text-slate-700 border border-slate-200/60 dark:bg-slate-800 dark:text-slate-300'
-                            )}
-                          >
-                            {item.category}
-                          </span>
+                        <Check className="h-3 w-3 stroke-[3]" />
+                      </span>
+                    </button>
+                  </li>
+                  {showLiveMarkerAfter && <NowMarker time={liveTime} t={t} />}
+                </Fragment>
+              )
+            })}
+          </ol>
 
-                          {/* Interactive Checkbox */}
-                          <div
-                            className={cn(
-                              'flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded border transition-colors',
-                              isCompleted
-                                ? 'border-slate-900 bg-slate-900 text-white dark:border-emerald-500 dark:bg-emerald-500'
-                                : 'border-slate-300 bg-white group-hover:border-slate-400 dark:border-slate-600 dark:bg-slate-800'
-                            )}
-                          >
-                            {isCompleted && <Check className="h-3 w-3 stroke-[3]" />}
-                          </div>
-                        </div>
-
-                        {/* Card Title & Subtitle */}
-                        <div className="mt-2.5">
-                          <h4
-                            className={cn(
-                              'text-xs sm:text-sm font-bold tracking-tight transition-colors',
-                              isCompleted
-                                ? 'text-slate-400 line-through dark:text-slate-500'
-                                : 'text-slate-900 dark:text-slate-100'
-                            )}
-                          >
-                            {item.title}
-                          </h4>
-                          <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400 leading-normal line-clamp-2">
-                            {item.subtitle}
-                          </p>
-                        </div>
-
-                        {/* Card Footer Info */}
-                        <div className="mt-3.5 flex items-center justify-between border-t border-slate-100 pt-2 text-[11px] text-slate-400 dark:border-slate-800">
-                          <span className="truncate max-w-[170px]">{item.location}</span>
-                          <span className="font-mono text-[10px] font-medium text-slate-500 dark:text-slate-400 shrink-0">
-                            {item.time} – {item.timeEnd}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Dynamic Live Current Time Marker inserted chronologically between tasks */}
-                    {showLiveMarkerAfter && (
-                      <div className="grid grid-cols-[48px_20px_1fr] gap-3 items-center py-2 pb-3.5 z-10 relative">
-                        <div className="text-right">
-                          <span className="inline-block rounded-md bg-slate-900 px-1.5 py-0.5 text-[10px] font-mono font-bold text-white shadow-xs dark:bg-white dark:text-slate-900">
-                            {liveTime}
-                          </span>
-                        </div>
-                        <div className="relative flex justify-center items-center h-6">
-                          <div
-                            className={cn(
-                              'absolute left-1/2 -translate-x-1/2 w-0 border-l-2 border-dashed border-slate-200 dark:border-slate-800 pointer-events-none',
-                              isLastTask ? 'top-0 bottom-1/2' : 'top-0 bottom-0'
-                            )}
-                          />
-                          <span className="relative z-10 h-2.5 w-2.5 rounded-full bg-slate-900 dark:bg-white ring-4 ring-white dark:ring-slate-900 animate-pulse" />
-                        </div>
-                        <div className="h-0 border-t border-dashed border-slate-200 dark:border-slate-800" />
-                      </div>
-                    )}
-                  </Fragment>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Timeline Bottom CTA */}
-          <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-            <span className="text-slate-400">
-              {completedTasks.length} of {DEFAULT_SCHEDULE.length} completed
-            </span>
-            <Link
-              to="/care-plan"
-              className="font-semibold text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white inline-flex items-center gap-1 transition-colors"
-            >
-              <span>Full Care Plan</span>
-              <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-
-        </div>
-
+          <Link
+            to="/care-plan"
+            className="mt-4 flex items-center justify-between rounded-2xl bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-800 transition-colors hover:bg-primary-100 dark:bg-primary-950/50 dark:text-primary-200 dark:hover:bg-primary-950"
+          >
+            {t('patientHome.plan.openCarePlan', 'Open my full care plan')}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </aside>
       </div>
     </div>
+  )
+}
+
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+const CATEGORY_TONES = {
+  amber: { icon: 'bg-amber-100 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300', text: 'text-amber-700 dark:text-amber-300' },
+  sky: { icon: 'bg-sky-100 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300', text: 'text-sky-700 dark:text-sky-300' },
+  emerald: { icon: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300', text: 'text-emerald-700 dark:text-emerald-300' },
+  purple: { icon: 'bg-purple-100 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300', text: 'text-purple-700 dark:text-purple-300' },
+  slate: { icon: 'bg-slate-100 text-slate-600 dark:bg-night-elevated dark:text-slate-300', text: 'text-slate-500 dark:text-slate-400' },
+}
+
+function ribbonWordTone(tone) {
+  if (tone === 'good') return 'text-emerald-200'
+  if (tone === 'watch') return 'text-amber-200'
+  return 'text-rose-200'
+}
+
+const STATUS_CHIP = {
+  good: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
+  watch: 'bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300',
+  high: 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300',
+  low: 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300',
+}
+
+function VitalCard({ icon: Icon, label, value, preset, rawValue, caption, sample, t, tr }) {
+  const segment = getRangeSegment(preset, rawValue)
+  return (
+    <div className="flex flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift dark:border-night-border dark:bg-night-surface">
+      <div className="flex items-center justify-between gap-2">
+        <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300">
+          <Icon className="h-4 w-4 text-primary-600 dark:text-primary-400" aria-hidden="true" />
+          {label}
+        </span>
+        {segment && (
+          <span className={cn('rounded-full px-2.5 py-0.5 text-xs font-semibold', STATUS_CHIP[segment.tone])}>
+            {tr(segment.label)}
+          </span>
+        )}
+      </div>
+      <div className="mt-4 flex items-baseline gap-1.5">
+        <span className="font-display text-4xl font-bold tracking-tight text-slate-900 dark:text-white">{value}</span>
+        <span className="text-sm text-slate-400">{preset.unit}</span>
+      </div>
+      <RangeRibbon preset={preset} value={rawValue} className="mt-4" />
+      <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+        {caption}
+        {sample && (
+          <span className="ml-1 text-slate-400 dark:text-slate-500">
+            · {t('patientHome.vitals.sampleShort', 'sample')}
+          </span>
+        )}
+      </p>
+    </div>
+  )
+}
+
+function ProgressDial({ value }) {
+  const radius = 20
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - (value / 100) * circumference
+  return (
+    <div className="relative h-14 w-14 shrink-0" role="img" aria-label={`${value}%`}>
+      <svg viewBox="0 0 48 48" className="h-full w-full -rotate-90">
+        <circle cx="24" cy="24" r={radius} fill="none" strokeWidth="5" className="stroke-slate-100 dark:stroke-night-border" />
+        <circle
+          cx="24"
+          cy="24"
+          r={radius}
+          fill="none"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          className="stroke-emerald-500 transition-[stroke-dashoffset] duration-500"
+        />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-xs font-bold tabular-nums text-slate-700 dark:text-slate-200">
+        {value}%
+      </span>
+    </div>
+  )
+}
+
+function NowMarker({ time, t }) {
+  return (
+    <li className="relative grid grid-cols-[2.5rem_1.5rem_minmax(0,1fr)] items-center gap-2 pb-3" aria-label={t('patientHome.plan.now', 'Now')}>
+      <span className="text-right text-xs font-bold tabular-nums text-amber-700 dark:text-amber-300">{time}</span>
+      <span className="relative z-10 flex justify-center">
+        <span className="h-3 w-3 rounded-full bg-amber-400 ring-4 ring-amber-100 dark:ring-amber-950" />
+      </span>
+      <span className="h-px bg-amber-300/80 dark:bg-amber-700/70" />
+    </li>
+  )
+}
+
+const RISK_FACTORS = [
+  { key: 'family_history', label: 'Family history of diabetes' },
+  { key: 'hypertension', label: 'High blood pressure' },
+  { key: 'high_cholesterol', label: 'High cholesterol' },
+  { key: 'smoking', label: 'Smoking' },
+  { key: 'sedentary_lifestyle', label: 'Mostly inactive days' },
+]
+
+function RiskFactorsCard({ profile, t }) {
+  const active = RISK_FACTORS.filter((factor) => Boolean(profile?.[factor.key]))
+  return (
+    <section className="flex flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface">
+      <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">
+        {t('patientHome.risk.title', 'What shapes your risk')}
+      </h2>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+        {profile
+          ? t('patientHome.risk.subtitle', '{{count}} of {{total}} factors apply to you', { count: active.length, total: RISK_FACTORS.length })
+          : t('patientHome.risk.loading', 'From your health profile')}
+      </p>
+      <ul className="mt-4 space-y-2">
+        {RISK_FACTORS.map((factor) => {
+          const applies = Boolean(profile?.[factor.key])
+          return (
+            <li
+              key={factor.key}
+              className={cn(
+                'flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm',
+                applies ? 'bg-amber-50 text-amber-900 dark:bg-amber-950/40 dark:text-amber-100' : 'bg-slate-50 text-slate-500 dark:bg-night-elevated dark:text-slate-400'
+              )}
+            >
+              <span className="font-medium">{t(`patientHome.risk.${factor.key}`, factor.label)}</span>
+              <span className={cn('text-xs font-semibold', applies ? 'text-amber-700 dark:text-amber-300' : 'text-slate-400')}>
+                {applies ? t('patientHome.risk.applies', 'Applies') : t('patientHome.risk.notApplies', 'No')}
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+      <Link
+        to="/profile"
+        className="mt-4 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-primary-700 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200"
+      >
+        <User className="h-4 w-4" />
+        {t('patientHome.risk.update', 'Update my health profile')}
+      </Link>
+    </section>
+  )
+}
+
+function LatestAssessmentCard({ result, dateLabel, isUrgent, reportHref, t }) {
+  if (!result) {
+    return (
+      <section className="flex flex-col rounded-3xl border border-dashed border-primary-300 bg-primary-50/60 p-5 sm:p-6 dark:border-primary-800 dark:bg-primary-950/30">
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-primary-700 shadow-sm dark:bg-night-elevated dark:text-primary-300">
+          <Stethoscope className="h-5 w-5" />
+        </span>
+        <h2 className="mt-4 text-xl font-bold text-slate-900 dark:text-slate-50">
+          {t('patientHome.latest.emptyTitle', 'No assessment yet')}
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+          {t('patientHome.latest.emptyBody', 'Answer a few questions about how you feel and any recent lab numbers. It takes about five minutes, and your result appears here with clear next steps.')}
+        </p>
+        <Link
+          to="/diagnosis"
+          className="mt-auto inline-flex items-center gap-2 self-start rounded-full bg-primary-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-800 dark:bg-primary-500 dark:text-navy-deep dark:hover:bg-primary-400"
+          style={{ marginTop: '1.5rem' }}
+        >
+          {t('patientHome.cta.firstAssessment', 'Take your first assessment')}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </section>
+    )
+  }
+
+  const certainty = Number(result.certainty)
+  const certaintyPct = Number.isFinite(certainty) ? Math.round(certainty <= 1 ? certainty * 100 : certainty) : null
+
+  return (
+    <section className="flex flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">
+            {t('patientHome.latest.title', 'Latest assessment')}
+          </h2>
+          {dateLabel && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{dateLabel}</p>}
+        </div>
+        <span
+          className={cn(
+            'rounded-full px-2.5 py-1 text-xs font-semibold',
+            isUrgent ? STATUS_CHIP.high : STATUS_CHIP.good
+          )}
+        >
+          {isUrgent ? t('patientHome.latest.urgent', 'See a doctor soon') : t('patientHome.latest.routine', 'Routine follow-up')}
+        </span>
+      </div>
+
+      <p className="mt-5 font-display text-2xl font-bold leading-tight text-slate-900 dark:text-white">
+        {result.diagnosis || t('patientHome.latest.pending', 'Result pending')}
+      </p>
+      {certaintyPct !== null && (
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          {t('patientHome.latest.certainty', 'Confidence {{value}}%', { value: certaintyPct })}
+        </p>
+      )}
+
+      {result.recommendation && (
+        <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{result.recommendation}</p>
+      )}
+
+      {result.review_note && (
+        <blockquote className="mt-4 rounded-2xl bg-slate-50 p-3 text-sm text-slate-700 dark:bg-night-elevated dark:text-slate-200">
+          <span className="block text-xs font-semibold text-slate-500 dark:text-slate-400">
+            {t('patientHome.latest.doctorNote', 'Note from {{name}}', { name: result.reviewed_by_name || t('patientHome.latest.careTeam', 'your care team') })}
+          </span>
+          {result.review_note}
+        </blockquote>
+      )}
+
+      <Link
+        to={reportHref}
+        className="mt-auto inline-flex items-center gap-1.5 self-start pt-5 text-sm font-semibold text-primary-700 hover:text-primary-900 dark:text-primary-300 dark:hover:text-primary-200"
+      >
+        {t('patientHome.latest.open', 'Read the full report')}
+        <ArrowRight className="h-4 w-4" />
+      </Link>
+    </section>
+  )
+}
+
+/** A soft glucose curve drawn behind the hero — the day's rhythm as decoration. */
+function GlucoseWave({ className }) {
+  return (
+    <svg viewBox="0 0 1200 160" preserveAspectRatio="none" className={className} aria-hidden="true">
+      <path
+        d="M0 120 C 120 120, 160 60, 260 70 S 400 140, 520 110 S 680 30, 800 60 S 980 130, 1080 100 S 1160 80, 1200 84"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <path
+        d="M0 140 C 140 135, 200 95, 300 100 S 460 150, 560 132 S 720 70, 840 88 S 1000 146, 1100 124 S 1170 112, 1200 114"
+        fill="none"
+        stroke="currentColor"
+        strokeOpacity="0.5"
+        strokeWidth="1.5"
+      />
+    </svg>
   )
 }

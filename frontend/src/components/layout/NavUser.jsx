@@ -139,7 +139,7 @@ export function NavUser({ user: propUser, collapsed = false, onLogout }) {
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-[#181830] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                className="group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-night-elevated focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                 aria-label={user.name}
                 title={`${user.name} (${user.email})`}
               >

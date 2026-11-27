@@ -385,7 +385,7 @@ export function ProfilePage() {
           <div className="group relative shrink-0">
             <div
               className={cn(
-                'relative flex h-20 w-20 overflow-hidden rounded-full shadow-md ring-2 ring-white dark:ring-[#1e2234]',
+                'relative flex h-20 w-20 overflow-hidden rounded-full shadow-md ring-2 ring-white dark:ring-night-border',
                 uploadingAvatar && 'opacity-60'
               )}
             >

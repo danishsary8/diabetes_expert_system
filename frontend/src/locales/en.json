@@ -101,6 +101,11 @@
     "super_admin": "Super Admin"
   },
   "nav": {
+    "patientHome": "Home",
+    "patientAssessment": "Health check",
+    "yourCare": "Your care",
+    "learn": "Records & learning",
+    "account": "Account",
     "dashboard": "Dashboard",
     "assessment": "Assessment",
     "patients": "Patients",
@@ -182,6 +187,18 @@
     "patientResults": {
       "title": "Patient Results",
       "subtitle": "All patient assessment results across the clinic"
+    },
+    "patientHome": {
+      "title": "Home",
+      "subtitle": "Your health at a glance"
+    },
+    "patientAssessment": {
+      "title": "Health check",
+      "subtitle": "A few questions about how you feel"
+    },
+    "profile": {
+      "title": "Your profile",
+      "subtitle": "Account details and health background"
     }
   },
   "usersPage": {
@@ -3326,5 +3343,121 @@
       "prepared": "Calculated before rules",
       "rule": "Rule output"
     }
+  },
+  "patientHome": {
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "status": {
+      "attention": "Needs your attention",
+      "onTrack": "On track",
+      "gettingStarted": "Getting started"
+    },
+    "note": {
+      "none": "Your first assessment takes about five minutes. It sets your personal baseline so this page can show your own numbers.",
+      "urgent": "Some of your recent numbers are above their target range. Keep taking your medication as prescribed and book a check-in with your doctor.",
+      "stable": "Your latest readings are holding steady. Keep following today’s plan below."
+    },
+    "cta": {
+      "firstAssessment": "Take your first assessment",
+      "newAssessment": "Start a new assessment",
+      "latestReport": "Open my latest report",
+      "myResults": "My results"
+    },
+    "vitals": {
+      "fastingGlucose": "Fasting glucose",
+      "fromAssessment": "From your assessment on {{date}}",
+      "sample": "Sample reading — add a blood test result to see yours",
+      "sampleShort": "sample",
+      "normalRange": "A normal fasting reading is 70–99 mg/dL.",
+      "hba1c": "HbA1c",
+      "hba1cTarget": "Normal is below 5.7%",
+      "glucoseTarget": "Normal is 70–99 mg/dL",
+      "bmi": "Body mass index",
+      "bmiTarget": "Healthy is 18.5–24.9",
+      "waist": "Waist size",
+      "waistTargetM": "Lower risk is under 94 cm",
+      "waistTargetF": "Lower risk is under 80 cm"
+    },
+    "range": {
+      "Low": "Low",
+      "Normal": "Normal",
+      "Elevated": "Elevated",
+      "High": "High",
+      "Prediabetes": "Prediabetes",
+      "Diabetes range": "Diabetes range",
+      "Lower risk": "Lower risk",
+      "Increased": "Increased",
+      "Under": "Under",
+      "Healthy": "Healthy",
+      "Over": "Over",
+      "Obese": "Obese"
+    },
+    "trend": {
+      "title": "Your week in glucose",
+      "subtitle": "Morning readings against the 80–130 mg/dL target band",
+      "targetBand": "Target band",
+      "average": "Average",
+      "sampleNote": "Sample week shown. Add a fasting glucose result to an assessment to centre it on your own reading.",
+      "estimateNote": "An illustration built around your latest reading of {{value}} mg/dL."
+    },
+    "risk": {
+      "title": "What shapes your risk",
+      "subtitle": "{{count}} of {{total}} factors apply to you",
+      "loading": "From your health profile",
+      "applies": "Applies",
+      "notApplies": "No",
+      "update": "Update my health profile",
+      "family_history": "Family history of diabetes",
+      "hypertension": "High blood pressure",
+      "high_cholesterol": "High cholesterol",
+      "smoking": "Smoking",
+      "sedentary_lifestyle": "Mostly inactive days"
+    },
+    "latest": {
+      "title": "Latest assessment",
+      "emptyTitle": "No assessment yet",
+      "emptyBody": "Answer a few questions about how you feel and any recent lab numbers. It takes about five minutes, and your result appears here with clear next steps.",
+      "urgent": "See a doctor soon",
+      "routine": "Routine follow-up",
+      "pending": "Result pending",
+      "certainty": "Confidence {{value}}%",
+      "doctorNote": "Note from {{name}}",
+      "careTeam": "your care team",
+      "open": "Read the full report"
+    },
+    "plan": {
+      "title": "Your day",
+      "progress": "{{done}} of {{total}} done",
+      "prevWeek": "Previous week",
+      "nextWeek": "Next week",
+      "filter": "Filter tasks",
+      "filterAll": "Everything",
+      "filterGlucose": "Glucose",
+      "filterMeds": "Medication",
+      "filterActivity": "Activity",
+      "now": "Now",
+      "openCarePlan": "Open my full care plan"
+    },
+    "category": {
+      "glucose": "Glucose",
+      "medication": "Medication",
+      "activity": "Activity",
+      "consultation": "Consultation",
+      "routine": "Routine"
+    }
+  },
+  "carePlanHero": {
+    "attention": "Needs your attention",
+    "routine": "Routine monitoring",
+    "title": "Your care plan, {{name}}",
+    "withResult": "Built around your latest result: {{diagnosis}}. Work through today’s goals, take your medication on time, and keep your appointments.",
+    "noResult": "Daily goals, medication times and appointments in one place. Take a health check to tailor it to you.",
+    "treatmentPlan": "See my doctor’s plan",
+    "report": "Open my report",
+    "newCheck": "New health check",
+    "lastCheck": "Last check: {{date}}"
   }
 }

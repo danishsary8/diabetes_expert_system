@@ -419,7 +419,7 @@ export function CarePlanProgressTracker({ t }) {
             <div key={idx} className="relative flex flex-col items-center">
               {/* Active Tooltip Pill */}
               {step.pill ? (
-                <div className="absolute -top-7.5 whitespace-nowrap rounded-md bg-slate-900 px-2 py-0.5 text-[10px] font-bold text-white shadow-md dark:bg-white dark:text-slate-900">
+                <div className="absolute -top-7.5 whitespace-nowrap rounded-md bg-primary-800 px-2 py-0.5 text-[10px] font-bold text-white shadow-md dark:bg-primary-400 dark:text-navy-deep">
                   {step.pill}
                 </div>
               ) : null}

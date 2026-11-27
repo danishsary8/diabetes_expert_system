@@ -144,7 +144,7 @@ export function Topbar({
       className={cn(
         'sticky top-0 z-20 flex h-[72px] shrink-0 w-full items-center px-4 sm:px-6 select-none backdrop-blur-md transition-all duration-150',
         isDark
-          ? 'bg-[#070712]/90 border-b border-slate-800/60'
+          ? 'bg-night-surface/90 border-b border-slate-800/60'
           : 'bg-white/90 border-b border-slate-200/60'
       )}
     >

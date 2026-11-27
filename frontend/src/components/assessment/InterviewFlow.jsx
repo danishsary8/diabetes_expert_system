@@ -305,7 +305,7 @@ function BmiQuestionCard({
                   </p>
 
                   {/* Title */}
-                  <h3 className="text-sm sm:text-base font-black text-[#1b365d] dark:text-white mt-0.5 tracking-tight">
+                  <h3 className="text-sm sm:text-base font-black text-navy dark:text-white mt-0.5 tracking-tight">
                     {t('assessment.interview.bmiCalculatorTitle', 'BMI Calculator')}
                   </h3>
 
@@ -359,7 +359,7 @@ function BmiQuestionCard({
                             className="w-full bg-transparent text-xs font-semibold text-slate-900 dark:text-white placeholder:text-xs placeholder:text-slate-400 focus:outline-none"
                           />
                           <div className="h-3.5 w-px bg-slate-200 dark:bg-slate-700 mx-1.5" />
-                          <span className={cn("text-[11px] font-bold whitespace-nowrap", isWeightError ? "text-rose-600 dark:text-rose-400" : "text-[#1b365d] dark:text-blue-400")}>kg</span>
+                          <span className={cn("text-[11px] font-bold whitespace-nowrap", isWeightError ? "text-rose-600 dark:text-rose-400" : "text-navy dark:text-blue-400")}>kg</span>
                         </div>
 
                         {/* Height */}
@@ -380,7 +380,7 @@ function BmiQuestionCard({
                             className="w-full bg-transparent text-xs font-semibold text-slate-900 dark:text-white placeholder:text-xs placeholder:text-slate-400 focus:outline-none"
                           />
                           <div className="h-3.5 w-px bg-slate-200 dark:bg-slate-700 mx-1.5" />
-                          <span className={cn("text-[11px] font-bold whitespace-nowrap", isHeightError ? "text-rose-600 dark:text-rose-400" : "text-[#1b365d] dark:text-blue-400")}>cm</span>
+                          <span className={cn("text-[11px] font-bold whitespace-nowrap", isHeightError ? "text-rose-600 dark:text-rose-400" : "text-navy dark:text-blue-400")}>cm</span>
                         </div>
                       </>
                     ) : (
@@ -403,7 +403,7 @@ function BmiQuestionCard({
                             className="w-full bg-transparent text-xs font-semibold text-slate-900 dark:text-white placeholder:text-xs placeholder:text-slate-400 focus:outline-none"
                           />
                           <div className="h-3.5 w-px bg-slate-200 dark:bg-slate-700 mx-1.5" />
-                          <span className={cn("text-[11px] font-bold whitespace-nowrap", isWeightError ? "text-rose-600 dark:text-rose-400" : "text-[#1b365d] dark:text-blue-400")}>lbs</span>
+                          <span className={cn("text-[11px] font-bold whitespace-nowrap", isWeightError ? "text-rose-600 dark:text-rose-400" : "text-navy dark:text-blue-400")}>lbs</span>
                         </div>
 
                         {/* Height Imperial */}
@@ -422,7 +422,7 @@ function BmiQuestionCard({
                             onChange={(e) => handleImperialHeightFt(e.target.value)}
                             className="w-8 bg-transparent text-center text-xs font-semibold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none"
                           />
-                          <span className="text-[10px] font-bold text-[#1b365d] dark:text-blue-400 mr-1">ft</span>
+                          <span className="text-[10px] font-bold text-navy dark:text-blue-400 mr-1">ft</span>
                           <div className="h-3.5 w-px bg-slate-200 dark:bg-slate-700 mr-1" />
                           <input
                             type="number"
@@ -433,7 +433,7 @@ function BmiQuestionCard({
                             onChange={(e) => handleImperialHeightIn(e.target.value)}
                             className="w-8 bg-transparent text-center text-xs font-semibold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none"
                           />
-                          <span className="text-[10px] font-bold text-[#1b365d] dark:text-blue-400">in</span>
+                          <span className="text-[10px] font-bold text-navy dark:text-blue-400">in</span>
                         </div>
                       </>
                     )}
@@ -463,12 +463,12 @@ function BmiQuestionCard({
                       <p className="text-[9px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
                         {t('assessment.interview.bmiCalculated', 'Calculated BMI')}
                       </p>
-                      <p className="text-xs font-bold text-[#1b365d] dark:text-blue-300 mt-0.5">
+                      <p className="text-xs font-bold text-navy dark:text-blue-300 mt-0.5">
                         <span className="text-blue-600 dark:text-blue-400 text-sm font-black mr-1">{form.bmi}</span> kg/m²
                       </p>
                     </div>
                   ) : (
-                    <p className="text-center text-[10px] font-semibold text-[#1b365d] dark:text-blue-300 leading-tight">
+                    <p className="text-center text-[10px] font-semibold text-navy dark:text-blue-300 leading-tight">
                       {t('assessment.interview.enterHeightWeightToCalc', 'Enter height & weight to calculate BMI')}
                     </p>
                   )}
@@ -515,23 +515,7 @@ function BmiQuestionCard({
       <img
         src="/images/png/bmiscale.png"
         alt="BMI Scale and Medical Record"
-        className="
-          hidden lg:block
-          absolute
-          bottom-0
-          right-0
-          z-10
-
-          h-full
-          w-auto
-          max-w-none
-
-          object-contain
-          object-right-bottom
-          pointer-events-none
-          select-none
-        "
-        style={{ objectPosition: 'right bottom' }}
+        className="assessment-illustration"
         onError={(e) => {
           if (!e.currentTarget.src.includes('bmiscale.png')) {
             e.currentTarget.src = '/images/png/bmiscale.png'
@@ -861,23 +845,7 @@ function WaistQuestionCard({
               : '/images/png/waist-measurement.png'
         }
         alt="Person measuring waist"
-        className="
-          hidden lg:block
-          absolute
-          bottom-0
-          right-0
-          z-10
-
-          h-full
-          w-auto
-          max-w-none
-
-          object-contain
-          object-right-bottom
-          pointer-events-none
-          select-none
-        "
-        style={{ objectPosition: 'right bottom' }}
+        className="assessment-illustration"
         onError={(e) => {
           if (!e.currentTarget.src.includes('waist-measurement.png')) {
             e.currentTarget.src = '/images/png/waist-measurement.png'
@@ -952,23 +920,7 @@ function QuestionCard({
         <img
           src={displayMedia.image}
           alt={displayMedia.name || title}
-          className="
-            hidden lg:block
-            absolute
-            bottom-0
-            right-0
-            z-10
-
-            h-full
-            w-auto
-            max-w-none
-
-            object-contain
-            object-right-bottom
-            pointer-events-none
-            select-none
-          "
-          style={{ objectPosition: 'right bottom' }}
+          className="assessment-illustration"
           loading="eager"
           onError={(e) => {
             const current = e.currentTarget.src

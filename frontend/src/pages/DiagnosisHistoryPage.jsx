@@ -35,24 +35,18 @@ function toCertaintyPercent(certainty) {
   return Math.max(0, Math.min(100, Math.round(raw)))
 }
 
-function getConfidenceBarClass(percent) {
-  if (percent >= 85) return 'from-rose-500 via-red-500 to-red-600'
-  if (percent >= 70) return 'from-orange-400 via-orange-500 to-amber-600'
-  if (percent >= 45) return 'from-amber-400 via-yellow-500 to-amber-600'
-  return 'from-emerald-400 via-emerald-500 to-teal-600'
+// Confidence describes how much evidence there was, not how serious the
+// result is — so it gets one calm colour instead of a warning scale.
+function getConfidenceBarClass() {
+  return 'from-primary-400 to-primary-600'
 }
 
-function getHeroGradient(percent, isUrgent) {
+// The hero colour follows urgency only.
+function getHeroGradient(_percent, isUrgent) {
   if (isUrgent) {
-    return 'bg-gradient-to-br from-rose-600 via-rose-700 to-red-800'
+    return 'bg-rose-800 dark:bg-rose-950 dark:ring-1 dark:ring-rose-900'
   }
-  if (percent >= 70) {
-    return 'bg-gradient-to-br from-orange-600 via-amber-600 to-red-700'
-  }
-  if (percent >= 45) {
-    return 'bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600'
-  }
-  return 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700'
+  return 'bg-primary-900 dark:bg-night-elevated dark:ring-1 dark:ring-night-border'
 }
 
 function getUrgencyMeta(result, t) {
@@ -484,7 +478,7 @@ export function DiagnosisHistoryPage() {
                     { value: 'oldest', label: t('myResults.timeline.sortOldest', 'Oldest first') },
                     { value: 'certainty', label: t('myResults.timeline.sortHighestCertainty', 'Highest confidence') },
                   ]}
-                  className="h-8 w-auto min-w-[9.5rem] rounded-lg border-slate-200 bg-white px-2.5 py-0 text-xs font-semibold text-slate-700 shadow-sm dark:border-slate-800 dark:bg-[#0c1024] dark:text-slate-200"
+                  className="h-8 w-auto min-w-[9.5rem] rounded-lg border-slate-200 bg-white px-2.5 py-0 text-xs font-semibold text-slate-700 shadow-sm dark:border-slate-800 dark:bg-night-surface dark:text-slate-200"
                 />
               </div>
             </div>
@@ -562,7 +556,7 @@ export function DiagnosisHistoryPage() {
                   return (
                     <article
                       key={result.id}
-                      className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800/80 dark:bg-[#070b15]"
+                      className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800/80 dark:bg-night-surface"
                     >
                       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0 flex-1">

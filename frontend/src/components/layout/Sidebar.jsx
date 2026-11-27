@@ -17,6 +17,7 @@ import { NavSecondary } from './NavSecondary'
 import { NavUser } from './NavUser'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { cn } from '@/lib/utils'
+import { userHasStaffRole } from '@/lib/nav-config'
 
 const BRAND_LOGO_SRC = '/images/logo.png'
 
@@ -83,6 +84,7 @@ export function Sidebar({
   const { t } = useLanguage()
   const { workspace, system, documents } = splitNavGroups(navItems)
   const [logoVisible, setLogoVisible] = useState(true)
+  const isPatient = Boolean(user) && !userHasStaffRole(user)
 
   const effectiveUser = user || {
     name: userName,
@@ -93,7 +95,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        'relative flex h-full min-h-0 w-full flex-col justify-between overflow-hidden border-r border-slate-200/80 bg-white select-none transition-all duration-200 dark:border-slate-800/80 dark:bg-[#070712]',
+        'relative flex h-full min-h-0 w-full flex-col justify-between overflow-hidden border-r border-slate-200/80 bg-white select-none transition-all duration-200 dark:border-slate-800/80 dark:bg-night-surface',
         className
       )}
     >
@@ -165,14 +167,14 @@ export function Sidebar({
         >
           {/* WORKSPACE Group */}
           <NavMain
-            title={t('nav.workspace', 'WORKSPACE')}
+            title={isPatient ? t('nav.yourCare', 'Your care') : t('nav.workspace', 'WORKSPACE')}
             items={workspace}
             collapsed={collapsed}
           />
 
           {/* DOCUMENTS Group */}
           <NavDocuments
-            title={t('nav.documents', 'DOCUMENTS')}
+            title={isPatient ? t('nav.learn', 'Records & learning') : t('nav.documents', 'DOCUMENTS')}
             items={documents}
             collapsed={collapsed}
           />
@@ -196,7 +198,7 @@ export function Sidebar({
         )}
       >
         {/* TOOLS Section */}
-        <NavSecondary collapsed={collapsed} />
+        <NavSecondary collapsed={collapsed} title={isPatient ? t('nav.account', 'Account') : undefined} />
 
         {/* Bottom Profile Card */}
         <NavUser

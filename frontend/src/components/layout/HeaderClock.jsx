@@ -67,7 +67,7 @@ export function HeaderClock({ theme = 'light', language = 'en' }) {
         className={cn(
           'pointer-events-none absolute right-0 top-full z-30 mt-2 flex items-baseline gap-1.5 whitespace-nowrap rounded-xl border px-3 py-2 opacity-0 shadow-[0_10px_24px_rgba(2,8,23,0.22)] transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100',
           isDark
-            ? 'border-[#1e2234] bg-[#0d0d1c]'
+            ? 'border-night-border bg-night-surface'
             : 'border-slate-900/10 bg-slate-900'
         )}
       >

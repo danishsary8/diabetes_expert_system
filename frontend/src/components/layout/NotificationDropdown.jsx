@@ -182,7 +182,7 @@ export function NotificationDropdown({ className = '' }) {
 
       {/* Popover Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-[min(24rem,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl transition-all dark:border-[#1e2234] dark:bg-[#0f111a] sm:w-[26rem]">
+        <div className="absolute right-0 z-50 mt-2 w-[min(24rem,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl transition-all dark:border-night-border dark:bg-night-surface sm:w-[26rem]">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-slate-800/80 dark:bg-slate-900/60">
             <div className="flex items-center gap-2">

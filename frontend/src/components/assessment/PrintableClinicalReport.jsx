@@ -349,7 +349,7 @@ export default function PrintableClinicalReport({
   return (
     <div className="printable-clinical-report text-slate-900 bg-white font-sans text-[8.5pt] leading-normal antialiased">
       {/* ── HEADER ── */}
-      <div className="header-bar mb-3 flex items-start justify-between gap-3 border-b-[2.5px] border-[#0F294A] pb-2">
+      <div className="header-bar mb-3 flex items-start justify-between gap-3 border-b-[2.5px] border-navy-deep pb-2">
         <div className="flex items-center gap-3">
           <img
             src="/images/logo.png"
@@ -365,7 +365,7 @@ export default function PrintableClinicalReport({
                 ? 'ប្រព័ន្ធជំនាញ និងគាំទ្រការសម្រេចចិត្តគ្លីនិក'
                 : 'Clinical Decision Support & Expert System'}
             </p>
-            <h1 className="text-[13.5pt] font-extrabold leading-tight text-[#0F294A]">
+            <h1 className="text-[13.5pt] font-extrabold leading-tight text-navy-deep">
               {isKhmer
                 ? 'របាយការណ៍វិនិច្ឆ័យ និងវាយតម្លៃជំងឺទឹកនោមផ្អែម'
                 : 'Diabetes Diagnosis & Assessment Report'}
@@ -385,22 +385,22 @@ export default function PrintableClinicalReport({
         </div>
         <div className="min-w-[150px] text-right text-[7.5pt] leading-relaxed">
           <p>
-            <strong className="text-[#0F294A]">{isKhmer ? 'លេខរបាយការណ៍:' : 'Report No:'}</strong>{' '}
+            <strong className="text-navy-deep">{isKhmer ? 'លេខរបាយការណ៍:' : 'Report No:'}</strong>{' '}
             {reportNumber}
           </p>
           <p>
-            <strong className="text-[#0F294A]">{isKhmer ? 'កាលបរិច្ឆេទ:' : 'Date:'}</strong>{' '}
+            <strong className="text-navy-deep">{isKhmer ? 'កាលបរិច្ឆេទ:' : 'Date:'}</strong>{' '}
             {issueDateFormatted}
           </p>
           <p>
-            <strong className="text-[#0F294A]">{isKhmer ? 'ការពិនិត្យ:' : 'Type:'}</strong>{' '}
+            <strong className="text-navy-deep">{isKhmer ? 'ការពិនិត្យ:' : 'Type:'}</strong>{' '}
             {isKhmer ? 'ការវាយតម្លៃទូទៅ' : 'Comprehensive Evaluation'}
           </p>
         </div>
       </div>
 
       {/* ── 1. PATIENT DEMOGRAPHICS ── */}
-      <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-[#0F294A]">
+      <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-navy-deep">
         {isKhmer ? 'ព័ត៌មានអ្នកជំងឺ និងការពិនិត្យ' : 'Patient Information & Demographics'}
       </div>
       <table className="mb-2 w-full border-collapse text-[8.5pt]">
@@ -453,7 +453,7 @@ export default function PrintableClinicalReport({
       </table>
 
       {/* ── 2. CLINICAL IMPRESSION ── */}
-      <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-[#0F294A]">
+      <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-navy-deep">
         {isKhmer ? 'លទ្ធផលវិនិច្ឆ័យ និងការវាយតម្លៃគ្លីនិក' : 'Clinical Impression & Diagnostic Evaluation'}
       </div>
       <table className="mb-2 w-full border-collapse border border-slate-300 bg-slate-50/70 text-[8.5pt]">
@@ -462,7 +462,7 @@ export default function PrintableClinicalReport({
             <td className="w-[28%] border border-slate-300 p-2 font-bold text-slate-700">
               {isKhmer ? 'លទ្ធផលវិនិច្ឆ័យ' : 'Primary Diagnosis'}
             </td>
-            <td className="border border-slate-300 p-2 text-[11pt] font-extrabold text-[#0F294A]">
+            <td className="border border-slate-300 p-2 text-[11pt] font-extrabold text-navy-deep">
               {displayDiagnosis}
             </td>
           </tr>
@@ -514,7 +514,7 @@ export default function PrintableClinicalReport({
       {/* ── 3. LAB FINDINGS ── */}
       {labRows.length > 0 && (
         <>
-          <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-[#0F294A]">
+          <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-navy-deep">
             {isKhmer
               ? 'លទ្ធផលតេស្តមន្ទីរពិសោធន៍ និងជីវសញ្ញាសម្គាល់'
               : 'Laboratory Findings & Biomarkers'}
@@ -575,12 +575,12 @@ export default function PrintableClinicalReport({
       )}
 
       {/* ── 5. SYMPTOMS & RISK FACTORS ── */}
-      <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-[#0F294A]">
+      <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-navy-deep">
         {isKhmer ? 'រោគសញ្ញា និងទម្រង់ហានិភ័យ' : 'Reported Symptoms & Risk Factors'}
       </div>
       <div className="mb-2 grid grid-cols-2 gap-2">
         <div className="rounded border border-slate-300 bg-slate-50/70 p-2">
-          <div className="mb-1 text-[8pt] font-bold uppercase tracking-wider text-[#0F294A]">
+          <div className="mb-1 text-[8pt] font-bold uppercase tracking-wider text-navy-deep">
             {isKhmer ? 'រោគសញ្ញាដែលបានកត់ត្រា' : 'Documented Symptoms'}
           </div>
           <ul className="space-y-0.5 text-[8pt]">
@@ -601,7 +601,7 @@ export default function PrintableClinicalReport({
           </ul>
         </div>
         <div className="rounded border border-slate-300 bg-slate-50/70 p-2">
-          <div className="mb-1 text-[8pt] font-bold uppercase tracking-wider text-[#0F294A]">
+          <div className="mb-1 text-[8pt] font-bold uppercase tracking-wider text-navy-deep">
             {isKhmer ? 'កត្តាហានិភ័យ និងប្រវត្តិជំងឺ' : 'Risk Factors & Medical History'}
           </div>
           <ul className="space-y-0.5 text-[8pt]">
@@ -624,7 +624,7 @@ export default function PrintableClinicalReport({
       </div>
 
       {/* ── 6. RECOMMENDATIONS ── */}
-      <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-[#0F294A]">
+      <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-navy-deep">
         {isKhmer ? 'ការណែនាំគ្លីនិក និងការថែទាំសុខភាព' : 'Clinical Recommendations & Care Actions'}
       </div>
       <div className="mb-2 space-y-1">
@@ -633,7 +633,7 @@ export default function PrintableClinicalReport({
             key={i}
             className="flex items-start gap-2.5 rounded border border-slate-300 bg-slate-50/70 p-2"
           >
-            <div className="min-w-[24px] text-center text-[10pt] font-extrabold text-[#0F294A]">
+            <div className="min-w-[24px] text-center text-[10pt] font-extrabold text-navy-deep">
               #{i + 1}
             </div>
             <div className="flex-1 text-[8.5pt] leading-relaxed text-slate-800">
@@ -644,7 +644,7 @@ export default function PrintableClinicalReport({
       </div>
 
       {/* ── 7. CLINICIAN REVIEW & CDS AUTHENTICATION ── */}
-      <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-[#0F294A]">
+      <div className="section-heading mb-1.5 border-b-[1.5px] border-blue-600 pb-0.5 text-[9.5pt] font-bold uppercase tracking-wide text-navy-deep">
         {isKhmer ? 'ការពិនិត្យ និងការបញ្ជាក់ពីគ្រូពេទ្យ' : 'Clinician Review & CDS Authentication'}
       </div>
       <table className="mb-3 w-full border-collapse border border-slate-300 text-[8pt]">

@@ -135,7 +135,7 @@ export function ConditionEducationPanel({ result, defaultOpen = true }) {
       </div>
 
       {open ? (
-        <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800/70 dark:bg-[#070b15] sm:p-6">
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800/70 dark:bg-night-surface sm:p-6">
           <div className="divide-y divide-slate-100 dark:divide-slate-800">
             <EducationSection
               icon={HelpCircle}

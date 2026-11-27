@@ -197,8 +197,8 @@ function StepDot({ item, status, onClick, locked }) {
           <span className={cn(
             'relative z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border-2 shadow-sm transition-all duration-300',
             status === 'done' ? 'border-cyan-500 bg-cyan-500 text-white' :
-              status === 'active' ? 'border-cyan-500 bg-white text-cyan-600 assessment-step-dot-active dark:bg-[#070712]' :
-                'border-slate-300 bg-slate-50 text-slate-400 dark:border-slate-600 dark:bg-[#070712] dark:text-slate-500',
+              status === 'active' ? 'border-cyan-500 bg-white text-cyan-600 assessment-step-dot-active dark:bg-night-surface' :
+                'border-slate-300 bg-slate-50 text-slate-400 dark:border-slate-600 dark:bg-night-surface dark:text-slate-500',
           )}>
             {status === 'done' ? <Check className="h-5 w-5" strokeWidth={2.5} /> : <Icon className="h-5 w-5" strokeWidth={2.25} />}
           </span>
@@ -1354,7 +1354,7 @@ export function DiagnosisPage() {
           "min-w-0 flex-1 flex flex-col rounded-3xl shadow-2xl transition-colors duration-700 ease-in-out relative overflow-hidden",
           isColoredInterview
             ? "text-white border-0 min-h-[calc(100dvh-7.5rem)] p-0"
-            : "surface p-4 sm:p-6 md:p-8 border border-slate-200/80 bg-white dark:border-[#1a2142] dark:bg-[#0c1129] text-slate-900 dark:text-slate-100 min-h-[calc(100dvh-7.5rem)]"
+            : "surface p-4 sm:p-6 md:p-8 border border-slate-200/80 bg-white dark:border-night-border dark:bg-night-surface text-slate-900 dark:text-slate-100 min-h-[calc(100dvh-7.5rem)]"
         )}
       >
         {/* Background decorative shapes */}
@@ -1542,7 +1542,7 @@ export function DiagnosisPage() {
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div>
                               <div className="flex items-center gap-3">
-                                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-[#1b365d] dark:bg-blue-950/60 dark:text-blue-300">
+                                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-navy dark:bg-blue-950/60 dark:text-blue-300">
                                   <ClipboardList className="h-5 w-5" />
                                 </span>
                                 <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -1581,13 +1581,13 @@ export function DiagnosisPage() {
                             <table className="w-full text-left border-collapse min-w-[600px]">
                               <thead>
                                 <tr className="bg-transparent">
-                                  <th scope="col" className="py-4 px-6 sm:px-8 text-left text-base sm:text-lg font-bold text-[#1b365d] dark:text-blue-400 w-[28%] sm:w-[26%]">
+                                  <th scope="col" className="py-4 px-6 sm:px-8 text-left text-base sm:text-lg font-bold text-navy dark:text-blue-400 w-[28%] sm:w-[26%]">
                                     {t('assessment.review.tableQuestion', 'Question')}
                                   </th>
-                                  <th scope="col" className="py-4 px-6 sm:px-8 text-left text-base sm:text-lg font-bold text-[#1b365d] dark:text-blue-400 w-[56%] sm:w-[58%]">
+                                  <th scope="col" className="py-4 px-6 sm:px-8 text-left text-base sm:text-lg font-bold text-navy dark:text-blue-400 w-[56%] sm:w-[58%]">
                                     {t('assessment.review.tableAnswer', 'Answer')}
                                   </th>
-                                  <th scope="col" className="py-4 px-6 sm:px-8 text-right sm:text-center text-base sm:text-lg font-bold text-[#1b365d] dark:text-blue-400 w-[16%]">
+                                  <th scope="col" className="py-4 px-6 sm:px-8 text-right sm:text-center text-base sm:text-lg font-bold text-navy dark:text-blue-400 w-[16%]">
                                     {t('assessment.review.tablePoints', 'Points')}
                                   </th>
                                 </tr>
@@ -1637,7 +1637,7 @@ export function DiagnosisPage() {
                                       </span>
                                     )}
                                   </td>
-                                  <td className="py-4 px-6 sm:px-8 text-right sm:text-center text-[#1b365d] dark:text-blue-400 text-lg font-black">
+                                  <td className="py-4 px-6 sm:px-8 text-right sm:text-center text-navy dark:text-blue-400 text-lg font-black">
                                     {reviewCalculations.totalAdaScore}
                                   </td>
                                 </tr>
@@ -1678,7 +1678,7 @@ export function DiagnosisPage() {
                   <div className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-xs">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div className="flex items-center gap-3.5">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-[#1b365d] dark:bg-blue-950/60 dark:text-blue-300 border border-blue-100 dark:border-blue-900/40">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-navy dark:bg-blue-950/60 dark:text-blue-300 border border-blue-100 dark:border-blue-900/40">
                           <UserRound className="h-5 w-5" />
                         </div>
                         <div>
@@ -1709,7 +1709,7 @@ export function DiagnosisPage() {
                       <button
                         type="button"
                         onClick={() => { setStep(1); setCursorOverride(null) }}
-                        className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full px-4 py-2 text-xs font-semibold text-[#1b365d] bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-900/60 transition-colors border border-blue-200/70 dark:border-blue-800/70 cursor-pointer"
+                        className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full px-4 py-2 text-xs font-semibold text-navy bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-900/60 transition-colors border border-blue-200/70 dark:border-blue-800/70 cursor-pointer"
                       >
                         <Edit3 className="h-3.5 w-3.5" />
                         {t('assessment.interview.editAnswers', 'Edit interview answers')}
@@ -1719,7 +1719,7 @@ export function DiagnosisPage() {
 
                   {/* ── Review Summary Table (Inspired by clean questionnaire style) ── */}
                   <QSection
-                    icon={<ClipboardList className="h-5 w-5 text-[#1b365d] dark:text-blue-400" />}
+                    icon={<ClipboardList className="h-5 w-5 text-navy dark:text-blue-400" />}
                     title={t('assessment.reviewSummary', 'Review Summary')}
                     sub={t('assessment.reviewSummarySub', 'Double-check before submitting')}
                   >
@@ -1728,13 +1728,13 @@ export function DiagnosisPage() {
                         <table className="w-full text-left border-collapse min-w-[550px]">
                           <thead>
                             <tr className="bg-white dark:bg-slate-900 border-b border-blue-100 dark:border-slate-800">
-                              <th scope="col" className="py-4 px-6 text-left text-base sm:text-lg font-bold text-[#1b365d] dark:text-blue-300 w-[28%] sm:w-[26%]">
+                              <th scope="col" className="py-4 px-6 text-left text-base sm:text-lg font-bold text-navy dark:text-blue-300 w-[28%] sm:w-[26%]">
                                 {t('assessment.review.tableQuestion', 'Question')}
                               </th>
-                              <th scope="col" className="py-4 px-6 text-left text-base sm:text-lg font-bold text-[#1b365d] dark:text-blue-300 w-[56%] sm:w-[58%]">
+                              <th scope="col" className="py-4 px-6 text-left text-base sm:text-lg font-bold text-navy dark:text-blue-300 w-[56%] sm:w-[58%]">
                                 {t('assessment.review.tableAnswer', 'Answer')}
                               </th>
-                              <th scope="col" className="py-4 px-6 text-right sm:text-center text-base sm:text-lg font-bold text-[#1b365d] dark:text-blue-300 w-[16%]">
+                              <th scope="col" className="py-4 px-6 text-right sm:text-center text-base sm:text-lg font-bold text-navy dark:text-blue-300 w-[16%]">
                                 {t('assessment.review.tablePoints', 'Points')}
                               </th>
                             </tr>
@@ -1768,7 +1768,7 @@ export function DiagnosisPage() {
                           </tbody>
                           <tfoot>
                             <tr className="border-t-2 border-blue-200 dark:border-blue-900/60 bg-blue-50/90 dark:bg-blue-950/50 font-bold">
-                              <td className="py-4 px-6 text-[#1b365d] dark:text-blue-300 text-sm sm:text-base">
+                              <td className="py-4 px-6 text-navy dark:text-blue-300 text-sm sm:text-base">
                                 {t('assessment.review.totalRiskScore', 'Total ADA Risk Score')}
                               </td>
                               <td className="py-4 px-6 text-slate-800 dark:text-slate-100 text-sm sm:text-base">
@@ -1784,7 +1784,7 @@ export function DiagnosisPage() {
                                   </span>
                                 )}
                               </td>
-                              <td className="py-4 px-6 text-right sm:text-center text-[#1b365d] dark:text-blue-300 text-base sm:text-lg font-black">
+                              <td className="py-4 px-6 text-right sm:text-center text-navy dark:text-blue-300 text-base sm:text-lg font-black">
                                 {reviewCalculations.totalAdaScore}
                               </td>
                             </tr>

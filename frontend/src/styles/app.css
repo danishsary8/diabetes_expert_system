@@ -1,6 +1,8 @@
 /* Google Fonts are loaded via <link rel="stylesheet"> in index.html for
    parallel discovery — CSS @import would delay them behind the CSS bundle. */
 
+@import './palette.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -25,6 +27,93 @@
     --dark-elevated: #101020;
     --dark-border: #1e2234;
     --dark-border-hover: #3a4161;
+    /* Semantic surface tokens (RGB triplets, consumed by tailwind.config.js) */
+    --app-bg: 244 248 252;
+    --night: 3 3 9;
+    --night-surface: 7 7 18;
+    --night-elevated: 16 16 32;
+    --night-border: 30 34 52;
+    --navy: 27 54 93;
+    --navy-deep: 15 41 74;
+    --shadow-tint: 13 42 74;
+  }
+
+  /* ------------------------------------------------------------------
+     Patient experience theme
+     Pine / Lagoon / Leaf / Marigold / Rose on green-tinted Ink neutrals,
+     Figtree body + Bricolage Grotesque display + Kantumruy Pro (Khmer).
+     ------------------------------------------------------------------ */
+  html[data-audience='patient'] {
+    --app-font-sans: 'Figtree', 'Kantumruy Pro', ui-sans-serif, system-ui, sans-serif;
+    --app-font-display: 'Bricolage Grotesque', 'Kantumruy Pro', ui-sans-serif, system-ui, sans-serif;
+    --app-bg: 241 248 244;
+    --night: 9 16 14;
+    --night-surface: 15 24 22;
+    --night-elevated: 24 35 33;
+    --night-border: 37 52 49;
+    --navy: 0 63 54;
+    --navy-deep: 13 36 32;
+    --shadow-tint: 16 48 42;
+    /* Legacy dark-mode surface overrides (see html.dark [class~=...] rules). */
+    --dark-base: rgb(9 16 14);
+    --dark-surface: rgb(15 24 22);
+    --dark-elevated: rgb(24 35 33);
+    --dark-border: rgb(37 52 49);
+    --dark-border-hover: rgb(56 76 72);
+  }
+
+  html[data-audience='patient'][lang='km'] {
+    --app-font-sans: 'Kantumruy Pro', 'Figtree', sans-serif;
+    --app-font-display: 'Kantumruy Pro', 'Bricolage Grotesque', sans-serif;
+  }
+
+  html[data-audience='patient'] body {
+    background-image: none;
+    background-color: rgb(var(--app-bg));
+    color: rgb(var(--c-slate-800));
+  }
+
+  html.dark[data-audience='patient'] body {
+    background-image: none;
+    background-color: rgb(var(--night));
+    color: rgb(var(--c-slate-100));
+  }
+
+  html[data-audience='patient'] :is(h1, h2) {
+    font-family: var(--app-font-display);
+    letter-spacing: -0.015em;
+  }
+
+  html[data-audience='patient'][lang='km'] :is(h1, h2) {
+    letter-spacing: normal;
+  }
+
+  /* Patient screens speak in sentence case: no shouty tracked-out labels. */
+  html[data-audience='patient'] .uppercase {
+    text-transform: none;
+  }
+
+  html[data-audience='patient'] :is(.tracking-wide, .tracking-wider, .tracking-widest, [class*='tracking-[0.']) {
+    letter-spacing: 0.005em;
+  }
+
+  /* Times and readings use tabular figures instead of a code font. */
+  html[data-audience='patient'] .font-mono {
+    font-family: var(--app-font-sans);
+    font-variant-numeric: tabular-nums;
+  }
+
+  html[data-audience='patient'] ::selection {
+    background: rgb(var(--c-primary-300) / 0.45);
+    color: rgb(var(--c-slate-900));
+  }
+
+  html[data-audience='patient'] :focus-visible {
+    outline-color: rgb(var(--c-primary-500));
+  }
+
+  .font-display {
+    font-family: var(--app-font-display);
   }
 
   * {
@@ -106,6 +195,30 @@
 }
 
 @layer components {
+  /* Question illustrations: confined to the right side of the interview card
+     and faded at their leading edge so they never sit under question text. */
+  .assessment-illustration {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .assessment-illustration {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      display: block;
+      height: 100%;
+      width: 44%;
+      object-fit: contain;
+      object-position: right bottom;
+      pointer-events: none;
+      user-select: none;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 24%);
+      mask-image: linear-gradient(to right, transparent 0%, #000 24%);
+    }
+  }
+
   @keyframes pageOpenMotion {
     0% {
       opacity: 0;

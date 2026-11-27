@@ -50,9 +50,9 @@ export function PatientSituationPanel({ latestResult }) {
       className={cn(
         'relative flex h-full flex-col justify-between overflow-hidden rounded-[28px] border p-6 transition-all duration-300 sm:p-7 shadow-[0_8px_30px_rgb(0,0,0,0.03)]',
         isUrgent
-          ? 'border-rose-200/80 bg-gradient-to-br from-[#fff6f6] via-white to-[#fffaf2] dark:border-rose-900/30 dark:from-[#211116]/60 dark:via-[#13131c] dark:to-[#13131c]'
+          ? 'border-rose-200/80 bg-gradient-to-br from-[#fff6f6] via-white to-[#fffaf2] dark:border-rose-900/30 dark:from-[#211116]/60 dark:via-night-surface dark:to-night-surface'
           : latestResult
-            ? 'border-emerald-200/80 bg-gradient-to-br from-[#f2fcf5] via-white to-[#f0f9ff] dark:border-emerald-900/30 dark:from-[#0d2218]/60 dark:via-[#13131c] dark:to-[#13131c]'
+            ? 'border-emerald-200/80 bg-gradient-to-br from-[#f2fcf5] via-white to-[#f0f9ff] dark:border-emerald-900/30 dark:from-[#0d2218]/60 dark:via-night-surface dark:to-night-surface'
             : 'border-slate-200/70 bg-white dark:border-slate-800 dark:bg-slate-900'
       )}
     >

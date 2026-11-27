@@ -1,5 +1,24 @@
 import animate from 'tailwindcss-animate'
 
+/*
+ * Colour scales are driven by CSS variables (src/styles/palette.css, generated
+ * by scripts/generate-palette.mjs). :root holds Tailwind's stock values; the
+ * patient experience (html[data-audience='patient']) swaps in its own palette
+ * without touching any component class names.
+ */
+const STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]
+const VAR_PALETTES = [
+  'primary', 'blue', 'teal', 'sky', 'cyan', 'indigo', 'violet', 'purple',
+  'emerald', 'green', 'amber', 'orange', 'yellow', 'rose', 'red', 'pink',
+  'slate', 'gray', 'zinc', 'neutral',
+]
+
+const varScale = (name) =>
+  Object.fromEntries(STEPS.map((step) => [step, `rgb(var(--c-${name}-${step}) / <alpha-value>)`]))
+
+const varColors = Object.fromEntries(VAR_PALETTES.map((name) => [name, varScale(name)]))
+const token = (name) => `rgb(var(--${name}) / <alpha-value>)`
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
@@ -7,23 +26,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#f4f8fc',
+        ...varColors,
+        background: token('app-bg'),
         muted: {
           DEFAULT: '#94a3b8',
           foreground: '#475569',
         },
-        primary: {
-          50: '#f0f7ff',
-          100: '#dcebff',
-          200: '#c2dcfd',
-          300: '#98c4fb',
-          400: '#64a7f8',
-          500: '#2f8cff',
-          600: '#1f76e8',
-          700: '#175bb7',
-          800: '#154d99',
-          900: '#14407d',
-          950: '#0e2a52',
+        // Dark-mode surfaces (previously hard-coded hex values).
+        night: {
+          DEFAULT: token('night'),
+          surface: token('night-surface'),
+          elevated: token('night-elevated'),
+          border: token('night-border'),
+        },
+        // Deep heading ink (previously hard-coded navy).
+        navy: {
+          DEFAULT: token('navy'),
+          deep: token('navy-deep'),
         },
         success: {
           50: '#ecfdf3',
@@ -43,12 +62,14 @@ export default {
       },
       boxShadow: {
         soft: '0 10px 25px -15px rgba(13, 42, 74, 0.35)',
+        lift: '0 1px 2px rgb(var(--shadow-tint) / 0.06), 0 12px 32px -18px rgb(var(--shadow-tint) / 0.28)',
       },
       spacing: {
         4.5: '1.125rem',
       },
       fontFamily: {
         sans: ['var(--app-font-sans)', 'Inter', 'Noto Sans Khmer', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['var(--app-font-display)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },

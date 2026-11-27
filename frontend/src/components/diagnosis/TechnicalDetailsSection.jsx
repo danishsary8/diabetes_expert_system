@@ -40,7 +40,7 @@ export function TechnicalDetailsSection({ children }) {
       </div>
 
       {open ? (
-        <div className="space-y-6 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800/70 dark:bg-[#070b15] sm:p-6">
+        <div className="space-y-6 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800/70 dark:bg-night-surface sm:p-6">
           <div className="flex items-start gap-2.5 border-b border-slate-100 pb-4 dark:border-slate-800">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
             <p className="text-xs sm:text-sm leading-relaxed text-slate-500 dark:text-slate-400">

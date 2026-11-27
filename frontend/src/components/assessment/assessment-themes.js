@@ -343,7 +343,33 @@ export const NODE_THEMES = {
   },
 }
 
-export function getNodeTheme(node) {
+/*
+ * Patient accounts use the Pine / Lagoon palette. The royal-blue section
+ * themes are re-tuned so the interview matches the rest of the patient app;
+ * the other section colours (plum, wine, forest …) are kept for variety.
+ */
+const PATIENT_PINE = { bg: '#0C5446', shape1: '#083F35', shape2: '#156C5A', buttonText: '#0C5446' }
+const PATIENT_LAGOON = { bg: '#0B4C5C', shape1: '#073846', shape2: '#126476', buttonText: '#0B4C5C' }
+const PATIENT_SLATE_PINE = { bg: '#1E4A47', shape1: '#153735', shape2: '#2A5F5B', buttonText: '#1E4A47' }
+
+const PATIENT_BG_REMAP = {
+  '#12488F': PATIENT_PINE,
+  '#144685': PATIENT_PINE,
+  '#174B8D': PATIENT_PINE,
+  '#0F4D8A': PATIENT_LAGOON,
+  '#115294': PATIENT_LAGOON,
+  '#204E74': PATIENT_SLATE_PINE,
+  '#24466B': PATIENT_SLATE_PINE,
+  '#123B66': PATIENT_SLATE_PINE,
+  '#233854': PATIENT_SLATE_PINE,
+  '#253456': PATIENT_SLATE_PINE,
+}
+
+function isPatientAudience() {
+  return typeof document !== 'undefined' && document.documentElement.dataset.audience === 'patient'
+}
+
+function resolveNodeTheme(node) {
   if (!node) return DEFAULT_ASSESSMENT_THEME
   if (node.id && NODE_THEMES[node.id]) {
     return NODE_THEMES[node.id]
@@ -352,4 +378,11 @@ export function getNodeTheme(node) {
   if (node.kind === 'waist') return NODE_THEMES.waist
   if (node.kind === 'labs') return NODE_THEMES.labs
   return DEFAULT_ASSESSMENT_THEME
+}
+
+export function getNodeTheme(node) {
+  const theme = resolveNodeTheme(node)
+  if (!isPatientAudience()) return theme
+  const remap = PATIENT_BG_REMAP[String(theme.bg).toUpperCase()]
+  return remap ? { ...theme, ...remap } : theme
 }

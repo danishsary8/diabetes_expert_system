@@ -334,7 +334,7 @@ function LabIndicatorCard({ title, valueLabel, status, subtitle, pointerPercent,
     ? null
     : Math.max(1.5, Math.min(98.5, Number(pointerPercent)))
   return (
-    <div className="min-w-0 rounded-xl border border-slate-200/80 bg-white p-4 dark:border-slate-800/80 dark:bg-[#0a0f1c]/50">
+    <div className="min-w-0 rounded-xl border border-slate-200/80 bg-white p-4 dark:border-slate-800/80 dark:bg-night-surface/50">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex items-center gap-2">
           {Icon && <Icon className="h-4 w-4 text-slate-600 dark:text-slate-400" />}
@@ -399,7 +399,7 @@ function SurfaceSection({ title, subtitle, children, icon: Icon, action, classNa
           {action && <div>{action}</div>}
         </div>
       )}
-      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800/70 dark:bg-[#070b15] sm:p-6">
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800/70 dark:bg-night-surface sm:p-6">
         {children}
       </div>
     </section>
@@ -771,18 +771,18 @@ export function DiagnosisResultPage() {
   const riskCategory = getRiskCategory(result?.diagnosis, certaintyPercent)
   const resultTone = riskCategory === 'urgent' || riskCategory === 'diabetes'
     ? {
-        panel: 'border-rose-200 bg-gradient-to-br from-rose-50 via-white to-rose-50/50 dark:border-rose-900/60 dark:from-rose-950/35 dark:via-[#070b15] dark:to-rose-950/20',
+        panel: 'border-rose-200 bg-gradient-to-br from-rose-50 via-white to-rose-50/50 dark:border-rose-900/60 dark:from-rose-950/35 dark:via-night-surface dark:to-rose-950/20',
         icon: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',
         badge: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',
       }
     : riskCategory === 'prediabetes'
       ? {
-          panel: 'border-amber-200 bg-gradient-to-br from-amber-50 via-white to-orange-50/40 dark:border-amber-900/60 dark:from-amber-950/30 dark:via-[#070b15] dark:to-orange-950/20',
+          panel: 'border-amber-200 bg-gradient-to-br from-amber-50 via-white to-orange-50/40 dark:border-amber-900/60 dark:from-amber-950/30 dark:via-night-surface dark:to-orange-950/20',
           icon: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
           badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
         }
       : {
-          panel: 'border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-teal-50/40 dark:border-emerald-900/60 dark:from-emerald-950/30 dark:via-[#070b15] dark:to-teal-950/20',
+          panel: 'border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-teal-50/40 dark:border-emerald-900/60 dark:from-emerald-950/30 dark:via-night-surface dark:to-teal-950/20',
           icon: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
           badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
         }
@@ -1057,7 +1057,7 @@ export function DiagnosisResultPage() {
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
                   {t('diagnosisResult.screeningResult', 'Your screening result')}
                 </p>
-                <h2 className="mt-1 break-words text-2xl font-extrabold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+                <h2 className="mt-1 break-words text-2xl font-extrabold leading-tight tracking-tight text-slate-950 dark:text-white sm:text-[2.15rem]">
                   {primaryHeadline}
                 </h2>
               </div>
@@ -1089,7 +1089,7 @@ export function DiagnosisResultPage() {
 
             <a
               href="#next-steps"
-              className="mt-5 inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
+              className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
             >
               {t('diagnosisResult.viewNextSteps', 'View my next steps')}
               <ArrowRight className="h-4 w-4" />
@@ -1501,7 +1501,7 @@ export function DiagnosisResultPage() {
 
       {/* ── Status Banner / Submit to Doctor Card ── */}
       {isStaff || isClinicianAssessment ? (
-        <section className="relative overflow-hidden rounded-3xl border border-primary-200/80 bg-gradient-to-br from-primary-50/60 via-white to-sky-50/40 p-5 shadow-sm dark:border-primary-900/50 dark:from-primary-950/30 dark:via-[#070b15] dark:to-slate-900">
+        <section className="relative overflow-hidden rounded-3xl border border-primary-200/80 bg-gradient-to-br from-primary-50/60 via-white to-sky-50/40 p-5 shadow-sm dark:border-primary-900/50 dark:from-primary-950/30 dark:via-night-surface dark:to-slate-900">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3.5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-600 text-white shadow-md shadow-primary-500/20 dark:bg-primary-500">
@@ -1541,7 +1541,7 @@ export function DiagnosisResultPage() {
           ) : null}
         </section>
       ) : !isSubmittedToCareTeam ? (
-        <section className="relative overflow-hidden rounded-3xl border-2 border-primary-200 bg-gradient-to-br from-primary-50/70 via-white to-sky-50/50 p-6 shadow-sm dark:border-primary-900/60 dark:from-primary-950/40 dark:via-[#070b15] dark:to-slate-900">
+        <section className="relative overflow-hidden rounded-3xl border-2 border-primary-200 bg-gradient-to-br from-primary-50/70 via-white to-sky-50/50 p-6 shadow-sm dark:border-primary-900/60 dark:from-primary-950/40 dark:via-night-surface dark:to-slate-900">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="flex items-start gap-3.5">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-600 text-white shadow-md shadow-primary-500/25 dark:bg-primary-500">
@@ -1614,7 +1614,7 @@ export function DiagnosisResultPage() {
           </div>
         </section>
       ) : (
-        <section className="relative overflow-hidden rounded-3xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50 p-5 shadow-sm dark:border-emerald-900/60 dark:from-emerald-950/30 dark:via-[#070b15] dark:to-slate-900">
+        <section className="relative overflow-hidden rounded-3xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50 p-5 shadow-sm dark:border-emerald-900/60 dark:from-emerald-950/30 dark:via-night-surface dark:to-slate-900">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3.5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-500/20 dark:bg-emerald-500">
@@ -1655,7 +1655,7 @@ export function DiagnosisResultPage() {
         </section>
       )}
 
-      <div className="rounded-xl bg-white px-4 py-3 dark:bg-[#050912]">
+      <div className="rounded-xl bg-white px-4 py-3 dark:bg-night">
         <div className="flex items-start gap-2">
           {diagnosisResultId ? (
             <History className="h-4 w-4 text-primary-600 dark:text-primary-400" />

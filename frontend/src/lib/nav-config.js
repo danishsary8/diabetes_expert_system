@@ -14,8 +14,8 @@ import {
 import { translate } from '@/lib/i18n'
 
 export const NAV_ITEMS = [
-  { to: '/dashboard', labelKey: 'nav.dashboard', icon: LayoutDashboard, section: 'workspace' },
-  { to: '/diagnosis', labelKey: 'nav.assessment', icon: Microscope, section: 'workspace', permissions: ['diagnosis.run'] },
+  { to: '/dashboard', labelKey: 'nav.dashboard', patientLabelKey: 'nav.patientHome', icon: LayoutDashboard, section: 'workspace' },
+  { to: '/diagnosis', labelKey: 'nav.assessment', patientLabelKey: 'nav.patientAssessment', icon: Microscope, section: 'workspace', permissions: ['diagnosis.run'] },
   { to: '/treatment-plans', labelKey: 'nav.treatmentPlans', icon: Stethoscope, section: 'workspace', notRoles: ['patient'], permissions: ['diagnosis.review_any', 'rule.view', 'patient.view'], permissionMode: 'any' },
   { to: '/patients', labelKey: 'nav.patients', icon: Users, section: 'workspace', permissions: ['patient.view'] },
   { to: '/rules', labelKey: 'nav.knowledgeBase', icon: BookOpen, section: 'documents', permissions: ['rule.view'] },
@@ -33,7 +33,13 @@ export const PAGE_TITLE_BY_PATH = [
   { pattern: '/unauthorized', titleKey: 'page.unauthorized.title', subtitleKey: 'page.unauthorized.subtitle' },
   { pattern: '/not-found', titleKey: 'page.notFound.title', subtitleKey: 'page.notFound.subtitle' },
   { pattern: '/diagnosis/result', titleKey: 'page.assessmentResult.title', subtitleKey: 'page.assessmentResult.subtitle' },
-  { pattern: '/diagnosis', titleKey: 'page.assessmentWorkspace.title', subtitleKey: 'page.assessmentWorkspace.subtitle' },
+  {
+    pattern: '/diagnosis',
+    titleKey: 'page.assessmentWorkspace.title',
+    subtitleKey: 'page.assessmentWorkspace.subtitle',
+    patientTitleKey: 'page.patientAssessment.title',
+    patientSubtitleKey: 'page.patientAssessment.subtitle',
+  },
   { pattern: '/patients', titleKey: 'page.patientManagement.title', subtitleKey: 'page.patientManagement.subtitle' },
   { pattern: '/rules', titleKey: 'page.knowledgeBase.title', subtitleKey: 'page.knowledgeBase.subtitle' },
   { pattern: '/review', titleKey: 'page.clinicalReview.title', subtitleKey: 'page.clinicalReview.subtitle' },
@@ -49,7 +55,14 @@ export const PAGE_TITLE_BY_PATH = [
   { pattern: '/care-plan', titleKey: 'page.carePlan.title', subtitleKey: 'page.carePlan.subtitle' },
   { pattern: '/users', titleKey: 'page.users.title', subtitleKey: 'page.users.subtitle' },
   { pattern: '/roles-permissions', titleKey: 'page.rolesPermissions.title', subtitleKey: 'page.rolesPermissions.subtitle' },
-  { pattern: '/dashboard', titleKey: 'page.dashboard.title', subtitleKey: 'page.dashboard.subtitle' },
+  { pattern: '/profile', titleKey: 'page.profile.title', subtitleKey: 'page.profile.subtitle' },
+  {
+    pattern: '/dashboard',
+    titleKey: 'page.dashboard.title',
+    subtitleKey: 'page.dashboard.subtitle',
+    patientTitleKey: 'page.patientHome.title',
+    patientSubtitleKey: 'page.patientHome.subtitle',
+  },
 ]
 
 export function getPageInfo(pathname, language = 'en', user = null) {
@@ -57,8 +70,13 @@ export function getPageInfo(pathname, language = 'en', user = null) {
   const page = matched || PAGE_TITLE_BY_PATH[PAGE_TITLE_BY_PATH.length - 1]
   const isStaff = userHasStaffRole(user)
 
-  const titleKey = isStaff && page.staffTitleKey ? page.staffTitleKey : page.titleKey
-  const subtitleKey = isStaff && page.staffSubtitleKey ? page.staffSubtitleKey : page.subtitleKey
+  const isPatient = Boolean(user) && !isStaff
+  let titleKey = isStaff && page.staffTitleKey ? page.staffTitleKey : page.titleKey
+  let subtitleKey = isStaff && page.staffSubtitleKey ? page.staffSubtitleKey : page.subtitleKey
+  if (isPatient && page.patientTitleKey) {
+    titleKey = page.patientTitleKey
+    subtitleKey = page.patientSubtitleKey
+  }
 
   return {
     ...page,
@@ -108,11 +126,12 @@ function hasAccess(user, item) {
 }
 
 export function getVisibleNavItems(user, language = 'en') {
+  const isPatient = Boolean(user) && !userHasStaffRole(user)
   return NAV_ITEMS
     .filter((item) => hasAccess(user, item))
     .map((item) => ({
       ...item,
-      label: translate(language, item.labelKey),
+      label: translate(language, isPatient && item.patientLabelKey ? item.patientLabelKey : item.labelKey),
     }))
 }
 
@@ -136,7 +155,7 @@ export function getBreadcrumbs(pathname, navItems = NAV_ITEMS, language = 'en') 
   const segments = pathOnly.split('/').filter(Boolean)
   const navLabelMap = new Map(navItems.map((item) => [item.to, item.label || translate(language, item.labelKey)]))
 
-  const breadcrumbs = [{ label: translate(language, 'breadcrumbs.dashboard'), to: segments.length ? '/dashboard' : null }]
+  const breadcrumbs = [{ label: navLabelMap.get('/dashboard') || translate(language, 'breadcrumbs.dashboard'), to: segments.length ? '/dashboard' : null }]
   if (!segments.length || (segments.length === 1 && segments[0] === 'dashboard')) return breadcrumbs
 
   let parentPath = ''
