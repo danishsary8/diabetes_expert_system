@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<!-- Source of cover/card.webp and cover/banner.webp. Open with ?mode=card (1600x1000) or ?mode=banner (1920x800) and screenshot at 2x. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@500&family=Noto+Sans+Khmer:wght@600&display=swap" />
+<style>
+
+  :root {
+    /* The portfolio's own "diabetes" cover stage, so the grid stays one system. */
+    --deep: #0b2038; --mid: #173f66; --lit: #2f6fa8; --gold: #f5c451;
+    /* The app's glucose range band (patient home). */
+    --low: #e7a3ad; --normal: #7fcf9c; --elevated: #f2bd5c; --high: #f08a8a;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: var(--w); height: var(--h); background: var(--deep); }
+  body { font-family: 'Geist', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+  .stage {
+    position: relative; width: var(--w); height: var(--h); overflow: hidden;
+    background: radial-gradient(120% 90% at 15% 10%, var(--lit) 0%, var(--mid) 50%, var(--deep) 100%);
+  }
+  .grain { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, transparent 1px 6px); }
+  .light { position: absolute; right: -25%; top: -33%; width: 70%; height: 90%; border-radius: 50%; background: rgba(255,255,255,.10); filter: blur(64px); }
+
+  .label { position: absolute; left: 6%; top: 9%; width: 46%; color: #fff; }
+  .kind { display: flex; align-items: center; gap: 10px; font: 500 15px/1 'Geist Mono', monospace; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+  .kind i { width: 9px; height: 9px; border-radius: 50%; background: var(--gold); }
+  h1 { margin-top: 18px; font-weight: 600; font-size: 76px; line-height: .95; letter-spacing: -0.04em; text-wrap: balance; }
+  .line { margin-top: 18px; font-size: 23px; line-height: 1.35; color: rgba(255,255,255,.72); }
+
+  /* Signature: the glucose band, read the way a patient reads it in the app. */
+  .band { position: absolute; left: 6%; top: 39.5%; width: 27%; }
+  .reading { display: flex; align-items: baseline; gap: 10px; }
+  .reading b { font-size: 54px; font-weight: 600; letter-spacing: -0.035em; line-height: 1; }
+  .reading span { font-size: 17px; color: rgba(255,255,255,.72); }
+  .reading em { font-style: normal; font-size: 17px; font-weight: 600; color: var(--elevated); margin-left: 4px; }
+  .bar { position: relative; display: grid; grid-template-columns: 1fr 1.6fr .55fr 2fr; gap: 4px; height: 7px; }
+  .bar s { border-radius: 99px; text-decoration: none; }
+  .bar s:nth-child(1) { background: var(--low); } .bar s:nth-child(2) { background: var(--normal); }
+  .bar s:nth-child(3) { background: var(--elevated); } .bar s:nth-child(4) { background: var(--high); }
+  .marker { position: absolute; top: 50%; left: 57%; width: 19px; height: 19px; margin: -9.5px 0 0 -9.5px; border-radius: 50%; background: #fff; border: 5px solid #0f2a47; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+  .ticks { display: grid; grid-template-columns: 1fr 1.6fr .55fr 2fr; gap: 5px; margin-top: 10px; font-size: 13.5px; color: rgba(255,255,255,.6); }
+
+  .chips { position: absolute; left: 6%; bottom: 8%; display: flex; gap: 10px; }
+  .chip { border-radius: 99px; padding: 8px 15px; font-size: 15px; font-weight: 500; }
+  .award { border: 1px solid rgba(245,196,81,.4); background: rgba(245,196,81,.15); color: var(--gold); }
+  .lang { border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08); color: rgba(255,255,255,.85); }
+  .lang k { font-family: 'Noto Sans Khmer', sans-serif; font-weight: 600; }
+
+  .window { position: absolute; overflow: hidden; border-radius: 14px; background: #fff; box-shadow: 0 40px 80px -30px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.12); }
+  .chrome { height: 30px; display: flex; align-items: center; gap: 7px; padding: 0 12px; background: #f4f4f6; border-bottom: 1px solid rgba(0,0,0,.05); }
+  .chrome i { width: 9px; height: 9px; border-radius: 50%; background: rgba(0,0,0,.15); }
+  .chrome span { margin: 0 auto; font: 12px 'Geist Mono', monospace; color: rgba(0,0,0,.45); }
+  .window img { display: block; width: 100%; }
+  .phone { position: absolute; overflow: hidden; border-radius: 26px; border: 5px solid #0a1a2e; background: #0a1a2e; box-shadow: 0 40px 60px -20px rgba(0,0,0,.65); }
+  .phone img { display: block; width: 100%; border-radius: 21px; }
+
+  /* Card (16:10): devices bottom-right, like every other cover in the grid. */
+  .card .window { right: -4%; bottom: -7%; width: 60%; }
+  .card .phone { left: 38%; bottom: -12%; width: 17%; }
+
+  /* Banner (2.4:1): no title, the case study prints it above. */
+  .banner .label, .banner .chips { display: none; }
+  .banner .band { display: none; }
+  .banner .window { left: 33%; top: 13%; width: 54%; }
+  .banner .phone { left: 23%; top: 24%; width: 12.5%; }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="grain"></div>
+    <div class="light"></div>
+
+    <div class="label">
+      <p class="kind"><i></i>Clinical assistant</p>
+      <h1>Diabetes Expert System</h1>
+      <p class="line">Early diabetes screening, in two languages</p>
+    </div>
+
+    <div class="band" aria-hidden="true">
+      <div class="bar"><s></s><s></s><s></s><s></s><span class="marker"></span></div>
+    </div>
+
+    <div class="chips">
+      <span class="chip award">Award winner 2026</span>
+      <span class="chip lang">English · <k>ខ្មែរ</k></span>
+    </div>
+
+    <div class="window">
+      <div class="chrome"><i></i><i></i><i></i><span>diabetes-expert-system</span></div>
+      <img src="../screens/doctor-home.webp" alt="" />
+    </div>
+    <div class="phone"><img src="../screens/m-patient-home.webp" alt="" /></div>
+  </div>
+  <script>
+    const mode = new URLSearchParams(location.search).get('mode') || 'card';
+    const [w, h] = mode === 'banner' ? [1920, 800] : [1600, 1000];
+    document.documentElement.style.setProperty('--w', w + 'px');
+    document.documentElement.style.setProperty('--h', h + 'px');
+    document.getElementById('stage').classList.add(mode);
+  </script>
+</body>
+</html>
