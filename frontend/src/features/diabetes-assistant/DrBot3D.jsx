@@ -59,7 +59,7 @@ export function DrBot3D({
     let scene = null
     let camera = null
     let modelInstance = null
-    const clock = new THREE.Clock()
+    const timer = new THREE.Timer()
 
     // 1. Scene setup
     scene = new THREE.Scene()
@@ -136,7 +136,8 @@ export function DrBot3D({
           if (isDestroyed) return
           animationFrameId = requestAnimationFrame(animate)
 
-          const elapsed = clock.getElapsedTime()
+          timer.update()
+          const elapsed = timer.getElapsed()
 
           if (idleAnimation && rootGroup) {
             // Gentle hovering bob

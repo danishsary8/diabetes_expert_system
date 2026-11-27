@@ -11,7 +11,7 @@ import html
 import json
 import logging
 import re
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from io import BytesIO
 from pathlib import Path
 from typing import Any
@@ -53,6 +53,11 @@ KHMER_FONT_PATH = KHMER_FONT_NOTO if KHMER_FONT_NOTO.is_file() else KHMER_FONT_D
 LOGO_PATH_OPT = STATIC_DIR / "images" / "logo_pdf.png"
 LOGO_PATH_ORIG = STATIC_DIR / "images" / "logo.png"
 EXACT_KM_PATH = Path(__file__).resolve().parents[1] / "locales" / "exact-en-km.json"
+
+
+def _utcnow() -> datetime:
+    """Naive UTC "now" — same value as the deprecated datetime.utcnow()."""
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 def _ensure_khmer_font() -> bool:
@@ -232,7 +237,7 @@ def render_diagnosis_report_pdf(diagnosis_result, *, lang: str = "en", config: d
         facts = diagnosis_result.get("facts_json") or diagnosis_result.get("clinical_inputs") or diagnosis_result.get("facts")
     facts = facts or {}
 
-    created_at = getattr(diagnosis_result, "created_at", None) or (diagnosis_result.get("created_at") if isinstance(diagnosis_result, dict) else None) or datetime.utcnow()
+    created_at = getattr(diagnosis_result, "created_at", None) or (diagnosis_result.get("created_at") if isinstance(diagnosis_result, dict) else None) or _utcnow()
     res_id = getattr(diagnosis_result, "id", None) or (diagnosis_result.get("id") or diagnosis_result.get("assessment_id") if isinstance(diagnosis_result, dict) else None) or 1
     report_number = _build_report_number(res_id, created_at)
     patient_name = (
@@ -993,7 +998,7 @@ def _build_report_number(diagnosis_result_id: int | None, created_at: Any) -> st
     elif isinstance(created_at, str) and len(created_at) >= 10:
         date_part = re.sub(r"\D", "", created_at[:10])
     else:
-        date_part = datetime.utcnow().strftime("%Y%m%d")
+        date_part = _utcnow().strftime("%Y%m%d")
     clean_id = diagnosis_result_id or 0
     return f"DX-{date_part}-{clean_id:04d}"
 
@@ -1212,7 +1217,7 @@ def render_html_report_weasyprint(
     if facts is None:
         facts = _get_attr_or_key(diagnosis_result, "clinical_inputs") or _get_attr_or_key(diagnosis_result, "facts") or {}
 
-    created_at = _get_attr_or_key(diagnosis_result, "created_at") or datetime.utcnow()
+    created_at = _get_attr_or_key(diagnosis_result, "created_at") or _utcnow()
     res_id = _get_attr_or_key(diagnosis_result, "id") or _get_attr_or_key(diagnosis_result, "assessment_id") or 1
 
     patient_name = _get_attr_or_key(patient, "full_name") or ("អ្នកជំងឺ" if is_km else "Patient")
@@ -1346,7 +1351,7 @@ def render_html_report_weasyprint(
         status_label=status_label,
         review_date=review_date,
         clinician_name_auth=_get_attr_or_key(clinician, "name") or ("វេជ្ជបណ្ឌិតឯកទេស" if is_km else "Attending Endocrinologist"),
-        year=datetime.utcnow().year,
+        year=_utcnow().year,
     )
 
     pdf_bytes = _weasyprint.HTML(string=rendered_html).write_pdf()

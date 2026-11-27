@@ -628,7 +628,7 @@ export function PatientDashboardPage() {
             </div>
 
             <div className="mt-5 h-60 w-full sm:h-72">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 1, height: 1 }}>
                 <AreaChart data={trendData} margin={{ top: 12, right: 8, left: -22, bottom: 0 }}>
                   <defs>
                     <linearGradient id="patientGlucoseFill" x1="0" y1="0" x2="0" y2="1">

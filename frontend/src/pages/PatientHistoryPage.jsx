@@ -754,7 +754,7 @@ export function PatientHistoryPage() {
               </div>
 
               <div className="mt-3 h-36 w-full min-w-0">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 1, height: 1 }}>
                   <LineChart data={visitHistoryData} margin={{ top: 8, right: 8, left: -22, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-slate-100 dark:text-slate-800/80" />
                     <XAxis
