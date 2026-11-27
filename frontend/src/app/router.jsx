@@ -9,6 +9,7 @@ import { RouteLoading } from '../components/RouteLoading'
 import { UnauthorizedPage } from '../pages/public/UnauthorizedPage'
 import { NotFoundPage } from '../pages/public/NotFoundPage'
 import { PrivacyPage } from '../pages/public/PrivacyPage'
+import { TermsPage } from '../pages/public/TermsPage'
 import { lazyWithRetry } from '@/lib/lazyWithRetry'
 
 /*
@@ -233,8 +234,9 @@ export function AppRouter() {
 
   return (
     <Routes>
-      {/* Privacy policy: public for everyone, signed in or not */}
+      {/* Privacy policy and terms: public for everyone, signed in or not */}
       <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
 
       {/* Root is ALWAYS the Landing Page */}
       <Route
