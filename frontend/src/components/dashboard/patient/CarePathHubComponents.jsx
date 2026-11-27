@@ -20,7 +20,7 @@ import { cn } from '@/lib/utils'
 import { MiniSparkline } from '@/components/ui/MiniSparkline'
 
 // ============================================================================
-// 1. TODAY'S CARE GOALS (Inspired by the goals layout, styled like Dashboard)
+// 1. TODAY'S CARE GOALS
 // ============================================================================
 export function CarePlanGoals({ t }) {
   const [goals, setGoals] = useState([
@@ -81,17 +81,17 @@ export function CarePlanGoals({ t }) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3.5 dark:border-slate-800">
         <div>
           <h2 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-            Today's Care Goals
+            {t('carePlanCards.goalsTitle', "Today's Care Goals")}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Daily diabetes management tasks and health habits
+            {t('carePlanCards.goalsSubtitle', 'Daily diabetes management tasks and health habits')}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            {completedCount} of {goals.length} Completed ({progressPercent}%)
+            {t('carePlanCards.goalsProgress', '{{done}} of {{total}} done ({{percent}}%)', { done: completedCount, total: goals.length, percent: progressPercent })}
           </span>
         </div>
       </div>
@@ -156,11 +156,11 @@ export function CarePlanGoals({ t }) {
                 {isDone ? (
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 transition-colors dark:bg-emerald-950/50 dark:text-emerald-300">
                     <Check className="h-3.5 w-3.5 stroke-[2.5]" />
-                    <span>Completed</span>
+                    <span>{t('carePlanCards.completed', 'Completed')}</span>
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 transition-colors group-hover:bg-slate-200/80 dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-slate-700/80">
-                    <span>Scheduled</span>
+                    <span>{t('carePlanCards.scheduled', 'Scheduled')}</span>
                     <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
                   </span>
                 )}
@@ -174,7 +174,7 @@ export function CarePlanGoals({ t }) {
 }
 
 // ============================================================================
-// 2. PRESCRIBED MEDICATIONS TABLE (Inspired by meds layout, styled like Dashboard)
+// 2. PRESCRIBED MEDICATIONS
 // ============================================================================
 export function CarePlanMedications({ t }) {
   const [meds, setMeds] = useState([
@@ -219,10 +219,10 @@ export function CarePlanMedications({ t }) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3.5 dark:border-slate-800">
         <div>
           <h2 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-            Prescribed Medications
+            {t('carePlanCards.medsTitle', 'Prescribed Medications')}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Active pharmacotherapy regimen and dosing schedule
+            {t('carePlanCards.medsSubtitle', 'Active pharmacotherapy regimen and dosing schedule')}
           </p>
         </div>
 
@@ -236,10 +236,10 @@ export function CarePlanMedications({ t }) {
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:border-slate-800">
-              <th className="py-2.5 font-bold">Medication & Timing</th>
-              <th className="py-2.5 font-bold">Dosage</th>
-              <th className="py-2.5 font-bold hidden sm:table-cell">Instructions</th>
-              <th className="py-2.5 text-right font-bold">Status</th>
+              <th className="py-2.5 font-bold">{t('carePlanCards.colMedication', 'Medication & Timing')}</th>
+              <th className="py-2.5 font-bold">{t('carePlanCards.colDosage', 'Dosage')}</th>
+              <th className="py-2.5 font-bold hidden sm:table-cell">{t('carePlanCards.colInstructions', 'Instructions')}</th>
+              <th className="py-2.5 text-right font-bold">{t('carePlanCards.colStatus', 'Status')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -288,7 +288,7 @@ export function CarePlanMedications({ t }) {
 }
 
 // ============================================================================
-// 3. UPCOMING APPOINTMENTS (Inspired by appointments card, styled like Dashboard)
+// 3. UPCOMING APPOINTMENTS
 // ============================================================================
 export function CarePlanAppointments({ t }) {
   const appointments = [
@@ -327,10 +327,10 @@ export function CarePlanAppointments({ t }) {
       <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
         <div>
           <h3 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-            Upcoming Appointments
+            {t('carePlanCards.apptsTitle', 'Upcoming Appointments')}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Scheduled consultations and lab work orders
+            {t('carePlanCards.apptsSubtitle', 'Scheduled consultations and lab work orders')}
           </p>
         </div>
 
@@ -394,7 +394,7 @@ export function CarePlanProgressTracker({ t }) {
       <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
         <div>
           <h3 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-            Care Plan Progress
+            {t('carePlanCards.progressTitle', 'Care Plan Progress')}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             30-Day Glycemic Stabilization Protocol
@@ -473,10 +473,10 @@ export function CarePlanVitalsSnapshot({ results = [], t }) {
     <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:border-slate-800 dark:bg-slate-900">
       <div className="flex items-center justify-between">
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-          Vitals Trend
+          {t('carePlanCards.vitalsTitle', 'Vitals Trend')}
         </h4>
         <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300">
-          In Target Range
+          {t('carePlanCards.inTarget', 'In Target Range')}
         </span>
       </div>
 
@@ -513,7 +513,7 @@ export function CarePlanActivitySnapshot({ t }) {
     <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:border-slate-800 dark:bg-slate-900">
       <div className="flex items-center justify-between">
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-          Daily Activity
+          {t('carePlanCards.activityTitle', 'Daily Activity')}
         </h4>
         <span className="text-[10px] font-bold text-slate-400">7-Day Log</span>
       </div>

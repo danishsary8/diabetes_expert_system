@@ -1447,7 +1447,7 @@ export function DiagnosisPage() {
                 </div>
               </div>
 
-              {/* Progress bar matching prototype */}
+              {/* Progress bar */}
               <div className={cn("h-2 w-full rounded-full relative z-0", isColoredInterview ? "bg-white/20" : "bg-slate-200 dark:bg-slate-800")}>
                 <div
                   className={cn("h-2 rounded-full transition-all duration-500 ease-out", isColoredInterview ? "bg-white" : "bg-blue-600 dark:bg-blue-500")}
@@ -1717,7 +1717,7 @@ export function DiagnosisPage() {
                     </div>
                   </div>
 
-                  {/* ── Review Summary Table (Inspired by clean questionnaire style) ── */}
+                  {/* ── Review summary table ── */}
                   <QSection
                     icon={<ClipboardList className="h-5 w-5 text-navy dark:text-blue-400" />}
                     title={t('assessment.reviewSummary', 'Review Summary')}

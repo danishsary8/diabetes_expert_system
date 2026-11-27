@@ -511,7 +511,7 @@ function BmiQuestionCard({
         </div>
       </main>
 
-      {/* ⭐ PNG OVERLAY */}
+      {/* Question illustration (sized and faded by .assessment-illustration) */}
       <img
         src="/images/png/bmiscale.png"
         alt="BMI Scale and Medical Record"
@@ -835,7 +835,7 @@ function WaistQuestionCard({
         </div>
       </main>
 
-      {/* ⭐ PNG OVERLAY */}
+      {/* Question illustration (sized and faded by .assessment-illustration) */}
       <img
         src={
           form?.sex === 'female'
@@ -915,7 +915,7 @@ function QuestionCard({
         </div>
       </main>
 
-      {/* ⭐ PNG OVERLAY */}
+      {/* Question illustration (sized and faded by .assessment-illustration) */}
       {displayMedia ? (
         <img
           src={displayMedia.image}

@@ -22,6 +22,7 @@ import {
 import api, { getApiData, getApiErrorMessage } from '@/api/client'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { getLocaleForLanguage } from '@/lib/i18n'
 import { ErrorAlert, LoadingState, StatusBadge, Skeleton, StatCardsSkeleton, CardListSkeleton } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import {
@@ -166,7 +167,7 @@ function SafetyCard({ t }) {
 
 export function CarePlanPage() {
   const { user } = useAuth()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -233,7 +234,7 @@ export function CarePlanPage() {
   const firstName = (user?.name || '').trim().split(/\s+/)[0] || 'Patient'
   const isUrgent = Boolean(latestResult?.is_urgent)
 
-  const formattedToday = new Intl.DateTimeFormat('en-US', {
+  const formattedToday = new Intl.DateTimeFormat(getLocaleForLanguage(language), {
     weekday: 'long',
     month: 'short',
     day: 'numeric',
@@ -336,7 +337,7 @@ export function CarePlanPage() {
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'
                 )}
               >
-                {tab}
+                {t(`carePlanCards.tabs.${tab.replace(/\s+/g, '')}`, tab)}
               </button>
             )
           })}
@@ -380,7 +381,7 @@ export function CarePlanPage() {
       </div>
 
       {/* ==================================================================== */}
-      {/* 3. MASTER SAAS 2-COLUMN GRID (Matching Dashboard 8/4 proportion)    */}
+      {/* 3. Two-column layout: daily care on the left, progress on the right */}
       {/* ==================================================================== */}
       {activeTab === 'Overview' && (
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">

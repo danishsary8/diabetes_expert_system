@@ -227,7 +227,7 @@ export function Topbar({
         {/* Right Section: Actions & Controls                        */}
         {/* ======================================================== */}
         <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
-          {/* Date Clock Indicator (Sleek Ghost Chip) */}
+          {/* Today's date */}
           <HeaderClock theme={theme} language={language} />
 
           {/* Hairline Divider */}
@@ -240,13 +240,13 @@ export function Topbar({
             <button
               type="button"
               onClick={() => setLangMenuOpen((prev) => !prev)}
-              className="inline-flex h-9 items-center gap-2 rounded-xl px-2.5 text-xs font-semibold text-slate-700 transition-all duration-150 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+              className="inline-flex h-9 items-center gap-2 rounded-xl px-2 text-xs font-semibold sm:px-2.5 text-slate-700 transition-all duration-150 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               aria-label={t('topbar.languageSwitcher')}
               title={t('topbar.languageSwitcher')}
             >
               {language === 'km' ? <CambodiaFlag /> : <UsFlag />}
-              <span className="font-semibold">{language === 'km' ? 'KM' : 'EN'}</span>
-              <ChevronDown className="h-3 w-3 text-slate-400 transition-transform" />
+              <span className="hidden font-semibold sm:inline">{language === 'km' ? 'KM' : 'EN'}</span>
+              <ChevronDown className="hidden h-3 w-3 text-slate-400 transition-transform sm:block" />
             </button>
 
             {/* Language Popover Menu */}
@@ -347,7 +347,7 @@ export function Topbar({
                 className="h-8 w-8 shrink-0 rounded-full"
               />
 
-              <ChevronDown className="h-3 w-3 text-slate-400" />
+              <ChevronDown className="hidden h-3 w-3 text-slate-400 sm:block" />
             </button>
 
             {/* Profile Dropdown Popover */}

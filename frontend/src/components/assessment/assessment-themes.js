@@ -8,7 +8,7 @@ export const DEFAULT_ASSESSMENT_THEME = {
 }
 
 export const NODE_THEMES = {
-  // 1. Demographics & Profile: Royal Navy (Classic prototype theme)
+  // 1. Demographics & profile: royal navy
   subject: {
     bg: '#12488F',
     shape1: '#0D3B78',
@@ -60,7 +60,7 @@ export const NODE_THEMES = {
     radioAccent: 'accent-teal-500',
   },
 
-  // 3. Waist: Classic Royal Blue (User's prototype specification)
+  // 3. Waist: royal blue
   waist: {
     bg: '#12488F',
     shape1: '#0D3B78',

@@ -38,6 +38,7 @@ import api, { getApiData, getApiErrorMessage } from '@/api/client'
 import { ErrorAlert, DashboardSkeleton } from '@/components/ui'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { getLocaleForLanguage } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 import { RANGE_PRESETS, RangeRibbon, getRangeSegment } from '@/components/patient/RangeRibbon'
 import { useChartPalette } from '@/components/patient/patient-palette'
@@ -136,7 +137,7 @@ function getGreeting(name, t) {
   return name ? `${greeting}, ${name}` : greeting
 }
 
-/** Linear-style minimalist chart tooltip */
+/** Tooltip for the weekly glucose chart. */
 function ChartCustomTooltip({ active, payload }) {
   if (!active || !payload?.length) return null
   const data = payload[0].payload
@@ -170,11 +171,12 @@ function ChartCustomTooltip({ active, payload }) {
 }
 
 // ============================================================================
-// MAIN COMPONENT: PATIENT DASHBOARD (SAAS DESIGN)
+// PATIENT HOME
 // ============================================================================
 export function PatientDashboardPage() {
   const { user } = useAuth()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
+  const locale = getLocaleForLanguage(language)
   const [patientResults, setPatientResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -276,7 +278,7 @@ export function PatientDashboardPage() {
     if (!latestResult?.created_at) return null
     try {
       const date = new Date(latestResult.created_at)
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleDateString(locale, {
         month: 'short',
         day: 'numeric',
         hour: 'numeric',
@@ -285,27 +287,27 @@ export function PatientDashboardPage() {
     } catch {
       return null
     }
-  }, [latestResult])
+  }, [latestResult, locale])
 
   // Current calendar day string
   const formattedToday = useMemo(() => {
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(locale, {
       weekday: 'long',
       month: 'short',
       day: 'numeric',
     }).format(new Date())
-  }, [])
+  }, [locale])
 
   // 7-day glucose trend data
   const trendData = useMemo(() => {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     const today = new Date()
     const variance = [-6, 8, -4, 12, -2, 5, 0]
 
-    return days.map((dayName, idx) => {
+    return variance.map((_, idx) => {
       const d = new Date()
       d.setDate(today.getDate() - (6 - idx))
-      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      const dayName = d.toLocaleDateString(locale, { weekday: 'short' })
+      const dateStr = d.toLocaleDateString(locale, { month: 'short', day: 'numeric' })
       const val = Math.max(70, Math.round(glucose + variance[idx]))
 
       return {
@@ -314,7 +316,7 @@ export function PatientDashboardPage() {
         glucose: val,
       }
     })
-  }, [glucose])
+  }, [glucose, locale])
 
   const avgGlucose = useMemo(() => {
     if (!trendData.length) return glucose
@@ -329,11 +331,12 @@ export function PatientDashboardPage() {
     const monday = new Date(today)
     monday.setDate(today.getDate() - distToMon + weekOffset * 7)
 
-    const monthName = monday.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    const monthName = monday.toLocaleDateString(locale, { month: 'long', year: 'numeric' })
 
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((name, idx) => {
+    const days = Array.from({ length: 7 }, (_, idx) => {
       const d = new Date(monday)
       d.setDate(monday.getDate() + idx)
+      const name = d.toLocaleDateString(locale, { weekday: 'short' })
       const isToday = d.toDateString() === today.toDateString()
 
       return {
@@ -345,19 +348,15 @@ export function PatientDashboardPage() {
     })
 
     return { monthName, days }
-  }, [weekOffset])
+  }, [weekOffset, locale])
 
   // Selected date label in timeline header
   const selectedDateLabel = useMemo(() => {
     const selectedObj = calendarWeek.days[selectedDayIndex]
     if (!selectedObj) return formattedToday
-    const d = selectedObj.fullDate
-    const isToday = selectedObj.isToday
-    const month = d.toLocaleDateString('en-US', { month: 'long' })
-    const day = d.getDate()
-    const weekday = selectedObj.dayName
-    return `${month} ${day}, ${isToday ? 'Today, ' : ''}${weekday}`
-  }, [calendarWeek, selectedDayIndex, formattedToday])
+    const label = selectedObj.fullDate.toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' })
+    return selectedObj.isToday ? t('patientHome.plan.todayLabel', 'Today · {{date}}', { date: label }) : label
+  }, [calendarWeek, selectedDayIndex, formattedToday, locale, t])
 
   // Whether currently viewing today's schedule
   const isViewingToday = useMemo(() => {
@@ -732,7 +731,7 @@ export function PatientDashboardPage() {
                 const isSelected = idx === selectedDayIndex
                 return (
                   <button
-                    key={item.dayName}
+                    key={item.fullDate.toDateString()}
                     type="button"
                     onClick={() => setSelectedDayIndex(idx)}
                     aria-pressed={isSelected}
@@ -743,7 +742,7 @@ export function PatientDashboardPage() {
                         : 'text-slate-700 hover:bg-white dark:text-slate-300 dark:hover:bg-night-border'
                     )}
                   >
-                    <span className={cn('text-[11px] font-medium', isSelected ? 'text-primary-100 dark:text-navy-deep/80' : 'text-slate-400')}>
+                    <span className={cn('block w-full truncate px-0.5 text-[11px] font-medium', isSelected ? 'text-primary-100 dark:text-navy-deep/80' : 'text-slate-400')}>
                       {item.dayName}
                     </span>
                     <span className="text-sm font-bold tabular-nums">{item.dayNum}</span>
@@ -826,10 +825,10 @@ export function PatientDashboardPage() {
                             isCompleted ? 'text-slate-400 line-through dark:text-slate-500' : 'text-slate-900 dark:text-slate-100'
                           )}
                         >
-                          {item.title}
+                          {t(`patientHome.schedule.${item.id}.title`, item.title)}
                         </span>
                         <span className="mt-0.5 block text-xs leading-snug text-slate-500 line-clamp-2 dark:text-slate-400">
-                          {item.subtitle}
+                          {t(`patientHome.schedule.${item.id}.subtitle`, item.subtitle)}
                         </span>
                       </span>
                       <span

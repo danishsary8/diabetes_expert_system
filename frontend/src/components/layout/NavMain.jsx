@@ -38,7 +38,7 @@ export function NavMain({ title, items, collapsed = false }) {
               >
                 {({ isActive }) => (
                   <>
-                    {/* Sleek left accent indicator */}
+                    {/* Active item marker */}
                     {isActive && !collapsed && (
                       <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-primary-600 dark:bg-primary-400 transition-all duration-200" />
                     )}

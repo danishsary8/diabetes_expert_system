@@ -3429,6 +3429,7 @@
       "open": "Read the full report"
     },
     "plan": {
+      "todayLabel": "Today · {{date}}",
       "title": "Your day",
       "progress": "{{done}} of {{total}} done",
       "prevWeek": "Previous week",
@@ -3440,6 +3441,32 @@
       "filterActivity": "Activity",
       "now": "Now",
       "openCarePlan": "Open my full care plan"
+    },
+    "schedule": {
+      "sched_glucose_am": {
+        "title": "Morning Fasting Glucose",
+        "subtitle": "Fasting reading before breakfast • Target: 80–130 mg/dL"
+      },
+      "sched_meds_am": {
+        "title": "Metformin 500mg",
+        "subtitle": "Take 1 tablet with full glass of water after breakfast"
+      },
+      "sched_walk_pm": {
+        "title": "30-Min Post-Meal Walk",
+        "subtitle": "Light aerobic cardio to improve muscle glucose uptake"
+      },
+      "sched_doctor_pm": {
+        "title": "Endocrinology Check-in",
+        "subtitle": "Dr. Lina • Diabetes Care Team Review"
+      },
+      "sched_glucose_pm": {
+        "title": "Post-Dinner Glucose Log",
+        "subtitle": "Check 2-hour postprandial blood sugar"
+      },
+      "sched_night_routine": {
+        "title": "Evening Hydration & Meds",
+        "subtitle": "Review daily diary and prepare for sleep"
+      }
     },
     "category": {
       "glucose": "Glucose",
@@ -3459,5 +3486,30 @@
     "report": "Open my report",
     "newCheck": "New health check",
     "lastCheck": "Last check: {{date}}"
+  },
+  "carePlanCards": {
+    "tabs": {
+      "Overview": "Overview",
+      "TreatmentPlan": "Treatment Plan",
+      "Medications": "Medications",
+      "Appointments": "Appointments"
+    },
+    "goalsTitle": "Today's Care Goals",
+    "goalsSubtitle": "Daily diabetes management tasks and health habits",
+    "medsTitle": "Prescribed Medications",
+    "medsSubtitle": "Active pharmacotherapy regimen and dosing schedule",
+    "apptsTitle": "Upcoming Appointments",
+    "apptsSubtitle": "Scheduled consultations and lab work orders",
+    "progressTitle": "Care Plan Progress",
+    "vitalsTitle": "Vitals Trend",
+    "inTarget": "In Target Range",
+    "activityTitle": "Daily Activity",
+    "completed": "Completed",
+    "scheduled": "Scheduled",
+    "colMedication": "Medication & Timing",
+    "colDosage": "Dosage",
+    "colInstructions": "Instructions",
+    "colStatus": "Status",
+    "goalsProgress": "{{done}} of {{total}} done ({{percent}}%)"
   }
 }
