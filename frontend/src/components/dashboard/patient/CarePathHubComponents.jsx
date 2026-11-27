@@ -1,70 +1,67 @@
 import { useState } from 'react'
 import {
-  Activity,
   Calendar,
   Check,
-  CheckCircle2,
   ChevronRight,
   Clock,
   Droplets,
-  FileText,
   Footprints,
   HeartPulse,
-  MoreHorizontal,
   Pill,
   Sparkles,
-  Stethoscope,
-  TrendingUp,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { MiniSparkline } from '@/components/ui/MiniSparkline'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { getLocaleForLanguage } from '@/lib/i18n'
+import { RANGE_PRESETS, RangeRibbon, getRangeSegment } from '@/components/patient/RangeRibbon'
 
 // ============================================================================
 // 1. TODAY'S CARE GOALS
 // ============================================================================
+const DAILY_HABITS = [
+  {
+    id: 'goal-glucose-am',
+    title: 'Morning fasting glucose check',
+    time: '08:00',
+    target: 'Before breakfast · target 80–130 mg/dL',
+    icon: Droplets,
+    badgeColor: 'amber',
+  },
+  {
+    id: 'goal-meds-am',
+    title: 'Morning medication',
+    time: '08:30',
+    target: 'Take it exactly as your doctor prescribed',
+    icon: Pill,
+    badgeColor: 'sky',
+  },
+  {
+    id: 'goal-exercise-pm',
+    title: '30-minute walk after a meal',
+    time: '12:30',
+    target: 'Helps your muscles use blood sugar',
+    icon: Footprints,
+    badgeColor: 'emerald',
+  },
+  {
+    id: 'goal-foot-pm',
+    title: 'Check your feet',
+    time: '20:00',
+    target: 'Look for cuts, redness or pressure spots',
+    icon: HeartPulse,
+    badgeColor: 'rose',
+  },
+]
+
 export function CarePlanGoals({ t }) {
-  const [goals, setGoals] = useState([
-    {
-      id: 'goal-glucose-am',
-      title: 'Morning Fasting Glucose Check',
-      time: '08:00 AM',
-      target: 'Target: 80–130 mg/dL',
-      category: 'glucose',
-      completed: true,
-      icon: Droplets,
-      badgeColor: 'amber',
-    },
-    {
-      id: 'goal-meds-am',
-      title: 'Metformin 500mg (Morning Dose)',
-      time: '08:30 AM',
-      target: 'Take with breakfast & full glass of water',
-      category: 'meds',
-      completed: true,
-      icon: Pill,
-      badgeColor: 'sky',
-    },
-    {
-      id: 'goal-exercise-pm',
-      title: '30-Min Postprandial Walk',
-      time: '12:30 PM',
-      target: 'Aerobic activity to boost insulin uptake',
-      category: 'activity',
+  const [goals, setGoals] = useState(() =>
+    DAILY_HABITS.map((habit) => ({
+      ...habit,
+      title: t(`carePlanCards.habits.${habit.id}.title`, habit.title),
+      target: t(`carePlanCards.habits.${habit.id}.target`, habit.target),
       completed: false,
-      icon: Footprints,
-      badgeColor: 'emerald',
-    },
-    {
-      id: 'goal-foot-pm',
-      title: 'Diabetic Foot & Skin Examination',
-      time: '08:00 PM',
-      target: 'Check for pressure spots & maintain hydration',
-      category: 'prevention',
-      completed: false,
-      icon: HeartPulse,
-      badgeColor: 'rose',
-    },
-  ])
+    }))
+  )
 
   const toggleGoal = (id) => {
     setGoals((prev) =>
@@ -183,395 +180,250 @@ export function CarePlanGoals({ t }) {
 }
 
 // ============================================================================
-// 2. PRESCRIBED MEDICATIONS
+// Shared pieces
 // ============================================================================
-export function CarePlanMedications({ t }) {
-  const [meds, setMeds] = useState([
-    {
-      id: 'med-1',
-      name: 'Metformin Hydrochloride (Glucophage)',
-      schedule: '08:00 AM (Breakfast) & 07:00 PM (Dinner)',
-      dosage: '500 mg',
-      instructions: 'Take with food to minimize GI effects',
-      category: 'Antihyperglycemic',
-      taken: true,
-    },
-    {
-      id: 'med-2',
-      name: 'Lisinopril (Zestril)',
-      schedule: '08:00 AM (Morning dose)',
-      dosage: '10 mg',
-      instructions: 'Blood pressure & kidney microvascular protection',
-      category: 'ACE Inhibitor',
-      taken: true,
-    },
-    {
-      id: 'med-3',
-      name: 'Empagliflozin (Jardiance)',
-      schedule: '08:00 AM (Once daily)',
-      dosage: '10 mg',
-      instructions: 'Promotes urinary glucose excretion (SGLT2i)',
-      category: 'SGLT2 Inhibitor',
-      taken: false,
-    },
-  ])
+const CARD = 'flex flex-col rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lift dark:border-night-border dark:bg-night-surface'
 
-  const toggleMed = (id) => {
-    setMeds((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, taken: !m.taken } : m))
-    )
+function CardHeader({ title, subtitle, aside, as: Heading = 'h2' }) {
+  return (
+    <div className="flex flex-col gap-2 border-b border-slate-100 pb-3.5 sm:flex-row sm:items-start sm:justify-between dark:border-night-border">
+      <div className="min-w-0">
+        <Heading className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">{title}</Heading>
+        {subtitle ? <p className="text-xs text-slate-500 dark:text-slate-400">{subtitle}</p> : null}
+      </div>
+      {aside}
+    </div>
+  )
+}
+
+function EmptyNote({ icon: Icon, children }) {
+  return (
+    <div className="mt-4 flex items-start gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-4 text-sm leading-relaxed text-slate-600 dark:border-night-border dark:bg-night-elevated/50 dark:text-slate-300">
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
+      <p>{children}</p>
+    </div>
+  )
+}
+
+function formatPlanDate(value, locale) {
+  if (!value) return null
+  const date = new Date(`${value}T00:00:00`)
+  if (Number.isNaN(date.getTime())) return null
+  return {
+    month: date.toLocaleDateString(locale, { month: 'short' }),
+    day: date.toLocaleDateString(locale, { day: '2-digit' }),
   }
+}
+
+// ============================================================================
+// 2. MEDICATIONS — from the patient's treatment plan
+// ============================================================================
+export function CarePlanMedications({ plan, t }) {
+  const planMeds = plan?.medications || []
+  const [taken, setTaken] = useState({})
 
   return (
-    <section className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all duration-200 dark:border-slate-800 dark:bg-slate-900">
-      {/* Card Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3.5 dark:border-slate-800">
-        <div>
-          <h2 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-            {t('carePlanCards.medsTitle', 'Prescribed Medications')}
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {t('carePlanCards.medsSubtitle', 'Active pharmacotherapy regimen and dosing schedule')}
-          </p>
-        </div>
+    <section className={CARD}>
+      <CardHeader
+        title={t('carePlanCards.medsTitle', 'Prescribed Medications')}
+        subtitle={plan?.doctorName
+          ? t('carePlanCards.medsFrom', 'From the plan written by {{doctor}}', { doctor: plan.doctorName })
+          : t('carePlanCards.medsSubtitle', 'Active pharmacotherapy regimen and dosing schedule')}
+      />
 
-        <span className="text-xs font-mono font-semibold text-slate-400 dark:text-slate-500">
-          Rx ACTIVE
-        </span>
-      </div>
-
-      {/* Table Structure */}
-      <div className="mt-3 overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:border-slate-800">
-              <th className="py-2.5 font-bold">{t('carePlanCards.colMedication', 'Medication & Timing')}</th>
-              <th className="py-2.5 font-bold">{t('carePlanCards.colDosage', 'Dosage')}</th>
-              <th className="py-2.5 font-bold hidden sm:table-cell">{t('carePlanCards.colInstructions', 'Instructions')}</th>
-              <th className="py-2.5 text-right font-bold">{t('carePlanCards.colStatus', 'Status')}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-            {meds.map((med) => (
-              <tr
-                key={med.id}
-                className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
-              >
-                <td className="py-3.5 pr-3">
+      {planMeds.length === 0 ? (
+        <EmptyNote icon={Pill}>
+          {t('carePlanCards.medsEmpty', 'No medicines are on file for you yet. When your doctor adds a treatment plan, your medicines and how to take them will appear here.')}
+        </EmptyNote>
+      ) : (
+        <ul className="mt-1 divide-y divide-slate-100 dark:divide-night-border">
+          {planMeds.map((med) => {
+            const isTaken = Boolean(taken[med.name])
+            return (
+              <li key={med.name} className="flex items-center gap-3 py-3.5">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
                     {med.name}
+                    <span className="ml-2 font-semibold text-slate-500 dark:text-slate-400">{med.dosage}</span>
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5">
-                    <Clock className="h-3 w-3 text-slate-400" />
-                    <span>{med.schedule}</span>
+                  <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                    <Clock className="h-3 w-3 shrink-0 text-slate-400" aria-hidden="true" />
+                    <span>{med.frequency}</span>
                   </p>
-                </td>
-                <td className="py-3.5 pr-3 text-sm font-bold text-slate-700 dark:text-slate-300">
-                  {med.dosage}
-                </td>
-                <td className="py-3.5 pr-3 text-xs text-slate-500 dark:text-slate-400 hidden sm:table-cell max-w-xs leading-relaxed">
-                  {med.instructions}
-                </td>
-                <td className="py-3.5 text-right">
-                  <button
-                    type="button"
-                    onClick={() => toggleMed(med.id)}
-                    aria-label={`Mark ${med.name} as ${med.taken ? 'not taken' : 'taken'}`}
-                    className={cn(
-                      'inline-flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-150 shadow-2xs',
-                      med.taken
-                        ? 'border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500'
-                        : 'border-slate-300 bg-white hover:border-emerald-500 dark:border-slate-600 dark:bg-slate-800'
-                    )}
-                  >
-                    {med.taken && <Check className="h-4 w-4 stroke-[3]" />}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  )
-}
-
-// ============================================================================
-// 3. UPCOMING APPOINTMENTS
-// ============================================================================
-export function CarePlanAppointments({ t }) {
-  const appointments = [
-    {
-      id: 'app-1',
-      month: 'Nov',
-      day: '02',
-      specialty: 'Endocrinologist Follow-up',
-      doctor: 'Dr. Lina • Diabetes Care Team',
-      location: 'Clinic Wing B, Room 204',
-      type: 'Clinical Review',
-    },
-    {
-      id: 'app-2',
-      month: 'Nov',
-      day: '05',
-      specialty: 'Comprehensive HbA1c Lab Panel',
-      doctor: 'Diagnostic Pathology Services',
-      location: 'Central Diagnostic Lab',
-      type: 'Lab Order',
-    },
-    {
-      id: 'app-3',
-      month: 'Nov',
-      day: '18',
-      specialty: 'Diabetic Retinal Eye Exam',
-      doctor: 'Dr. Jennifer • Ophthalmology Suite',
-      location: 'Eye Care Institute',
-      type: 'Preventive Screening',
-    },
-  ]
-
-  return (
-    <section className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all duration-200 dark:border-slate-800 dark:bg-slate-900">
-      {/* Card Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
-        <div>
-          <h3 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-            {t('carePlanCards.apptsTitle', 'Upcoming Appointments')}
-          </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {t('carePlanCards.apptsSubtitle', 'Scheduled consultations and lab work orders')}
-          </p>
-        </div>
-
-        <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300">
-          3 Scheduled
-        </span>
-      </div>
-
-      {/* Appointment Items with clean seamless dividers */}
-      <div className="mt-2 divide-y divide-slate-100 dark:divide-slate-800/60">
-        {appointments.map((app) => (
-          <div
-            key={app.id}
-            className="flex items-center gap-3.5 py-3 px-2 rounded-xl transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
-          >
-            {/* Boxed Date Badge */}
-            <div className="flex flex-col items-center justify-center min-w-[46px] rounded-xl bg-slate-50 px-2.5 py-1.5 shadow-2xs dark:bg-slate-800">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-                {app.month}
-              </span>
-              <span className="text-base font-extrabold text-slate-900 dark:text-slate-100 leading-tight">
-                {app.day}
-              </span>
-            </div>
-
-            {/* Specialty & Details */}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
-                  {app.specialty}
-                </h4>
-              </div>
-              <p className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate mt-0.5">
-                {app.doctor}
-              </p>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">
-                {app.location}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-// ============================================================================
-// 4. PROGRESS TRACKER (Horizontal Stepper matching Dashboard styling)
-// ============================================================================
-export function CarePlanProgressTracker({ t }) {
-  const steps = [
-    { label: 'Day 1', desc: 'Baseline Assessment', status: 'completed' },
-    { label: 'Day 7', desc: 'Regimen Adherence', status: 'completed' },
-    { label: 'Day 14', desc: 'Mid-Point Review', status: 'active', pill: 'Day 14/30' },
-    { label: 'Day 30', desc: 'Glycemic Target', status: 'pending' },
-  ]
-
-  return (
-    <section className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all duration-200 dark:border-slate-800 dark:bg-slate-900">
-      {/* Card Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
-        <div>
-          <h3 className="text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-            {t('carePlanCards.progressTitle', 'Care Plan Progress')}
-          </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            30-Day Glycemic Stabilization Protocol
-          </p>
-        </div>
-
-        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-md">
-          Phase 2 Active
-        </span>
-      </div>
-
-      {/* Horizontal Milestone Stepper */}
-      <div className="relative mt-9 mb-3 px-3">
-        {/* Continuous Connecting Line */}
-        <div className="absolute left-6 right-6 top-3 h-1 -translate-y-1/2 rounded-full bg-slate-200 dark:bg-slate-800">
-          <div className="h-full w-[67%] rounded-full bg-emerald-500" />
-        </div>
-
-        {/* Milestone Nodes */}
-        <div className="relative flex justify-between">
-          {steps.map((step, idx) => (
-            <div key={idx} className="relative flex flex-col items-center">
-              {/* Active Tooltip Pill */}
-              {step.pill ? (
-                <div className="absolute -top-7.5 whitespace-nowrap rounded-md bg-primary-800 px-2 py-0.5 text-[10px] font-bold text-white shadow-md dark:bg-primary-400 dark:text-navy-deep">
-                  {step.pill}
                 </div>
-              ) : null}
-
-              {/* Node Circle */}
-              <div
-                className={cn(
-                  'h-6 w-6 rounded-full border-2 transition-all flex items-center justify-center shadow-2xs',
-                  step.status === 'completed' &&
-                    'border-emerald-500 bg-emerald-500 text-white',
-                  step.status === 'active' &&
-                    'border-emerald-500 bg-white ring-4 ring-emerald-100 dark:bg-slate-900 dark:ring-emerald-950/80',
-                  step.status === 'pending' &&
-                    'border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800'
-                )}
-              >
-                {step.status === 'completed' && <Check className="h-3 w-3 stroke-[3]" />}
-              </div>
-
-              {/* Day Label */}
-              <span
-                className={cn(
-                  'mt-2 text-xs font-bold',
-                  step.status === 'pending'
-                    ? 'text-slate-400 dark:text-slate-500'
-                    : 'text-slate-800 dark:text-slate-200'
-                )}
-              >
-                {step.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+                <button
+                  type="button"
+                  onClick={() => setTaken((prev) => ({ ...prev, [med.name]: !prev[med.name] }))}
+                  aria-pressed={isTaken}
+                  aria-label={isTaken
+                    ? t('carePlanCards.medUntake', 'Mark {{name}} as not taken today', { name: med.name })
+                    : t('carePlanCards.medTake', 'Mark {{name}} as taken today', { name: med.name })}
+                  className={cn(
+                    'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-500',
+                    isTaken
+                      ? 'border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500'
+                      : 'border-slate-300 text-transparent hover:border-emerald-500 dark:border-slate-600'
+                  )}
+                >
+                  <Check className="h-4 w-4 stroke-[3]" />
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      )}
     </section>
   )
 }
 
 // ============================================================================
-// 5. VITALS & ACTIVITY LOG DUAL CARDS (Matching Dashboard style)
+// 3. APPOINTMENTS — scheduled items from the treatment plan
+// ============================================================================
+export function CarePlanAppointments({ plan, t }) {
+  const { language } = useLanguage()
+  const locale = getLocaleForLanguage(language)
+  const today = new Date().toISOString().slice(0, 10)
+  const scheduled = (plan?.procedures || [])
+    .filter((item) => item.status === 'Scheduled' && item.scheduledDate >= today)
+    .sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate))
+
+  return (
+    <section className={CARD}>
+      <CardHeader
+        as="h3"
+        title={t('carePlanCards.apptsTitle', 'Upcoming Appointments')}
+        subtitle={t('carePlanCards.apptsSubtitle', 'Scheduled consultations and lab work orders')}
+        aside={scheduled.length ? (
+          <span className="shrink-0 self-start whitespace-nowrap rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:bg-night-elevated dark:text-slate-300">
+            {t('carePlanCards.apptsCount', '{{count}} scheduled', { count: scheduled.length })}
+          </span>
+        ) : null}
+      />
+
+      {scheduled.length === 0 ? (
+        <EmptyNote icon={Calendar}>
+          {t('carePlanCards.apptsEmpty', 'Nothing is booked yet. Your clinic will add check-ups and lab tests here. To book or change a visit, contact your clinic directly.')}
+        </EmptyNote>
+      ) : (
+        <ul className="mt-1 divide-y divide-slate-100 dark:divide-night-border">
+          {scheduled.map((item) => {
+            const date = formatPlanDate(item.scheduledDate, locale)
+            return (
+              <li key={item.id} className="flex items-start gap-3.5 py-3">
+                <div className="flex min-w-[46px] flex-col items-center justify-center rounded-xl bg-slate-50 px-2.5 py-1.5 dark:bg-night-elevated">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">{date?.month || '—'}</span>
+                  <span className="text-base font-extrabold leading-tight text-slate-900 dark:text-slate-100">{date?.day || ''}</span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-sm font-bold leading-snug text-slate-900 dark:text-slate-100">{item.title}</h4>
+                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{item.category}</p>
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </section>
+  )
+}
+
+// ============================================================================
+// 4. PROGRESS — milestones from the treatment plan
+// ============================================================================
+export function CarePlanProgressTracker({ plan, t }) {
+  const milestones = plan?.milestones || []
+  const doneCount = milestones.filter((step) => step.completed).length
+  const activeIndex = milestones.findIndex((step) => !step.completed)
+
+  return (
+    <section className={CARD}>
+      <CardHeader
+        as="h3"
+        title={t('carePlanCards.progressTitle', 'Care Plan Progress')}
+        subtitle={plan?.protocolName || null}
+        aside={plan?.phase ? (
+          <span className="self-start rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300">
+            {plan.phase}
+          </span>
+        ) : null}
+      />
+
+      {milestones.length === 0 ? (
+        <EmptyNote icon={Sparkles}>
+          {t('carePlanCards.progressEmpty', 'Your progress appears here once your doctor starts a treatment plan with you.')}
+        </EmptyNote>
+      ) : (
+        <ol className="mt-4 space-y-3">
+          <li aria-hidden="true" className="h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-night-border">
+            <div className="h-full rounded-full bg-emerald-500" style={{ width: `${Math.round((doneCount / milestones.length) * 100)}%` }} />
+          </li>
+          {milestones.map((step, idx) => {
+            const isActive = idx === activeIndex
+            return (
+              <li key={step.title} className="flex items-start gap-3">
+                <span
+                  className={cn(
+                    'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2',
+                    step.completed && 'border-emerald-500 bg-emerald-500 text-white',
+                    isActive && 'border-emerald-500 bg-white ring-4 ring-emerald-100 dark:bg-night-surface dark:ring-emerald-950/80',
+                    !step.completed && !isActive && 'border-slate-300 bg-slate-100 dark:border-slate-600 dark:bg-night-elevated'
+                  )}
+                >
+                  {step.completed && <Check className="h-3 w-3 stroke-[3]" />}
+                </span>
+                <div className="min-w-0">
+                  <p className={cn('text-sm font-semibold leading-snug', step.completed || isActive ? 'text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400')}>
+                    {step.title}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {step.date}
+                    {isActive ? ` · ${t('carePlanCards.progressNow', 'You are here')}` : ''}
+                  </p>
+                </div>
+              </li>
+            )
+          })}
+        </ol>
+      )}
+    </section>
+  )
+}
+
+// ============================================================================
+// 5. LATEST FASTING GLUCOSE — only a real reading, shown against its range
 // ============================================================================
 export function CarePlanVitalsSnapshot({ results = [], t }) {
-  const latestResult = results[0]
-  const facts = latestResult?.facts || {}
-  const glucose = facts.fasting_glucose ? Math.round(facts.fasting_glucose) : 118
-
-  // 7-day sparkline series
-  const glucoseTrend = [124, 119, 130, 115, 122, 118, 118]
+  const facts = results[0]?.facts || {}
+  const raw = Number(facts.fasting_glucose ?? facts.fasting_plasma_glucose)
+  const glucose = Number.isFinite(raw) && raw > 0 ? Math.round(raw) : null
+  const segment = glucose === null ? null : getRangeSegment(RANGE_PRESETS.fastingGlucose, glucose)
 
   return (
-    <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex items-center justify-between">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-          {t('carePlanCards.vitalsTitle', 'Vitals Trend')}
-        </h4>
-        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300">
-          {t('carePlanCards.inTarget', 'In Target Range')}
-        </span>
-      </div>
-
-      <div className="mt-2 flex items-baseline justify-between">
-        <div>
-          <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100">
-            {glucose}
-          </span>
-          <span className="text-xs text-slate-400 ml-1">mg/dL Fasting</span>
-        </div>
-        <span className="text-xs text-slate-400">Target: 80–130</span>
-      </div>
-
-      {/* Mini Sparkline Curve */}
-      <div className="mt-2 pt-1 border-t border-slate-100 dark:border-slate-800">
-        <MiniSparkline
-          points={glucoseTrend}
-          strokeColor="#10b981"
-          fillColor="#10b981"
-          height={32}
-        />
-      </div>
-
-      <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-        <span>7-Day Fasting Blood Glucose</span>
-        <span className="text-emerald-600 dark:text-emerald-400">Stable</span>
-      </div>
-    </div>
-  )
-}
-
-export function CarePlanActivitySnapshot({ t }) {
-  return (
-    <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:border-slate-800 dark:bg-slate-900">
-      <div className="flex items-center justify-between">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-          {t('carePlanCards.activityTitle', 'Daily Activity')}
-        </h4>
-        <span className="text-[10px] font-bold text-slate-400">7-Day Log</span>
-      </div>
-
-      {/* Steps counter & mini duration bars */}
-      <div className="mt-2 flex items-center justify-between gap-3 h-[50px]">
-        {/* Footprints Icon + Steps */}
-        <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 shadow-2xs dark:bg-emerald-950/60 dark:text-emerald-300">
-            <Footprints className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-base font-extrabold text-slate-900 dark:text-slate-100 leading-none">
-              6,540
+    <section className={CARD}>
+      <CardHeader as="h3" title={t('carePlanCards.vitalsTitle', 'Vitals Trend')} />
+      {glucose === null ? (
+        <EmptyNote icon={Droplets}>
+          {t('carePlanCards.vitalsEmpty', 'No fasting glucose reading yet. Add one in your next health check to see it here against the healthy range.')}
+        </EmptyNote>
+      ) : (
+        <>
+          <div className="mt-3 flex items-baseline justify-between gap-3">
+            <p>
+              <span className="font-display text-3xl font-bold text-slate-900 dark:text-white">{glucose}</span>
+              <span className="ml-1 text-xs text-slate-500">mg/dL</span>
             </p>
-            <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
-              Goal: 8,000 steps
-            </p>
+            {segment ? (
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {t(`patientHome.range.${segment.label}`, segment.label)}
+              </span>
+            ) : null}
           </div>
-        </div>
-
-        {/* 5-bar vertical mini chart */}
-        <div className="flex items-end justify-between gap-1.5 w-24 h-9">
-          {[
-            { height: '40%', active: false },
-            { height: '65%', active: false },
-            { height: '50%', active: false },
-            { height: '90%', active: true },
-            { height: '75%', active: false },
-          ].map((bar, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center h-full justify-end">
-              <div
-                className={cn(
-                  'w-full rounded-xs transition-all',
-                  bar.active
-                    ? 'bg-emerald-600 dark:bg-emerald-500'
-                    : 'bg-emerald-200/60 dark:bg-emerald-900/50'
-                )}
-                style={{ height: bar.height }}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 text-[11px] font-semibold text-slate-500 dark:border-slate-800 dark:text-slate-400">
-        <span>Postprandial Exercise</span>
-        <span className="font-bold text-emerald-600 dark:text-emerald-400">82% Goal Met</span>
-      </div>
-    </div>
+          <RangeRibbon preset={RANGE_PRESETS.fastingGlucose} value={glucose} className="mt-3" />
+          <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+            {t('patientHome.vitals.glucoseTarget', 'Normal is 70–99 mg/dL')}
+          </p>
+        </>
+      )}
+    </section>
   )
 }

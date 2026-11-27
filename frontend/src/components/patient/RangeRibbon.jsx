@@ -137,11 +137,11 @@ export function RangeRibbon({
       </div>
 
       {showLabels && (
-        <div className={cn('mt-2 flex w-full', isLarge ? 'text-xs' : 'text-[11px]')}>
+        <div className={cn('mt-2 flex w-full text-[11px]', isLarge && 'sm:text-xs')}>
           {parts.map((part) => (
             <span
               key={part.label}
-              className={cn('truncate pr-1', onDark ? 'text-white/65' : 'text-slate-500 dark:text-slate-400')}
+              className={cn('truncate pr-0.5', onDark ? 'text-white/65' : 'text-slate-500 dark:text-slate-400')}
               style={{ width: `${part.width}%` }}
             >
               {translateLabel(part.label)}

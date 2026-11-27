@@ -68,6 +68,14 @@ export function ProfileSetupPage() {
   const navigate = useNavigate()
 
   const [step, setStep] = useState(1)
+
+  // This page renders outside AppLayout, which normally applies the saved
+  // light / dark preference, so apply it here too.
+  useEffect(() => {
+    const stored = window.localStorage.getItem('theme')
+    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches
+    document.documentElement.classList.toggle('dark', stored ? stored === 'dark' : Boolean(prefersDark))
+  }, [])
   const [profile, setProfile] = useState({
     gender: '',
     date_of_birth: '',

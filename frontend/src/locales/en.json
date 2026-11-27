@@ -3448,16 +3448,12 @@
         "subtitle": "Fasting reading before breakfast • Target: 80–130 mg/dL"
       },
       "sched_meds_am": {
-        "title": "Metformin 500mg",
-        "subtitle": "Take 1 tablet with full glass of water after breakfast"
+        "title": "Morning medication",
+        "subtitle": "Take it exactly as your doctor prescribed, with breakfast"
       },
       "sched_walk_pm": {
         "title": "30-Min Post-Meal Walk",
         "subtitle": "Light aerobic cardio to improve muscle glucose uptake"
-      },
-      "sched_doctor_pm": {
-        "title": "Endocrinology Check-in",
-        "subtitle": "Dr. Lina • Diabetes Care Team Review"
       },
       "sched_glucose_pm": {
         "title": "Post-Dinner Glucose Log",
@@ -3502,14 +3498,37 @@
     "apptsSubtitle": "Scheduled consultations and lab work orders",
     "progressTitle": "Care Plan Progress",
     "vitalsTitle": "Vitals Trend",
-    "inTarget": "In Target Range",
-    "activityTitle": "Daily Activity",
     "completed": "Completed",
     "scheduled": "Scheduled",
-    "colMedication": "Medication & Timing",
-    "colDosage": "Dosage",
-    "colInstructions": "Instructions",
-    "colStatus": "Status",
-    "goalsProgress": "{{done}} of {{total}} done ({{percent}}%)"
+    "goalsProgress": "{{done}} of {{total}} done ({{percent}}%)",
+    "habits": {
+      "goal-glucose-am": {
+        "title": "Morning fasting glucose check",
+        "target": "Before breakfast · target 80–130 mg/dL"
+      },
+      "goal-meds-am": {
+        "title": "Morning medication",
+        "target": "Take it exactly as your doctor prescribed"
+      },
+      "goal-exercise-pm": {
+        "title": "30-minute walk after a meal",
+        "target": "Helps your muscles use blood sugar"
+      },
+      "goal-foot-pm": {
+        "title": "Check your feet",
+        "target": "Look for cuts, redness or pressure spots"
+      }
+    },
+    "medsFrom": "From the plan written by {{doctor}}",
+    "medsEmpty": "No medicines are on file for you yet. When your doctor adds a treatment plan, your medicines and how to take them will appear here.",
+    "medTake": "Mark {{name}} as taken today",
+    "medUntake": "Mark {{name}} as not taken today",
+    "apptsCount": "{{count}} scheduled",
+    "apptsEmpty": "Nothing is booked yet. Your clinic will add check-ups and lab tests here. To book or change a visit, contact your clinic directly.",
+    "progressEmpty": "Your progress appears here once your doctor starts a treatment plan with you.",
+    "progressNow": "You are here",
+    "vitalsEmpty": "No fasting glucose reading yet. Add one in your next health check to see it here against the healthy range.",
+    "noPlanTitle": "No treatment plan yet",
+    "noPlanBody": "Your doctor writes your treatment plan after reviewing your health check. Once it is ready, your medicines, check-ups and goals will appear here."
   }
 }

@@ -212,19 +212,15 @@ export function getTreatmentPlanById(id) {
   return plans.find((p) => p.id === id) || null
 }
 
-export function getTreatmentPlanForUser(userName, userEmail) {
-  const plans = getTreatmentPlans()
+/**
+ * The treatment plan written for this patient, or null when none exists.
+ * Matches on the full patient name only — a patient must never be shown a
+ * plan that was written for someone else.
+ */
+export function getTreatmentPlanForUser(userName) {
   const cleanName = (userName || '').toLowerCase().trim()
-  const cleanEmail = (userEmail || '').toLowerCase().trim()
-
-  return (
-    plans.find(
-      (p) =>
-        p.patientName.toLowerCase().includes(cleanName) ||
-        (cleanName && cleanName.includes(p.patientName.toLowerCase())) ||
-        p.patientId === 'P-1042'
-    ) || plans[2]
-  )
+  if (!cleanName) return null
+  return getTreatmentPlans().find((p) => (p.patientName || '').toLowerCase().trim() === cleanName) || null
 }
 
 export function createTreatmentPlan(planData) {

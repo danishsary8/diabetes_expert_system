@@ -67,9 +67,9 @@ const DEFAULT_SCHEDULE = [
     timeEnd: '08:45',
     category: 'Medication',
     badgeTone: 'sky',
-    title: 'Metformin 500mg',
-    subtitle: 'Take 1 tablet with full glass of water after breakfast',
-    location: 'Daily Prescription',
+    title: 'Morning medication',
+    subtitle: 'Take it exactly as your doctor prescribed, with breakfast',
+    location: 'Daily routine',
     icon: Pill,
   },
   {
@@ -82,17 +82,6 @@ const DEFAULT_SCHEDULE = [
     subtitle: 'Light aerobic cardio to improve muscle glucose uptake',
     location: 'Outdoor / Treadmill',
     icon: Footprints,
-  },
-  {
-    id: 'sched_doctor_pm',
-    time: '15:00',
-    timeEnd: '15:30',
-    category: 'Consultation',
-    badgeTone: 'purple',
-    title: 'Endocrinology Check-in',
-    subtitle: 'Dr. Lina • Diabetes Care Team Review',
-    location: 'Clinic Wing B, Room 204',
-    icon: Stethoscope,
   },
   {
     id: 'sched_glucose_pm',
@@ -387,9 +376,9 @@ export function PatientDashboardPage() {
   const [completedTasks, setCompletedTasks] = useState(() => {
     try {
       const saved = localStorage.getItem(storageKey)
-      return saved ? JSON.parse(saved) : ['sched_glucose_am']
+      return saved ? JSON.parse(saved) : []
     } catch {
-      return ['sched_glucose_am']
+      return []
     }
   })
 
@@ -872,7 +861,6 @@ const CATEGORY_TONES = {
   amber: { icon: 'bg-amber-100 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300', text: 'text-amber-700 dark:text-amber-300' },
   sky: { icon: 'bg-sky-100 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300', text: 'text-sky-700 dark:text-sky-300' },
   emerald: { icon: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300', text: 'text-emerald-700 dark:text-emerald-300' },
-  purple: { icon: 'bg-purple-100 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300', text: 'text-purple-700 dark:text-purple-300' },
   slate: { icon: 'bg-slate-100 text-slate-600 dark:bg-night-elevated dark:text-slate-300', text: 'text-slate-500 dark:text-slate-400' },
 }
 
