@@ -3,7 +3,11 @@
 Everything needed to add this project to the portfolio (Danish_portfolio), in the same
 shape as the Bookly case study. Captured from the real app with demo data on 27 Nov 2026.
 
-![Cover](cover/card.jpg)
+![New cover](cover/card-v2.jpg)
+
+Two cover styles are included. **v2** (above, deep clinical green, laptop + phone in 3D and a
+card showing the result and its reasons) is the newer, premium one. The first style is
+`cover/card.webp` / `cover/banner.webp`.
 
 ## What's here
 
@@ -12,7 +16,9 @@ shape as the Bookly case study. Captured from the real app with demo data on 27 
 | `cover/card.webp` | Project card cover (16:10), with title, award and language tags | 3200×2000 |
 | `cover/banner.webp` | Wide banner for the top of the case study (2.4:1), no title | 3840×1600 |
 | `cover/*.jpg` | Same covers at half size, for LinkedIn, README or slides | |
-| `cover/cover.source.html` | Source of both covers, if a change is ever needed | |
+| `cover/card-v2.webp` | New premium cover (16:10) | 3200×2000 |
+| `cover/banner-v2.webp` | New premium banner (2.4:1), no title | 3840×1600 |
+| `cover/cover.source.html`, `cover/cover-v2.source.html` | Sources of the covers, if a change is ever needed | |
 | `screens/*.webp` | 14 screens, each on laptop and phone | laptop 1440×900, phone 516×1118 |
 | `diabetes.portfolio.ts` | Ready-to-paste portfolio entry: pitch, problem, what I built, screens, numbers, future plan | |
 | `overview.jpg` | All main screens on one page, for a quick look | |

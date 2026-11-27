@@ -666,7 +666,7 @@ function WaistQuestionCard({
     : t('assessment.interview.waistQuestionTitle', "What's your waist circumference?")
 
   return (
-    <div className="assessment-card-enter w-full flex-1 flex flex-col justify-center min-h-0 h-full">
+    <div className="assessment-card-enter relative w-full flex-1 flex flex-col justify-center min-h-0 h-full">
       {/* Left Content */}
       <main className="w-full lg:w-[58%] flex flex-col justify-center px-6 sm:px-12 lg:px-16 py-6 relative z-20 text-white">
         <div className="flex items-start gap-5">
@@ -849,7 +849,7 @@ function WaistQuestionCard({
               : '/images/png/waist-measurement.png'
         }
         alt="Person measuring waist"
-        className="assessment-illustration"
+        className="assessment-illustration assessment-illustration--bleed"
         onError={(e) => {
           if (!e.currentTarget.src.includes('waist-measurement.png')) {
             e.currentTarget.src = '/images/png/waist-measurement.png'
@@ -886,9 +886,17 @@ function QuestionCard({
   const displayMedia = symptomMedia
 
   return (
-    <div className="assessment-card-enter w-full flex-1 flex flex-col justify-center min-h-0 h-full">
+    <div className="assessment-card-enter relative w-full flex-1 flex flex-col justify-center min-h-0 h-full">
       {/* Left Content */}
-      <main className="w-full lg:w-[58%] flex flex-col justify-between px-6 sm:px-12 lg:px-16 py-6 relative z-20 text-white min-h-[460px] lg:min-h-[520px]">
+      {/* Without an illustration the question takes the full width, so long
+          checklists and lab forms fit on one screen. */}
+      <main
+        data-wide={displayMedia ? undefined : ''}
+        className={cn(
+          'w-full flex flex-col justify-between px-6 sm:px-12 lg:px-16 py-6 relative z-20 text-white min-h-[460px] lg:min-h-[520px]',
+          displayMedia ? 'lg:w-[58%]' : 'lg:max-w-6xl'
+        )}
+      >
         <div className="flex items-start gap-5">
           {/* Question Number Badge */}
           <div className="patient-glass hidden h-12 w-12 sm:flex sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-2xl sm:rounded-3xl text-2xl sm:text-3xl font-bold text-white">
@@ -1009,7 +1017,7 @@ function MultiGrid({ node, form, ctx, t, factsMap, language, onToggle, onNone, o
   const selectedCount = fields.filter((f) => form[f]).length
   return (
     <div>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="multi-grid grid gap-3 sm:grid-cols-2">
         {fields.map((key) => {
           const FIcon = FIELD_ICONS[key] || Activity
           const active = Boolean(form[key])
@@ -1434,8 +1442,14 @@ export function InterviewFlow(props) {
   } else if (node.kind === 'choice') {
     const selectedVal = form[node.field]
     continueEnabled = selectedVal !== null && selectedVal !== undefined && selectedVal !== ''
+    // Long lists (e.g. 6 ethnic backgrounds) use two columns on wide screens
+    // so the whole question and its Continue button fit one screen.
+    const isLongList = node.options.length > 4
     body = (
-      <div className="space-y-3 max-w-md pt-1" role="radiogroup">
+      <div
+        className={cn('pt-1', isLongList ? 'grid max-w-2xl gap-3 lg:grid-cols-2' : 'space-y-3 max-w-md')}
+        role="radiogroup"
+      >
         {node.options.map((opt) => {
           const isSelected = selectedVal === opt.value
           return (
@@ -1574,7 +1588,8 @@ export function InterviewFlow(props) {
         title={title}
         helper={helper}
         medicalTerm={medicalTerm}
-        symptomMedia={symptomMedia}
+        // The lab form needs the full width more than a photo.
+        symptomMedia={node.kind === 'labs' ? null : symptomMedia}
         onPreviewImage={setPreviewMedia}
         actions={navActions}
         t={t}
@@ -1652,7 +1667,7 @@ function LabsSection({ form, qcm, t, labOptions, renderBadge, extraLabs, onAddEx
   const isOgInvalid = og !== '' && (Number.isNaN(Number(og)) || Number(og) < 40 || Number(og) > 800)
 
   return (
-    <div className="space-y-4">
+    <div className="labs-grid space-y-4">
       <div className="q-section">
         <div className="q-section-title"><TestTube2 className="h-5 w-5 text-slate-500" /> {t('assessment.labs.fastingTitle', 'Fasting Blood Glucose')}</div>
         <p className="q-section-sub">{t('assessment.labs.fastingHelper', 'mg/dL — after 8+ hours of fasting')}</p>

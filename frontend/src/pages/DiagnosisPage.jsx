@@ -1356,7 +1356,7 @@ export function DiagnosisPage() {
         className={cn(
           "min-w-0 flex-1 flex flex-col rounded-3xl shadow-2xl transition-colors duration-700 ease-in-out relative overflow-hidden",
           isColoredInterview
-            ? "text-white border-0 min-h-[calc(100dvh-7.5rem)] p-0"
+            ? "assessment-fit text-white border-0 min-h-[calc(100dvh-7.5rem)] p-0 lg:h-[calc(100dvh-7.5rem)] lg:max-h-[calc(100dvh-7.5rem)] lg:min-h-[32rem]"
             : "surface p-4 sm:p-6 md:p-8 border border-slate-200/80 bg-white dark:border-night-border dark:bg-night-surface text-slate-900 dark:text-slate-100 min-h-[calc(100dvh-7.5rem)]"
         )}
       >
@@ -1376,7 +1376,7 @@ export function DiagnosisPage() {
           </div>
         ) : null}
 
-        <div className="w-full flex-1 flex flex-col relative z-10 min-h-0 h-full">
+        <div className={cn("w-full flex-1 flex flex-col relative z-10 min-h-0 h-full", isColoredInterview && "assessment-fit__body")}>
 
           {/* ── Step 1: Progress Header ── */}
           {step === 1 ? (

@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: Geist; src: url(https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.2.8/files/geist-latin-wght-normal.woff2) format('woff2'); font-weight: 100 900; }
+  @font-face { font-family: Kantumruy; src: url(https://cdn.jsdelivr.net/npm/@fontsource/kantumruy-pro@5.2.8/files/kantumruy-pro-khmer-500-normal.woff2) format('woff2'); font-weight: 500; }
+
+  :root {
+    --ink: #041f1e;       /* deep clinical green, not neutral black */
+    --deep: #06302e;
+    --teal: #0c5a55;      /* the patient app's own hero teal */
+    --mint: #8af0cb;
+    --paper: #ffffff;
+    --muted: rgba(255,255,255,.66);
+    --gold: #f2c35b;
+    --low: #e7a3ad; --normal: #7fcf9c; --elevated: #f2bd5c; --high: #f08a8a;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: var(--w,1600px); height: var(--h,1000px); background: var(--ink); }
+  body { font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: var(--paper); }
+
+  .stage { position: relative; width: var(--w,1600px); height: var(--h,1000px); overflow: hidden;
+    background:
+      radial-gradient(55% 70% at 78% 58%, rgba(138,240,203,.16) 0%, transparent 70%),
+      radial-gradient(90% 90% at 0% 0%, var(--teal) 0%, var(--deep) 48%, var(--ink) 100%); }
+  /* one hairline horizon: the ground the devices stand on */
+  .horizon { position: absolute; left: 0; right: 0; top: 795px; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(138,240,203,.28) 45%, transparent 100%); }
+
+  /* ---------- type ---------- */
+  .copy { position: absolute; left: 96px; top: 104px; width: 640px; }
+  h1 { font-size: 104px; line-height: .9; font-weight: 600; letter-spacing: -0.055em; }
+  .km { margin-top: 26px; font-family: Kantumruy, sans-serif; font-weight: 500; font-size: 38px; line-height: 1.35; color: var(--mint); }
+  .line { margin-top: 22px; font-size: 24px; line-height: 1.4; color: var(--muted); max-width: 26ch; }
+
+  .award { position: absolute; left: 96px; bottom: 92px; display: flex; align-items: center; gap: 14px; }
+  .award .seal { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+    background: radial-gradient(circle at 35% 30%, #ffe3a1, var(--gold) 60%, #b98a2a); box-shadow: 0 8px 24px rgba(242,195,91,.25); }
+  .award .seal svg { width: 22px; height: 22px; }
+  .award b { display: block; font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+  .award span { display: block; margin-top: 3px; font-size: 15px; color: var(--muted); }
+
+  /* ---------- devices ---------- */
+  .scene { position: absolute; left: 690px; top: 150px; width: 1040px; height: 700px; perspective: 2400px; }
+  .laptop { position: absolute; left: 70px; top: 0; width: 900px; transform: rotateY(-20deg) rotateX(4deg) rotateZ(.6deg); transform-origin: 0% 50%;
+    border-radius: 16px; overflow: hidden; background: #fff;
+    box-shadow: 0 60px 120px -40px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.14); }
+  .laptop img { display: block; width: 100%; }
+  .laptop::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255,255,255,.18) 0%, transparent 32%); pointer-events: none; }
+
+  .phone { position: absolute; left: 0; top: 190px; width: 250px; border-radius: 34px; padding: 7px; background: #0a1716;
+    box-shadow: 0 50px 80px -24px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.12); }
+  .phone img { display: block; width: 100%; border-radius: 28px; }
+
+  /* ---------- the signature: the engine explains itself ---------- */
+  .why { position: absolute; left: 285px; top: 455px; width: 380px; padding: 22px 24px 20px; border-radius: 20px;
+    background: rgba(255,255,255,.94); color: #0c2726;
+    box-shadow: 0 40px 70px -26px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.6); backdrop-filter: blur(10px); }
+  .why .head { display: flex; align-items: center; gap: 12px; }
+  .why .icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(140deg, #f6b04a, #e8862a); }
+  .why .icon svg { width: 20px; height: 20px; }
+  .why small { display: block; font-size: 13px; color: #5b6f6d; }
+  .why strong { display: block; font-size: 21px; font-weight: 650; letter-spacing: -0.02em; }
+  .meter { margin-top: 18px; display: flex; align-items: center; gap: 12px; }
+  .meter .track { flex: 1; height: 8px; border-radius: 99px; background: #e5eeec; overflow: hidden; }
+  .meter .fill { width: 94%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #12867c, #2fb59a); }
+  .meter em { font-style: normal; font-weight: 650; font-size: 17px; color: #0f6f67; }
+  .reasons { margin-top: 14px; display: grid; gap: 8px; }
+  .reasons div { display: flex; align-items: center; gap: 10px; font-size: 14.5px; color: #34504e; }
+  .reasons i { width: 18px; height: 18px; border-radius: 50%; background: #e2f6ef; display: grid; place-items: center; }
+  .reasons i::after { content: ""; width: 7px; height: 4px; border: 2px solid #12867c; border-top: 0; border-right: 0; transform: rotate(-45deg) translate(1px,-1px); }
+  /* Banner (2.4:1): no title, the case study prints it above. */
+  .banner .copy, .banner .award { display: none; }
+  .banner .scene { left: 470px; top: 90px; }
+</style>
+</head>
+<body>
+  <div class="stage">
+
+
+    <div class="copy">
+      <h1>Diabetes Expert System</h1>
+      <p class="km">ប្រព័ន្ធជំនាញទឹកនោមផ្អែម</p>
+      <p class="line">Early diabetes screening that explains its answer.</p>
+    </div>
+
+    <div class="award">
+      <span class="seal"><svg viewBox="0 0 24 24" fill="none" stroke="#5a3d06" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 13.9 7 22l5-3 5 3-1.5-8.1"/></svg></span>
+      <p><b>Award winner 2026</b><span>AI Expert System and Innovation</span></p>
+    </div>
+
+    <div class="scene">
+      <div class="laptop"><img src="../screens/result.webp" alt="" /></div>
+      <div class="phone"><img src="../screens/m-patient-home.webp" alt="" /></div>
+
+      <div class="why">
+        <div class="head">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span><small>Screening result</small><strong>Prediabetes risk pattern</strong></span>
+        </div>
+        <div class="meter"><span class="track"><span class="fill" style="display:block"></span></span><em>94%</em></div>
+        <div class="reasons">
+          <div><i></i>Fasting glucose 112 mg/dL, above normal</div>
+          <div><i></i>HbA1c 6.0%, in the prediabetes range</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    if (new URLSearchParams(location.search).get('mode') === 'banner') {
+      document.documentElement.style.setProperty('--w', '1920px');
+      document.documentElement.style.setProperty('--h', '800px');
+      document.querySelector('.stage').classList.add('banner');
+    }
+  </script>
+</body>
+</html>
