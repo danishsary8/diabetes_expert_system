@@ -1887,6 +1887,8 @@
       "filterUrgent": "ត្រូវការការយកចិត្តទុកដាក់",
       "filterReviewed": "បានពិនិត្យដោយវេជ្ជបណ្ឌិត",
       "filterStable": "ធម្មតា/ថេរ",
+      "sortLabel": "តម្រៀប៖",
+      "sortAria": "តម្រៀបលទ្ធផល",
       "sortNewest": "ថ្មីបំផុតមុន",
       "sortOldest": "ចាស់បំផុតមុន",
       "sortHighestCertainty": "កម្រិតទុកចិត្តខ្ពស់បំផុត",

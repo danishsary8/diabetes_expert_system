@@ -732,7 +732,7 @@ export function PatientDashboardPage() {
                         : 'text-slate-700 hover:bg-white dark:text-slate-300 dark:hover:bg-night-border'
                     )}
                   >
-                    <span className={cn('block w-full truncate px-0.5 text-[11px] font-medium', isSelected ? 'text-primary-100 dark:text-navy-deep/80' : 'text-slate-400')}>
+                    <span className={cn('block w-full truncate px-0.5 text-[11px] font-medium', isSelected ? 'text-primary-100 dark:text-navy-deep' : 'text-slate-500 dark:text-slate-400')}>
                       {item.dayName}
                     </span>
                     <span className="text-sm font-bold tabular-nums">{item.dayNum}</span>

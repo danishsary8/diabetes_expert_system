@@ -469,8 +469,11 @@ export function DiagnosisHistoryPage() {
 
               {/* Sort Selector */}
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-slate-400 dark:text-slate-500">Sort:</span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400" aria-hidden="true">
+                  {t('myResults.timeline.sortLabel', 'Sort:')}
+                </span>
                 <AppSelect
+                  ariaLabel={t('myResults.timeline.sortAria', 'Sort results')}
                   value={sortBy}
                   onValueChange={setSortBy}
                   options={[
@@ -507,7 +510,7 @@ export function DiagnosisHistoryPage() {
                     className={cn(
                       'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition',
                       statusFilter === tab.id
-                        ? 'bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-900'
+                        ? 'bg-primary-800 text-white shadow-sm dark:bg-primary-400 dark:text-navy-deep'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-800'
                     )}
                   >

@@ -12,7 +12,7 @@ const LIGHT = {
   above: '#db8200', // marigold 500
   below: '#e54b6b', // rose 500
   grid: '#edf2f0', // ink 100
-  axis: '#98a5a0', // ink 400
+  axis: '#6b7873', // readable on white (4.5:1)
   surface: '#ffffff',
 }
 
@@ -23,7 +23,7 @@ const DARK = {
   above: '#f7a53e', // marigold 400
   below: '#ff758c', // rose 400
   grid: '#253431', // night border
-  axis: '#6b7873', // ink 500
+  axis: '#a3b0ab', // readable on night surfaces
   surface: '#0f1816', // night surface
 }
 

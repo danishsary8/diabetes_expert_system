@@ -724,8 +724,9 @@ export function ProfilePage() {
                     </div>
                   </div>
                   <div>
-                    <span className={fieldLabel}>{t(`${SETUP}.dobLabel`, 'Date of birth')}</span>
+                    <label htmlFor="profile-dob" className={fieldLabel}>{t(`${SETUP}.dobLabel`, 'Date of birth')}</label>
                     <input
+                      id="profile-dob"
                       className={fieldInput}
                       type="date"
                       max={new Date().toISOString().slice(0, 10)}

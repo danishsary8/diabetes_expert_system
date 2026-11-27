@@ -332,7 +332,7 @@ export function Topbar({
                   {user?.name || t('common.user')}
                 </span>
                 <span
-                  className="max-w-36 truncate text-[10.5px] font-medium text-slate-400 dark:text-slate-500"
+                  className="max-w-36 truncate text-[10.5px] font-medium text-slate-500 dark:text-slate-400"
                   title={roleLabel}
                 >
                   {roleLabel}

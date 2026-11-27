@@ -123,6 +123,7 @@ function AppSelect({
   disabled = false,
   className,
   showIcon = true,
+  ariaLabel,
 }) {
   const mappedValue = value === '' || value === null || value === undefined ? EMPTY_VALUE : String(value)
 
@@ -135,7 +136,7 @@ function AppSelect({
       }}
       disabled={disabled}
     >
-      <SelectTrigger className={className} showIcon={showIcon}>
+      <SelectTrigger className={className} showIcon={showIcon} aria-label={ariaLabel}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

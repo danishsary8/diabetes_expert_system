@@ -53,7 +53,8 @@ const ink = Object.fromEntries(
   STEPS.map((step, i) => [
     step,
     oklchToRgb(
-      [0.982, 0.958, 0.915, 0.855, 0.71, 0.56, 0.46, 0.385, 0.3, 0.235, 0.165][i],
+      // 400–600 are used for secondary text; kept dark enough for 4.5:1 on white.
+      [0.982, 0.958, 0.915, 0.855, 0.545, 0.49, 0.43, 0.375, 0.3, 0.235, 0.165][i],
       [0.004, 0.006, 0.009, 0.012, 0.016, 0.018, 0.018, 0.018, 0.016, 0.014, 0.012][i],
       170
     ),
@@ -108,6 +109,22 @@ lines.push("html[data-audience='patient'] {")
 for (const [name, family] of Object.entries(PATIENT_MAP)) {
   for (const step of STEPS) {
     lines.push(`  --c-${name}-${step}: ${triple(patient[family][step])};`)
+  }
+}
+lines.push('}')
+lines.push('')
+
+// In dark mode the same muted-text steps sit on near-black, so they need to be
+// lighter, not darker, to stay readable (4.5:1 on the night surfaces).
+const darkInk = {
+  400: oklchToRgb(0.76, 0.014, 170),
+  500: oklchToRgb(0.68, 0.016, 170),
+}
+lines.push("html.dark[data-audience='patient'] {")
+for (const [name, family] of Object.entries(PATIENT_MAP)) {
+  if (family !== 'ink') continue
+  for (const [step, rgb] of Object.entries(darkInk)) {
+    lines.push(`  --c-${name}-${step}: ${triple(rgb)};`)
   }
 }
 lines.push('}')

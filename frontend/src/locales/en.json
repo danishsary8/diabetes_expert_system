@@ -1887,6 +1887,8 @@
       "filterUrgent": "Needs Attention",
       "filterReviewed": "Doctor Reviewed",
       "filterStable": "Stable",
+      "sortLabel": "Sort:",
+      "sortAria": "Sort results",
       "sortNewest": "Newest first",
       "sortOldest": "Oldest first",
       "sortHighestCertainty": "Highest confidence",
