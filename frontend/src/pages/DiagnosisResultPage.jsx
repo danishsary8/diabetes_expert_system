@@ -1195,7 +1195,7 @@ export function DiagnosisResultPage() {
             {t('diagnosisResult.clinicalEvidence', 'The evidence behind this result')}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Biomarkers, symptoms, and risk factors that influenced this assessment
+            {t('diagnosisResult.clinicalEvidenceSubtitle', 'Biomarkers, symptoms, and risk factors that influenced this assessment')}
           </p>
         </div>
       </div>

@@ -158,7 +158,7 @@ function SafetyCard({ t }) {
 
 export function CarePlanPage() {
   const { user } = useAuth()
-  const { t, language } = useLanguage()
+  const { t, tExact, language } = useLanguage()
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -268,7 +268,7 @@ export function CarePlanPage() {
 
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-primary-50/85">
             {latestResult?.diagnosis
-              ? t('carePlanHero.withResult', 'Built around your latest result: {{diagnosis}}. Work through today’s goals, take your medication on time, and keep your appointments.', { diagnosis: latestResult.diagnosis })
+              ? t('carePlanHero.withResult', 'Built around your latest result: {{diagnosis}}. Work through today’s goals, take your medication on time, and keep your appointments.', { diagnosis: tExact(latestResult.diagnosis) })
               : t('carePlanHero.noResult', 'Daily goals, medication times and appointments in one place. Take a health check to tailor it to you.')}
           </p>
 

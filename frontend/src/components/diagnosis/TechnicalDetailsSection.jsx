@@ -34,7 +34,7 @@ export function TechnicalDetailsSection({ children }) {
           aria-expanded={open}
           className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         >
-          <span>{open ? 'Hide technical details' : 'View technical details'}</span>
+          <span>{open ? t('diagnosisResult.technical.hide', 'Hide technical details') : t('diagnosisResult.technical.show', 'View technical details')}</span>
           <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
         </button>
       </div>

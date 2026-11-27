@@ -112,7 +112,7 @@ export function ConditionEducationPanel({ result, defaultOpen = true }) {
                 {t('diagnosisResult.education.titlePrefix', 'Understanding')} {name}
               </h3>
               <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-[10px] font-semibold text-cyan-700 ring-1 ring-cyan-200/60 dark:bg-cyan-950/60 dark:text-cyan-300 dark:ring-cyan-800/60">
-                Patient Guide
+                {t('diagnosisResult.education.badge', 'Patient Guide')}
               </span>
             </div>
             {tagline ? (
@@ -129,7 +129,7 @@ export function ConditionEducationPanel({ result, defaultOpen = true }) {
           aria-expanded={open}
           className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         >
-          <span>{open ? 'Collapse guide' : 'Expand guide'}</span>
+          <span>{open ? t('diagnosisResult.education.collapse', 'Collapse guide') : t('diagnosisResult.education.expand', 'Expand guide')}</span>
           <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
         </button>
       </div>

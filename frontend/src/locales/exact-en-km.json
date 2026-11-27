@@ -540,5 +540,9 @@
   "Numbness In Extremities": "ស្ពឹកស្រពន់នៅចុងដៃចុងជើង",
   "Tingling In Hands/Feet": "ស្ពឹកស្រពន់ ឬចាក់ស្រៀបៗនៅដៃជើង",
   "Elevated Diabetes Risk — Screening Recommended": "ហានិភ័យកើនឡើងនៃជំងឺទឹកនោមផ្អែម — ណែនាំឱ្យពិនិត្យឈាម",
-  "Isolated Symptom — Non-Specific (Consider Other Causes)": "រោគសញ្ញាតែមួយ — មិនទាន់គ្រប់គ្រាន់សន្និដ្ឋាន (ពិចារណាមូលហេតុផ្សេង)"
+  "Isolated Symptom — Non-Specific (Consider Other Causes)": "រោគសញ្ញាតែមួយ — មិនទាន់គ្រប់គ្រាន់សន្និដ្ឋាន (ពិចារណាមូលហេតុផ្សេង)",
+  "Routine Diabetes Screening Recommended": "ណែនាំឱ្យពិនិត្យរកទឹកនោមផ្អែមជាប្រចាំ",
+  "Likely Diabetes": "ទំនងជាមានជំងឺទឹកនោមផ្អែម",
+  "Normal Risk": "ហានិភ័យធម្មតា",
+  "Multiple Symptoms with High Risk": "មានរោគសញ្ញាច្រើន និងហានិភ័យខ្ពស់"
 }

@@ -999,6 +999,7 @@ function RiskFactorsCard({ profile, t }) {
 }
 
 function LatestAssessmentCard({ result, dateLabel, isUrgent, reportHref, t }) {
+  const { tExact } = useLanguage()
   if (!result) {
     return (
       <section className="flex flex-col rounded-3xl border border-dashed border-primary-300 bg-primary-50/60 p-5 sm:p-6 dark:border-primary-800 dark:bg-primary-950/30">
@@ -1046,7 +1047,7 @@ function LatestAssessmentCard({ result, dateLabel, isUrgent, reportHref, t }) {
       </div>
 
       <p className="mt-5 font-display text-2xl font-bold leading-tight text-slate-900 dark:text-white">
-        {result.diagnosis || t('patientHome.latest.pending', 'Result pending')}
+        {result.diagnosis ? tExact(result.diagnosis) : t('patientHome.latest.pending', 'Result pending')}
       </p>
       {certaintyPct !== null && (
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -1055,7 +1056,7 @@ function LatestAssessmentCard({ result, dateLabel, isUrgent, reportHref, t }) {
       )}
 
       {result.recommendation && (
-        <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{result.recommendation}</p>
+        <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{tExact(result.recommendation)}</p>
       )}
 
       {result.review_note && (
