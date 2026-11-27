@@ -371,3 +371,86 @@
   background-color: #38bdf8;
 }
 
+
+/* ---------------------------------------------------------------------------
+   Panel redesign: gradient header, soft tinted conversation, gradient bubbles
+   --------------------------------------------------------------------------- */
+.assistant-panel {
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.04),
+    0 30px 70px -28px rgba(7, 94, 87, 0.45),
+    0 12px 30px -18px rgba(15, 23, 42, 0.25);
+}
+
+.dark .assistant-panel {
+  box-shadow: 0 30px 70px -28px rgba(0, 0, 0, 0.7);
+}
+
+.assistant-header {
+  background:
+    radial-gradient(70% 120% at 0% 0%, rgba(52, 211, 153, 0.45), transparent 60%),
+    radial-gradient(60% 120% at 100% 0%, rgba(56, 189, 248, 0.45), transparent 60%),
+    linear-gradient(125deg, #0f766e 0%, #0d9488 45%, #0891b2 100%);
+  padding-bottom: 1.6rem;
+}
+
+.dark .assistant-header {
+  background:
+    radial-gradient(70% 120% at 0% 0%, rgba(16, 185, 129, 0.3), transparent 60%),
+    radial-gradient(60% 120% at 100% 0%, rgba(14, 165, 233, 0.28), transparent 60%),
+    linear-gradient(125deg, #064e4a 0%, #0b5f5a 45%, #0c4a6e 100%);
+}
+
+.assistant-chat-bg {
+  position: relative;
+  background-color: #f6fbfa;
+  background-image:
+    radial-gradient(rgba(13, 148, 136, 0.07) 1px, transparent 1px),
+    linear-gradient(180deg, #f2fbf8 0%, #f7fafc 60%, #f8fafc 100%);
+  background-size: 18px 18px, 100% 100%;
+  box-shadow: 0 -10px 24px -18px rgba(15, 23, 42, 0.35);
+}
+
+.dark .assistant-chat-bg {
+  background-color: #0b1220;
+  background-image:
+    radial-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+    linear-gradient(180deg, #0c1424 0%, #0b1220 100%);
+}
+
+.assistant-bubble-user {
+  background-image: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
+  box-shadow: 0 10px 22px -12px rgba(8, 145, 178, 0.75);
+}
+
+.assistant-avatar {
+  background-image: conic-gradient(from 140deg, #34d399, #22d3ee, #38bdf8, #34d399);
+}
+
+.assistant-msg-in {
+  animation: assistant-msg-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes assistant-msg-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Greeting bubble beside the mascot */
+.assistant-mascot-bubble {
+  border: 0 !important;
+  background: linear-gradient(135deg, #0d9488, #0891b2) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 26px -12px rgba(8, 145, 178, 0.8) !important;
+}
+
+.assistant-mascot-bubble::after {
+  border-color: transparent !important;
+  background: #0b8fa6 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assistant-msg-in {
+    animation: none;
+  }
+}

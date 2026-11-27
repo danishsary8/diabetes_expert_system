@@ -73,7 +73,7 @@ export function CarePlanGoals({ t }) {
   const progressPercent = Math.round((completedCount / goals.length) * 100)
 
   return (
-    <section className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all duration-200 dark:border-slate-800 dark:bg-slate-900">
+    <section className="patient-card flex flex-col justify-between p-5">
       {/* Card Header matching Dashboard */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3.5 dark:border-slate-800">
         <div>
@@ -182,7 +182,7 @@ export function CarePlanGoals({ t }) {
 // ============================================================================
 // Shared pieces
 // ============================================================================
-const CARD = 'flex flex-col rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lift dark:border-night-border dark:bg-night-surface'
+const CARD = 'patient-card flex flex-col p-5'
 
 function CardHeader({ title, subtitle, aside, as: Heading = 'h2' }) {
   return (

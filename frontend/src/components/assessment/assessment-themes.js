@@ -351,18 +351,20 @@ export const NODE_THEMES = {
 const PATIENT_PINE = { bg: '#0C5446', shape1: '#083F35', shape2: '#156C5A', buttonText: '#0C5446' }
 const PATIENT_LAGOON = { bg: '#0B4C5C', shape1: '#073846', shape2: '#126476', buttonText: '#0B4C5C' }
 const PATIENT_SLATE_PINE = { bg: '#1E4A47', shape1: '#153735', shape2: '#2A5F5B', buttonText: '#1E4A47' }
+const PATIENT_OCEAN = { bg: '#0E4A78', shape1: '#0A3659', shape2: '#17619B', buttonText: '#0E4A78' }
+const PATIENT_INDIGO = { bg: '#2A3F86', shape1: '#1E2E66', shape2: '#3B55AA', buttonText: '#2A3F86' }
 
 const PATIENT_BG_REMAP = {
   '#12488F': PATIENT_PINE,
-  '#144685': PATIENT_PINE,
-  '#174B8D': PATIENT_PINE,
+  '#144685': PATIENT_LAGOON,
+  '#174B8D': PATIENT_OCEAN,
   '#0F4D8A': PATIENT_LAGOON,
-  '#115294': PATIENT_LAGOON,
+  '#115294': PATIENT_OCEAN,
   '#204E74': PATIENT_SLATE_PINE,
   '#24466B': PATIENT_SLATE_PINE,
-  '#123B66': PATIENT_SLATE_PINE,
+  '#123B66': PATIENT_INDIGO,
   '#233854': PATIENT_SLATE_PINE,
-  '#253456': PATIENT_SLATE_PINE,
+  '#253456': PATIENT_INDIGO,
 }
 
 function isPatientAudience() {

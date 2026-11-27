@@ -379,13 +379,14 @@ export function ProfilePage() {
       </p>
 
       {/* ── 1. Hero / Avatar & Identity Card ── */}
-      <div className="surface mt-6 p-5 sm:p-6">
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-6">
+      <div className="surface mt-6 overflow-hidden p-0">
+        <div aria-hidden="true" className="patient-hero h-24 rounded-none sm:h-28" style={{ boxShadow: 'none' }} />
+        <div className="relative flex flex-col gap-4 px-5 pb-5 pt-4 sm:flex-row sm:items-start sm:gap-6 sm:px-6 sm:pb-6">
           {/* Avatar with upload trigger */}
-          <div className="group relative shrink-0">
+          <div className="group relative -mt-14 shrink-0 sm:-mt-16">
             <div
               className={cn(
-                'relative flex h-20 w-20 overflow-hidden rounded-full shadow-md ring-2 ring-white dark:ring-night-border',
+                'relative flex h-20 w-20 overflow-hidden rounded-full shadow-lg ring-4 ring-white sm:h-24 sm:w-24 dark:ring-night-surface',
                 uploadingAvatar && 'opacity-60'
               )}
             >

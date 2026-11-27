@@ -1349,7 +1349,10 @@ export function DiagnosisPage() {
   return (
     <div className="flex-1 flex flex-col min-h-0 relative overflow-visible">
       <section
-        style={isColoredInterview ? { backgroundColor: currentTheme.bg } : undefined}
+        style={isColoredInterview ? {
+          backgroundColor: currentTheme.bg,
+          backgroundImage: `radial-gradient(48% 60% at 100% 0%, rgb(255 255 255 / 0.16), transparent 62%), radial-gradient(45% 55% at 0% 100%, rgb(52 211 153 / 0.2), transparent 62%), radial-gradient(35% 45% at 60% 110%, rgb(251 191 36 / 0.14), transparent 60%), linear-gradient(140deg, ${currentTheme.shape2} 0%, ${currentTheme.bg} 45%, ${currentTheme.shape1} 100%)`,
+        } : undefined}
         className={cn(
           "min-w-0 flex-1 flex flex-col rounded-3xl shadow-2xl transition-colors duration-700 ease-in-out relative overflow-hidden",
           isColoredInterview
@@ -1362,7 +1365,7 @@ export function DiagnosisPage() {
           <div className="absolute inset-0 z-0 pointer-events-none">
             <div
               className="absolute -right-20 -top-32 h-[500px] w-[700px]
-                     rotate-12 rounded-[50%] opacity-60 transition-colors duration-700 ease-in-out"
+                     rotate-12 rounded-[50%] opacity-40 transition-colors duration-700 ease-in-out"
               style={{ backgroundColor: currentTheme.shape1 }}
             />
             <div
@@ -1448,9 +1451,9 @@ export function DiagnosisPage() {
               </div>
 
               {/* Progress bar */}
-              <div className={cn("h-2 w-full rounded-full relative z-0", isColoredInterview ? "bg-white/20" : "bg-slate-200 dark:bg-slate-800")}>
+              <div className={cn("h-2.5 w-full rounded-full relative z-0", isColoredInterview ? "bg-white/15 ring-1 ring-inset ring-white/10" : "bg-slate-200 dark:bg-slate-800")}>
                 <div
-                  className={cn("h-2 rounded-full transition-all duration-500 ease-out", isColoredInterview ? "bg-white" : "bg-blue-600 dark:bg-blue-500")}
+                  className={cn("h-2.5 rounded-full transition-all duration-500 ease-out", isColoredInterview ? "bg-gradient-to-r from-emerald-300 via-cyan-200 to-white shadow-[0_0_16px_rgba(167,243,208,0.65)]" : "bg-gradient-to-r from-primary-500 to-cyan-500")}
                   style={{ width: !currentNode ? '100%' : `${Math.max(4, Math.round((currentQNum / totalQNum) * 100))}%` }}
                 />
               </div>

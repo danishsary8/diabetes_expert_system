@@ -33,6 +33,9 @@ import {
   Sparkles,
   Stethoscope,
   User,
+  Users,
+  Cigarette,
+  Armchair,
 } from 'lucide-react'
 import api, { getApiData, getApiErrorMessage } from '@/api/client'
 import { ErrorAlert, DashboardSkeleton } from '@/components/ui'
@@ -440,9 +443,9 @@ export function PatientDashboardPage() {
       {/* ================================================================ */}
       <section
         aria-labelledby="patient-today-heading"
-        className="relative overflow-hidden rounded-[28px] bg-primary-900 text-white shadow-lift dark:bg-night-elevated dark:ring-1 dark:ring-night-border"
+        className="patient-hero rounded-[28px]"
       >
-        <GlucoseWave className="pointer-events-none absolute inset-x-0 bottom-0 h-40 w-full text-primary-700/70 dark:text-primary-900/80" />
+        <GlucoseWave className="pointer-events-none absolute inset-x-0 bottom-0 h-40 w-full text-white/15" />
 
         <div className="relative grid gap-7 p-5 sm:gap-8 sm:p-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-10 lg:p-10">
           <div className="flex min-w-0 flex-col">
@@ -501,7 +504,7 @@ export function PatientDashboardPage() {
           </div>
 
           {/* Fasting glucose reading against its range */}
-          <div className="flex min-w-0 flex-col justify-between rounded-3xl bg-white/[0.07] p-5 ring-1 ring-inset ring-white/15 backdrop-blur-sm sm:p-6">
+          <div className="patient-glass flex min-w-0 flex-col justify-between rounded-3xl p-5 sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-primary-100">
@@ -549,6 +552,7 @@ export function PatientDashboardPage() {
       {/* Vitals: a swipeable strip on phones, three columns from sm up */}
       <div className="no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-4 -mb-3 sm:mx-0 sm:mb-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0">
         <VitalCard
+          accent="indigo"
           icon={Activity}
           label={t('patientHome.vitals.hba1c', 'HbA1c')}
           value={a1c.toFixed(1)}
@@ -561,6 +565,7 @@ export function PatientDashboardPage() {
         />
         {waist !== null ? (
           <VitalCard
+            accent="sky"
             icon={Ruler}
             label={t('patientHome.vitals.waist', 'Waist size')}
             value={Math.round(waist)}
@@ -575,6 +580,7 @@ export function PatientDashboardPage() {
           />
         ) : (
           <VitalCard
+            accent="cyan"
             icon={Droplets}
             label={t('patientHome.vitals.fastingGlucose', 'Fasting glucose')}
             value={glucose}
@@ -587,6 +593,7 @@ export function PatientDashboardPage() {
           />
         )}
         <VitalCard
+          accent="amber"
           icon={Scale}
           label={t('patientHome.vitals.bmi', 'Body mass index')}
           value={bmi.toFixed(1)}
@@ -605,24 +612,27 @@ export function PatientDashboardPage() {
         {/* ============================================================== */}
         <div className="min-w-0 space-y-6">
           {/* Weekly trend */}
-          <section className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface">
+          <section className="patient-card p-5 sm:p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
+              <div className="flex items-start gap-3">
+                <SectionIcon icon={Activity} tone="cyan" />
+                <div>
                 <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">
                   {t('patientHome.trend.title', 'Your week in glucose')}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   {t('patientHome.trend.subtitle', 'Morning readings against the 80–130 mg/dL target band')}
                 </p>
+                </div>
               </div>
               <div className="flex items-center gap-4 text-sm">
                 <span className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300">
                   <span className="h-3 w-5 rounded-[4px] border border-emerald-500/50 bg-emerald-500/15" aria-hidden="true" />
                   {t('patientHome.trend.targetBand', 'Target band')}
                 </span>
-                <span className="text-slate-500 dark:text-slate-400">
+                <span className="rounded-full bg-cyan-50 px-3 py-1 text-cyan-800 dark:bg-cyan-950/50 dark:text-cyan-200">
                   {t('patientHome.trend.average', 'Average')}{' '}
-                  <strong className="font-display text-lg text-slate-900 dark:text-white">{avgGlucose}</strong>
+                  <strong className="font-display text-lg text-cyan-950 dark:text-white">{avgGlucose}</strong>
                 </span>
               </div>
             </div>
@@ -632,8 +642,13 @@ export function PatientDashboardPage() {
                 <AreaChart data={trendData} margin={{ top: 12, right: 8, left: -22, bottom: 0 }}>
                   <defs>
                     <linearGradient id="patientGlucoseFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={chart.line} stopOpacity={0.22} />
-                      <stop offset="100%" stopColor={chart.line} stopOpacity={0} />
+                      <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.28} />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="patientGlucoseStroke" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#0891b2" />
+                      <stop offset="55%" stopColor="#0d9488" />
+                      <stop offset="100%" stopColor="#059669" />
                     </linearGradient>
                   </defs>
                   <CartesianGrid vertical={false} stroke={chart.grid} />
@@ -646,10 +661,10 @@ export function PatientDashboardPage() {
                   <Area
                     type="monotone"
                     dataKey="glucose"
-                    stroke={chart.line}
-                    strokeWidth={2.5}
+                    stroke="url(#patientGlucoseStroke)"
+                    strokeWidth={3}
                     fill="url(#patientGlucoseFill)"
-                    dot={{ r: 4, fill: chart.line, strokeWidth: 2, stroke: chart.surface }}
+                    dot={{ r: 4.5, fill: '#0d9488', strokeWidth: 2.5, stroke: chart.surface }}
                     activeDot={{ r: 6, fill: chart.lineStrong, stroke: chart.surface, strokeWidth: 2 }}
                   />
                 </AreaChart>
@@ -679,22 +694,25 @@ export function PatientDashboardPage() {
         {/* ============================================================== */}
         <aside
           aria-labelledby="patient-plan-heading"
-          className="order-first min-w-0 rounded-3xl xl:order-none border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface"
+          className="patient-card order-first min-w-0 p-5 xl:order-none sm:p-6"
         >
           <div className="flex items-start justify-between gap-3">
-            <div>
+            <div className="flex items-start gap-3">
+              <SectionIcon icon={Calendar} tone="emerald" />
+              <div>
               <h2 id="patient-plan-heading" className="text-xl font-bold text-slate-900 dark:text-slate-50">
                 {t('patientHome.plan.title', 'Your day')}
               </h2>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 {t('patientHome.plan.progress', '{{done}} of {{total}} done', { done: doneToday, total: DEFAULT_SCHEDULE.length })}
               </p>
+              </div>
             </div>
             <ProgressDial value={dayProgress} />
           </div>
 
           {/* Week strip */}
-          <div className="mt-6 rounded-2xl bg-slate-50 p-3 dark:bg-night-elevated">
+          <div className="mt-6 rounded-2xl bg-gradient-to-br from-emerald-50 via-cyan-50/70 to-sky-50 p-3 ring-1 ring-inset ring-emerald-100/80 dark:from-night-elevated dark:via-night-elevated dark:to-night-elevated dark:ring-night-border">
             <div className="flex items-center justify-between px-1">
               <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{calendarWeek.monthName}</span>
               <div className="flex items-center gap-1">
@@ -728,8 +746,8 @@ export function PatientDashboardPage() {
                     className={cn(
                       'flex flex-col items-center gap-1 rounded-xl py-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-500',
                       isSelected
-                        ? 'bg-primary-700 text-white shadow-sm dark:bg-primary-500 dark:text-navy-deep'
-                        : 'text-slate-700 hover:bg-white dark:text-slate-300 dark:hover:bg-night-border'
+                        ? 'bg-gradient-to-b from-primary-600 to-teal-700 text-white shadow-md shadow-primary-700/30 dark:from-primary-400 dark:to-teal-500 dark:text-navy-deep'
+                        : 'text-slate-700 hover:bg-white/80 dark:text-slate-300 dark:hover:bg-night-border'
                     )}
                   >
                     <span className={cn('block w-full truncate px-0.5 text-[11px] font-medium', isSelected ? 'text-primary-100 dark:text-navy-deep' : 'text-slate-500 dark:text-slate-400')}>
@@ -842,10 +860,10 @@ export function PatientDashboardPage() {
 
           <Link
             to="/care-plan"
-            className="mt-4 flex items-center justify-between rounded-2xl bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-800 transition-colors hover:bg-primary-100 dark:bg-primary-950/50 dark:text-primary-200 dark:hover:bg-primary-950"
+            className="patient-cta group mt-4 flex items-center justify-between rounded-2xl px-4 py-3.5 text-sm font-semibold transition"
           >
             {t('patientHome.plan.openCarePlan', 'Open my full care plan')}
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </aside>
       </div>
@@ -877,13 +895,36 @@ const STATUS_CHIP = {
   low: 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300',
 }
 
-function VitalCard({ icon: Icon, label, value, preset, rawValue, caption, sample, t, tr }) {
-  const segment = getRangeSegment(preset, rawValue)
+const ACCENTS = {
+  indigo: { tile: 'from-indigo-500 to-sky-500 shadow-indigo-500/30', glow: 'bg-indigo-400/20' },
+  sky: { tile: 'from-sky-500 to-cyan-500 shadow-sky-500/30', glow: 'bg-sky-400/20' },
+  cyan: { tile: 'from-cyan-500 to-teal-500 shadow-cyan-500/30', glow: 'bg-cyan-400/20' },
+  amber: { tile: 'from-amber-400 to-orange-500 shadow-orange-500/30', glow: 'bg-amber-400/20' },
+  emerald: { tile: 'from-emerald-500 to-teal-600 shadow-emerald-500/30', glow: 'bg-emerald-400/20' },
+  rose: { tile: 'from-rose-500 to-orange-400 shadow-rose-500/30', glow: 'bg-rose-400/20' },
+}
+
+/** Small gradient icon tile placed beside a section heading. */
+function SectionIcon({ icon: Icon, tone = 'emerald' }) {
+  const accent = ACCENTS[tone] || ACCENTS.emerald
   return (
-    <div className="flex w-[80%] shrink-0 snap-start flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:w-auto dark:border-night-border dark:bg-night-surface">
-      <div className="flex items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300">
-          <Icon className="h-4 w-4 text-primary-600 dark:text-primary-400" aria-hidden="true" />
+    <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-lg', accent.tile)}>
+      <Icon className="h-5 w-5" aria-hidden="true" />
+    </span>
+  )
+}
+
+function VitalCard({ icon: Icon, label, value, preset, rawValue, caption, sample, t, tr, accent: accentKey = 'emerald' }) {
+  const segment = getRangeSegment(preset, rawValue)
+  const accent = ACCENTS[accentKey] || ACCENTS.emerald
+  return (
+    <div className="patient-card patient-card-hover flex w-[80%] shrink-0 snap-start flex-col overflow-hidden p-5 sm:w-auto">
+      <span aria-hidden="true" className={cn('pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full blur-2xl', accent.glow)} />
+      <div className="relative flex items-center justify-between gap-2">
+        <span className="inline-flex items-center gap-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200">
+          <span className={cn('flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-md', accent.tile)}>
+            <Icon className="h-4.5 w-4.5" aria-hidden="true" />
+          </span>
           {label}
         </span>
         {segment && (
@@ -892,7 +933,7 @@ function VitalCard({ icon: Icon, label, value, preset, rawValue, caption, sample
           </span>
         )}
       </div>
-      <div className="mt-4 flex items-baseline gap-1.5">
+      <div className="relative mt-4 flex items-baseline gap-1.5">
         <span className="font-display text-4xl font-bold tracking-tight text-slate-900 dark:text-white">{value}</span>
         <span className="text-sm text-slate-400">{preset.unit}</span>
       </div>
@@ -926,8 +967,15 @@ function ProgressDial({ value }) {
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className="stroke-emerald-500 transition-[stroke-dashoffset] duration-500"
+          stroke="url(#dayProgressStroke)"
+          className="transition-[stroke-dashoffset] duration-500"
         />
+        <defs>
+          <linearGradient id="dayProgressStroke" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#10b981" />
+            <stop offset="100%" stopColor="#06b6d4" />
+          </linearGradient>
+        </defs>
       </svg>
       <span className="absolute inset-0 flex items-center justify-center text-xs font-bold tabular-nums text-slate-700 dark:text-slate-200">
         {value}%
@@ -941,7 +989,7 @@ function NowMarker({ time, t }) {
     <li className="relative grid grid-cols-[2.5rem_1.5rem_minmax(0,1fr)] items-center gap-2 pb-3" aria-label={t('patientHome.plan.now', 'Now')}>
       <span className="text-right text-xs font-bold tabular-nums text-amber-700 dark:text-amber-300">{time}</span>
       <span className="relative z-10 flex justify-center">
-        <span className="h-3 w-3 rounded-full bg-amber-400 ring-4 ring-amber-100 dark:ring-amber-950" />
+        <span className="h-3 w-3 animate-pulse rounded-full bg-amber-400 ring-4 ring-amber-100 motion-reduce:animate-none dark:ring-amber-950" />
       </span>
       <span className="h-px bg-amber-300/80 dark:bg-amber-700/70" />
     </li>
@@ -949,17 +997,20 @@ function NowMarker({ time, t }) {
 }
 
 const RISK_FACTORS = [
-  { key: 'family_history', label: 'Family history of diabetes' },
-  { key: 'hypertension', label: 'High blood pressure' },
-  { key: 'high_cholesterol', label: 'High cholesterol' },
-  { key: 'smoking', label: 'Smoking' },
-  { key: 'sedentary_lifestyle', label: 'Mostly inactive days' },
+  { key: 'family_history', label: 'Family history of diabetes', icon: Users, tone: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300' },
+  { key: 'hypertension', label: 'High blood pressure', icon: HeartPulse, tone: 'bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300' },
+  { key: 'high_cholesterol', label: 'High cholesterol', icon: Droplets, tone: 'bg-amber-100 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300' },
+  { key: 'smoking', label: 'Smoking', icon: Cigarette, tone: 'bg-orange-100 text-orange-600 dark:bg-orange-950/60 dark:text-orange-300' },
+  { key: 'sedentary_lifestyle', label: 'Mostly inactive days', icon: Armchair, tone: 'bg-sky-100 text-sky-600 dark:bg-sky-950/60 dark:text-sky-300' },
 ]
 
 function RiskFactorsCard({ profile, t }) {
   const active = RISK_FACTORS.filter((factor) => Boolean(profile?.[factor.key]))
   return (
-    <section className="flex flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface">
+    <section className="patient-card flex flex-col p-5 sm:p-6">
+      <div className="flex items-start gap-3">
+      <SectionIcon icon={HeartPulse} tone="rose" />
+      <div>
       <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">
         {t('patientHome.risk.title', 'What shapes your risk')}
       </h2>
@@ -968,19 +1019,29 @@ function RiskFactorsCard({ profile, t }) {
           ? t('patientHome.risk.subtitle', '{{count}} of {{total}} factors apply to you', { count: active.length, total: RISK_FACTORS.length })
           : t('patientHome.risk.loading', 'From your health profile')}
       </p>
-      <ul className="mt-4 space-y-2">
+      </div>
+      </div>
+      <ul className="mt-5 space-y-2">
         {RISK_FACTORS.map((factor) => {
           const applies = Boolean(profile?.[factor.key])
+          const FactorIcon = factor.icon
           return (
             <li
               key={factor.key}
               className={cn(
-                'flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm',
-                applies ? 'bg-amber-50 text-amber-900 dark:bg-amber-950/40 dark:text-amber-100' : 'bg-slate-50 text-slate-500 dark:bg-night-elevated dark:text-slate-400'
+                'flex items-center justify-between gap-3 rounded-2xl border px-3 py-2.5 text-sm transition-colors',
+                applies
+                  ? 'border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50/60 text-amber-950 dark:border-amber-900/60 dark:from-amber-950/40 dark:to-amber-950/20 dark:text-amber-100'
+                  : 'border-transparent bg-slate-50 text-slate-500 dark:bg-night-elevated dark:text-slate-400'
               )}
             >
-              <span className="font-medium">{t(`patientHome.risk.${factor.key}`, factor.label)}</span>
-              <span className={cn('text-xs font-semibold', applies ? 'text-amber-700 dark:text-amber-300' : 'text-slate-400')}>
+              <span className="flex min-w-0 items-center gap-3">
+                <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-xl', applies ? factor.tone : 'bg-white text-slate-400 dark:bg-night-surface dark:text-slate-500')}>
+                  <FactorIcon className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <span className="font-medium">{t(`patientHome.risk.${factor.key}`, factor.label)}</span>
+              </span>
+              <span className={cn('shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold', applies ? 'bg-amber-200/70 text-amber-900 dark:bg-amber-900/60 dark:text-amber-200' : 'text-slate-400')}>
                 {applies ? t('patientHome.risk.applies', 'Applies') : t('patientHome.risk.notApplies', 'No')}
               </span>
             </li>
@@ -1002,19 +1063,21 @@ function LatestAssessmentCard({ result, dateLabel, isUrgent, reportHref, t }) {
   const { tExact } = useLanguage()
   if (!result) {
     return (
-      <section className="flex flex-col rounded-3xl border border-dashed border-primary-300 bg-primary-50/60 p-5 sm:p-6 dark:border-primary-800 dark:bg-primary-950/30">
-        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-primary-700 shadow-sm dark:bg-night-elevated dark:text-primary-300">
+      <section className="patient-hero flex flex-col rounded-3xl p-5 sm:p-6">
+        <span aria-hidden="true" className="pointer-events-none absolute -bottom-16 -right-12 h-48 w-48 rounded-full bg-white/10" />
+        <span aria-hidden="true" className="pointer-events-none absolute -bottom-6 -right-2 h-24 w-24 rounded-full bg-white/10" />
+        <span className="patient-glass flex h-12 w-12 items-center justify-center rounded-2xl text-white">
           <Stethoscope className="h-5 w-5" />
         </span>
-        <h2 className="mt-4 text-xl font-bold text-slate-900 dark:text-slate-50">
+        <h2 className="mt-4 text-xl font-bold text-white">
           {t('patientHome.latest.emptyTitle', 'No assessment yet')}
         </h2>
-        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+        <p className="mt-2 text-sm leading-relaxed text-white/80">
           {t('patientHome.latest.emptyBody', 'Answer a few questions about how you feel and any recent lab numbers. It takes about five minutes, and your result appears here with clear next steps.')}
         </p>
         <Link
           to="/diagnosis"
-          className="mt-auto inline-flex items-center gap-2 self-start rounded-full bg-primary-700 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-800 dark:bg-primary-500 dark:text-navy-deep dark:hover:bg-primary-400"
+          className="relative mt-auto inline-flex items-center gap-2 self-start rounded-full bg-amber-300 px-5 py-3 text-sm font-bold text-navy-deep shadow-[0_8px_24px_-10px_rgba(247,165,62,0.9)] transition-transform hover:-translate-y-0.5 hover:bg-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
           style={{ marginTop: '1.5rem' }}
         >
           {t('patientHome.cta.firstAssessment', 'Take your first assessment')}
@@ -1028,7 +1091,7 @@ function LatestAssessmentCard({ result, dateLabel, isUrgent, reportHref, t }) {
   const certaintyPct = Number.isFinite(certainty) ? Math.round(certainty <= 1 ? certainty * 100 : certainty) : null
 
   return (
-    <section className="flex flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface">
+    <section className="patient-card flex flex-col p-5 sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">

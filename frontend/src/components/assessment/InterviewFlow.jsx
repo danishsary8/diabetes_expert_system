@@ -233,7 +233,7 @@ function BmiQuestionCard({
       <main className="w-full lg:w-[64%] xl:w-[60%] flex flex-col justify-center px-6 sm:px-12 lg:px-16 py-6 relative z-20 text-white min-h-[460px] lg:min-h-[520px]">
         <div className="flex items-start gap-5">
           {/* Circular Step Badge */}
-          <div className="flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-full bg-white/20 text-2xl sm:text-3xl font-bold text-white">
+          <div className="patient-glass flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-2xl sm:rounded-3xl text-2xl sm:text-3xl font-bold text-white">
             {questionNumber || 2}
           </div>
 
@@ -264,14 +264,16 @@ function BmiQuestionCard({
                         key={opt.id}
                         type="button"
                         onClick={() => handlePickTier(opt)}
-                        className="flex items-center gap-4 group cursor-pointer select-none text-left transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                        role="radio"
+                aria-checked={Boolean(isSelected)}
+                className={optionCardClass(isSelected)}
                       >
                         <div
                           className={cn(
                             'h-9 w-9 sm:h-10 sm:w-10 rounded-full shrink-0 flex items-center justify-center transition-all duration-200',
                             isSelected
                               ? 'bg-white border-2 border-white shadow-md'
-                              : 'bg-white/20 border-2 border-white/50 group-hover:bg-white/30 group-hover:border-white'
+                              : 'bg-white/15 border-2 border-white/50 group-hover:border-white'
                           )}
                         >
                           {isSelected ? (
@@ -482,7 +484,7 @@ function BmiQuestionCard({
                 type="button"
                 onClick={onBack}
                 disabled={!canBack}
-                className="rounded-full border-2 border-white px-8 py-3 font-semibold text-white transition hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none cursor-pointer text-sm sm:text-base active:scale-[0.98]"
+                className="rounded-full bg-white/10 px-8 py-3 ring-1 ring-inset ring-white/45 backdrop-blur-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none cursor-pointer text-sm sm:text-base active:scale-[0.98]"
               >
                 {t('assessment.interview.previousQuestion', 'Previous')}
               </button>
@@ -669,7 +671,7 @@ function WaistQuestionCard({
       <main className="w-full lg:w-[58%] flex flex-col justify-center px-6 sm:px-12 lg:px-16 py-6 relative z-20 text-white">
         <div className="flex items-start gap-5">
           {/* Question Number */}
-          <div className="flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-full bg-white/20 text-2xl sm:text-3xl font-bold text-white">
+          <div className="patient-glass flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-2xl sm:rounded-3xl text-2xl sm:text-3xl font-bold text-white">
             {questionNumber || 3}
           </div>
 
@@ -733,14 +735,16 @@ function WaistQuestionCard({
                   key={opt.id}
                   type="button"
                   onClick={() => handleSelectOption(opt)}
-                  className="flex items-center gap-4 group cursor-pointer select-none text-left transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                  role="radio"
+                aria-checked={Boolean(isSelected)}
+                className={optionCardClass(isSelected)}
                 >
                   <div
                     className={cn(
                       'h-9 w-9 sm:h-10 sm:w-10 rounded-full shrink-0 flex items-center justify-center transition-all duration-200',
                       isSelected
                         ? 'bg-white border-2 border-white shadow-md'
-                        : 'bg-white/20 border-2 border-white/50 group-hover:bg-white/30 group-hover:border-white'
+                        : 'bg-white/15 border-2 border-white/50 group-hover:border-white'
                     )}
                   >
                     {isSelected ? (
@@ -806,7 +810,7 @@ function WaistQuestionCard({
             type="button"
             onClick={onBack}
             disabled={!canBack}
-            className="rounded-full border-2 border-white px-8 py-3 font-semibold text-white transition hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+            className="rounded-full bg-white/10 px-8 py-3 ring-1 ring-inset ring-white/45 backdrop-blur-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
           >
             {t('assessment.interview.previousQuestion', 'Previous')}
           </button>
@@ -856,6 +860,16 @@ function WaistQuestionCard({
   )
 }
 
+/** Glass option card used by every single-choice answer list. */
+function optionCardClass(isSelected) {
+  return cn(
+    'flex w-full items-center gap-4 group cursor-pointer select-none rounded-2xl px-4 py-3 text-left ring-1 ring-inset transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white',
+    isSelected
+      ? 'bg-white/25 ring-white/70 shadow-[0_14px_30px_-16px_rgba(0,0,0,0.5)]'
+      : 'bg-white/[0.07] ring-white/20 hover:bg-white/[0.14] hover:ring-white/40'
+  )
+}
+
 function QuestionCard({
   node,
   questionNumber,
@@ -877,7 +891,7 @@ function QuestionCard({
       <main className="w-full lg:w-[58%] flex flex-col justify-between px-6 sm:px-12 lg:px-16 py-6 relative z-20 text-white min-h-[460px] lg:min-h-[520px]">
         <div className="flex items-start gap-5">
           {/* Question Number Badge */}
-          <div className="flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-full bg-white/20 text-2xl sm:text-3xl font-bold text-white">
+          <div className="patient-glass flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-2xl sm:rounded-3xl text-2xl sm:text-3xl font-bold text-white">
             {questionNumber || 1}
           </div>
 
@@ -940,22 +954,29 @@ function YesNoButtons({ value, onPick, noLabel, yesLabel, theme, t }) {
     { v: false, label: noLabel || t('assessment.interview.answerNo', 'No') },
   ]
   return (
-    <div className="space-y-4 max-w-md pt-1">
+    <div className="space-y-3 max-w-md pt-1" role="radiogroup">
       {options.map((opt) => {
         const isSelected = value === opt.v
         return (
           <button
             key={String(opt.v)}
             type="button"
+            role="radio"
+            aria-checked={isSelected}
             onClick={() => onPick(opt.v)}
-            className="flex items-center gap-4 group cursor-pointer select-none text-left transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className={cn(
+              'flex w-full items-center gap-4 group cursor-pointer select-none rounded-2xl px-4 py-3.5 text-left ring-1 ring-inset transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white',
+              isSelected
+                ? 'bg-white/25 ring-white/70 shadow-[0_14px_30px_-16px_rgba(0,0,0,0.5)]'
+                : 'bg-white/[0.07] ring-white/20 hover:bg-white/[0.14] hover:ring-white/40'
+            )}
           >
             <div
               className={cn(
                 'h-9 w-9 sm:h-10 sm:w-10 rounded-full shrink-0 flex items-center justify-center transition-all duration-200',
                 isSelected
                   ? 'bg-white border-2 border-white shadow-md'
-                  : 'bg-white/20 border-2 border-white/50 group-hover:bg-white/30 group-hover:border-white'
+                  : 'bg-white/15 border-2 border-white/50 group-hover:border-white'
               )}
             >
               {isSelected ? (
@@ -1302,22 +1323,29 @@ export function InterviewFlow(props) {
   } else if (node.kind === 'subject') {
     /* Patient accounts: "Myself / Someone else" with Ada radio cards */
     body = (
-      <div className="space-y-4 max-w-md pt-1">
+      <div className="space-y-3 max-w-lg pt-1" role="radiogroup">
         {subjectOptions.map((option) => {
           const active = subjectValue === option.id
           return (
             <button
               key={option.id}
               type="button"
+              role="radio"
+              aria-checked={active}
               onClick={() => onSelectSubject(option.id)}
-              className="flex items-start gap-4 group cursor-pointer select-none text-left transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              className={cn(
+                'flex w-full items-start gap-4 group cursor-pointer select-none rounded-2xl px-4 py-4 text-left ring-1 ring-inset transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white',
+                active
+                  ? 'bg-white/25 ring-white/70 shadow-[0_14px_30px_-16px_rgba(0,0,0,0.5)]'
+                  : 'bg-white/[0.07] ring-white/20 hover:bg-white/[0.14] hover:ring-white/40'
+              )}
             >
               <div
                 className={cn(
                   'h-9 w-9 sm:h-10 sm:w-10 rounded-full shrink-0 flex items-center justify-center transition-all duration-200 mt-0.5',
                   active
                     ? 'bg-white border-2 border-white shadow-md'
-                    : 'bg-white/20 border-2 border-white/50 group-hover:bg-white/30 group-hover:border-white'
+                    : 'bg-white/15 border-2 border-white/50 group-hover:border-white'
                 )}
               >
                 {active ? (
@@ -1407,7 +1435,7 @@ export function InterviewFlow(props) {
     const selectedVal = form[node.field]
     continueEnabled = selectedVal !== null && selectedVal !== undefined && selectedVal !== ''
     body = (
-      <div className="space-y-4 max-w-md pt-1">
+      <div className="space-y-3 max-w-md pt-1" role="radiogroup">
         {node.options.map((opt) => {
           const isSelected = selectedVal === opt.value
           return (
@@ -1415,14 +1443,16 @@ export function InterviewFlow(props) {
               key={opt.value}
               type="button"
               onClick={() => onChoice(node, opt.value)}
-              className="flex items-center gap-4 group cursor-pointer select-none text-left transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              role="radio"
+                aria-checked={Boolean(isSelected)}
+                className={optionCardClass(isSelected)}
             >
               <div
                 className={cn(
                   'h-9 w-9 sm:h-10 sm:w-10 rounded-full shrink-0 flex items-center justify-center transition-all duration-200',
                   isSelected
                     ? 'bg-white border-2 border-white shadow-md'
-                    : 'bg-white/20 border-2 border-white/50 group-hover:bg-white/30 group-hover:border-white'
+                    : 'bg-white/15 border-2 border-white/50 group-hover:border-white'
                 )}
               >
                 {isSelected ? (
@@ -1504,7 +1534,7 @@ export function InterviewFlow(props) {
       {onBack && canBack ? (
         <button
           type="button"
-          className="rounded-full border-2 border-white px-8 py-3 text-base sm:text-lg font-semibold text-white transition hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none cursor-pointer active:scale-[0.98]"
+          className="rounded-full bg-white/10 px-8 py-3 ring-1 ring-inset ring-white/45 backdrop-blur-sm text-base sm:text-lg font-semibold text-white transition hover:bg-white/10 disabled:opacity-40 disabled:pointer-events-none cursor-pointer active:scale-[0.98]"
           onClick={onBack}
         >
           {t('assessment.interview.previousQuestion', 'Previous')}
@@ -1524,7 +1554,7 @@ export function InterviewFlow(props) {
       {node.kind !== 'patient' && node.kind !== 'subject' && node.kind !== 'body' && node.kind !== 'waist' ? (
         <button
           type="button"
-          className="rounded-full bg-white px-10 py-3 text-base sm:text-lg font-semibold transition hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-md active:scale-[0.98]"
+          className="rounded-full bg-white px-10 py-3 text-base sm:text-lg font-semibold transition hover:-translate-y-0.5 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 cursor-pointer shadow-[0_16px_32px_-14px_rgba(0,0,0,0.55)] active:scale-[0.98] motion-reduce:hover:translate-y-0"
           style={{ color: theme?.buttonText || '#12488F' }}
           disabled={!continueEnabled || analyzing}
           onClick={onContinue}

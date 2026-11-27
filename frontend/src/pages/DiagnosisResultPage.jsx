@@ -374,15 +374,25 @@ function LabIndicatorCard({ title, valueLabel, status, subtitle, pointerPercent,
   )
 }
 
-function SurfaceSection({ title, subtitle, children, icon: Icon, action, className = '' }) {
+const SECTION_TONES = {
+  cyan: 'from-cyan-500 to-teal-500 shadow-cyan-500/30',
+  emerald: 'from-emerald-500 to-teal-600 shadow-emerald-500/30',
+  sky: 'from-sky-500 to-indigo-500 shadow-sky-500/30',
+  rose: 'from-rose-500 to-orange-400 shadow-rose-500/30',
+  amber: 'from-amber-400 to-orange-500 shadow-orange-500/30',
+  indigo: 'from-indigo-500 to-violet-500 shadow-indigo-500/30',
+  slate: 'from-slate-500 to-slate-700 shadow-slate-500/30',
+}
+
+function SurfaceSection({ title, subtitle, children, icon: Icon, action, className = '', tone = 'cyan' }) {
   return (
     <section className={`space-y-2.5 ${className}`}>
       {title && (
         <div className="flex flex-wrap items-center justify-between gap-2.5 px-1">
           <div className="flex items-center gap-2.5">
             {Icon && (
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-cyan-100/70 text-cyan-700 ring-1 ring-cyan-200/60 dark:bg-cyan-900/40 dark:text-cyan-300 dark:ring-cyan-800/60">
-                <Icon className="h-4 w-4" />
+              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-md ${SECTION_TONES[tone] || SECTION_TONES.cyan}`}>
+                <Icon className="h-4.5 w-4.5" />
               </div>
             )}
             <div>
@@ -399,7 +409,7 @@ function SurfaceSection({ title, subtitle, children, icon: Icon, action, classNa
           {action && <div>{action}</div>}
         </div>
       )}
-      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs dark:border-slate-800/70 dark:bg-night-surface sm:p-6">
+      <div className="patient-card overflow-hidden p-5 sm:p-6">
         {children}
       </div>
     </section>
@@ -772,18 +782,21 @@ export function DiagnosisResultPage() {
   const resultTone = riskCategory === 'urgent' || riskCategory === 'diabetes'
     ? {
         panel: 'border-rose-200 bg-gradient-to-br from-rose-50 via-white to-rose-50/50 dark:border-rose-900/60 dark:from-rose-950/35 dark:via-night-surface dark:to-rose-950/20',
-        icon: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',
+        icon: 'bg-gradient-to-br from-rose-500 to-orange-400 text-white shadow-lg shadow-rose-500/30',
+        stripe: 'from-rose-500 via-orange-400 to-amber-300',
         badge: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',
       }
     : riskCategory === 'prediabetes'
       ? {
           panel: 'border-amber-200 bg-gradient-to-br from-amber-50 via-white to-orange-50/40 dark:border-amber-900/60 dark:from-amber-950/30 dark:via-night-surface dark:to-orange-950/20',
-          icon: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
+          icon: 'bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-lg shadow-orange-500/30',
+          stripe: 'from-amber-400 via-orange-400 to-rose-400',
           badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
         }
       : {
           panel: 'border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-teal-50/40 dark:border-emerald-900/60 dark:from-emerald-950/30 dark:via-night-surface dark:to-teal-950/20',
-          icon: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
+          icon: 'bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30',
+          stripe: 'from-emerald-400 via-teal-400 to-cyan-400',
           badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
         }
   const suspectedType = result?.suspected_type
@@ -1046,12 +1059,14 @@ export function DiagnosisResultPage() {
         onConfirm={handleRestartConfirm}
       />
 
-      <section className={`overflow-hidden rounded-3xl border shadow-[0_14px_40px_-28px_rgba(15,23,42,0.35)] ${resultTone.panel}`}>
-        <div className="grid lg:grid-cols-[minmax(0,1.55fr)_minmax(260px,0.75fr)]">
+      <section className={`relative overflow-hidden rounded-3xl border shadow-[0_24px_60px_-32px_rgba(15,23,42,0.45)] ${resultTone.panel}`}>
+        <div aria-hidden="true" className={`h-1.5 w-full bg-gradient-to-r ${resultTone.stripe}`} />
+        <div aria-hidden="true" className="pointer-events-none absolute -left-16 -top-20 h-56 w-56 rounded-full bg-white/60 blur-3xl dark:bg-white/5" />
+        <div className="relative grid lg:grid-cols-[minmax(0,1.55fr)_minmax(260px,0.75fr)]">
           <article className="px-5 py-6 sm:px-7 sm:py-8 lg:px-9">
             <div className="flex items-center gap-3">
-              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${resultTone.icon}`}>
-                <ShieldCheck className="h-5 w-5" />
+              <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${resultTone.icon}`}>
+                <ShieldCheck className="h-6 w-6" />
               </span>
               <div>
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
@@ -1089,7 +1104,7 @@ export function DiagnosisResultPage() {
 
             <a
               href="#next-steps"
-              className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
+              className="patient-cta mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950"
             >
               {t('diagnosisResult.viewNextSteps', 'View my next steps')}
               <ArrowRight className="h-4 w-4" />
@@ -1115,7 +1130,7 @@ export function DiagnosisResultPage() {
               <span className={`shrink-0 rounded-full px-3 py-1 text-sm font-extrabold ${resultTone.badge}`}>{certaintyPercent}%</span>
             </div>
             <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-              <div className="h-full rounded-full bg-primary-500 transition-[width] duration-700" style={{ width: `${certaintyPercent}%` }} />
+              <div className="h-full rounded-full bg-gradient-to-r from-primary-500 via-teal-400 to-cyan-400 transition-[width] duration-700" style={{ width: `${certaintyPercent}%` }} />
             </div>
             <p className="mt-4 text-xs leading-relaxed text-slate-600 dark:text-slate-300 sm:text-sm">
               {confidenceReason || ((evidenceCompleteness?.missing_recommended_labs || missingLabs).length
@@ -1127,7 +1142,7 @@ export function DiagnosisResultPage() {
       </section>
 
       <div id="next-steps" className="scroll-mt-24">
-      <SurfaceSection title={t('diagnosisResult.actionableRecommendations', 'What you should do next')} icon={ClipboardList}>
+      <SurfaceSection title={t('diagnosisResult.actionableRecommendations', 'What you should do next')} icon={ClipboardList} tone="emerald">
         {recommendations.length ? (
           <ol className="divide-y divide-slate-100 dark:divide-slate-800">
             {recommendations.map((item, index) => {
@@ -1135,12 +1150,12 @@ export function DiagnosisResultPage() {
               return (
                 <li
                   key={`${item.text}-${index}`}
-                  className="flex items-start gap-3 py-3.5 first:pt-0 last:pb-0"
+                  className="flex items-start gap-3.5 py-3.5 first:pt-0 last:pb-0"
                 >
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-50 text-xs font-bold text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300">
+                  <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-sm font-bold text-white shadow-md ${isUrgent ? 'from-rose-500 to-orange-400 shadow-rose-500/30' : 'from-emerald-500 to-cyan-500 shadow-emerald-500/30'}`}>
                     {index + 1}
                   </span>
-                  <p className="flex-1 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                  <p className="flex-1 pt-1 text-sm leading-relaxed text-slate-700 dark:text-slate-300 sm:text-[15px]">
                     {tExact(bilingualField(item.text, item.text_km))}
                   </p>
                   {isUrgent ? (
@@ -1165,7 +1180,7 @@ export function DiagnosisResultPage() {
 
       <div className="space-y-6">
       {showPrevention && preventionContent ? (
-        <SurfaceSection title={preventionContent.title} icon={ShieldCheck}>
+        <SurfaceSection title={preventionContent.title} icon={ShieldCheck} tone="cyan">
           <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{preventionContent.intro}</p>
           {preventionContent.listIntro ? (
             <p className="mt-2.5 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{preventionContent.listIntro}</p>
@@ -1187,7 +1202,7 @@ export function DiagnosisResultPage() {
       <ConditionEducationPanel result={result} defaultOpen={false} />
 
       <div className="flex items-center gap-2.5 pt-4 px-1">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-sky-500 text-white shadow-md shadow-indigo-500/30">
           <Stethoscope className="h-4.5 w-4.5" />
         </div>
         <div>
@@ -1202,7 +1217,7 @@ export function DiagnosisResultPage() {
 
       <div className="space-y-6">
         <article>
-          <SurfaceSection title={t('diagnosisResult.keyDiagnosticIndicators', 'Key Diagnostic Indicators')} icon={FlaskConical}>
+          <SurfaceSection title={t('diagnosisResult.keyDiagnosticIndicators', 'Key Diagnostic Indicators')} icon={FlaskConical} tone="sky">
             <div className="grid gap-2 sm:grid-cols-2">
               <LabIndicatorCard
                 title={t('diagnosisResult.hba1cIndicator', 'HbA1c Level Indicator')}
@@ -1242,7 +1257,7 @@ export function DiagnosisResultPage() {
         </article>
 
         <article>
-          <SurfaceSection title={t('diagnosisResult.relevantHistory', 'Relevant History & Symptoms')} icon={Heart}>
+          <SurfaceSection title={t('diagnosisResult.relevantHistory', 'Relevant History & Symptoms')} icon={Heart} tone="rose">
             {matchedSymptoms.length ? (
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('diagnosisResult.knownSymptoms', 'You reported:')}</p>
@@ -1294,6 +1309,7 @@ export function DiagnosisResultPage() {
             <SurfaceSection
               title={t('diagnosisResult.differentials.title', 'Alternative Explanations to Consider')}
               icon={HelpCircle}
+              tone="indigo"
             >
               <div className="space-y-4">
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -1355,7 +1371,7 @@ export function DiagnosisResultPage() {
         )}
 
         <article>
-          <SurfaceSection title={t('diagnosisResult.riskFactors', 'Risk Factors')} icon={Zap}>
+          <SurfaceSection title={t('diagnosisResult.riskFactors', 'Risk Factors')} icon={Zap} tone="amber">
             {matchedRiskFactors.length ? (
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('diagnosisResult.knownHistory', 'Known history includes:')}</p>

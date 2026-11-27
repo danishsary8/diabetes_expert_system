@@ -52,10 +52,10 @@ function DoctorNoteCard({ latestResult, t }) {
   const reviewerName = reviewer?.name ? (reviewer.name.startsWith('Dr.') ? reviewer.name : `Dr. ${reviewer.name}`) : null
 
   return (
-    <section className="min-w-0 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] sm:p-6 dark:border-slate-800 dark:bg-slate-900">
+    <section className="patient-card min-w-0 p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-600 dark:bg-primary-950/50 dark:text-primary-300">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 text-white shadow-md shadow-emerald-500/30">
             <Stethoscope className="h-5 w-5" aria-hidden />
           </span>
           <div>
@@ -199,7 +199,7 @@ export function CarePlanPage() {
   if (loading) {
     return (
       <div className="space-y-6 pb-12 animate-in fade-in duration-150">
-        <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 space-y-4">
+        <div className="patient-card space-y-4 p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="space-y-2">
               <Skeleton className="h-8 w-64" />
@@ -240,8 +240,8 @@ export function CarePlanPage() {
       {/* ==================================================================== */}
       {/* 1. HERO — matches the pine "today" panel on the patient home page    */}
       {/* ==================================================================== */}
-      <section className="relative overflow-hidden rounded-[28px] bg-primary-900 p-5 text-white shadow-lift sm:p-8 lg:p-10 dark:bg-night-elevated dark:ring-1 dark:ring-night-border">
-        <svg viewBox="0 0 1200 160" preserveAspectRatio="none" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-32 w-full text-primary-700/70 dark:text-primary-900/80">
+      <section className="patient-hero rounded-[28px] p-5 sm:p-8 lg:p-10">
+        <svg viewBox="0 0 1200 160" preserveAspectRatio="none" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-32 w-full text-white/15">
           <path d="M0 120 C 120 120, 160 60, 260 70 S 400 140, 520 110 S 680 30, 800 60 S 980 130, 1080 100 S 1160 80, 1200 84" fill="none" stroke="currentColor" strokeWidth="2" />
         </svg>
 

@@ -89,7 +89,7 @@ export function CarePlanPrevention({ latestResult, t }) {
   ]
 
   return (
-    <section className="min-w-0 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.02)] sm:p-6 dark:border-slate-800 dark:bg-slate-900">
+    <section className="patient-card min-w-0 p-5 sm:p-6">
       {/* Section Header */}
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>

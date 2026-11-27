@@ -29,9 +29,9 @@ export function NavMain({ title, items, collapsed = false }) {
                 className={({ isActive }) =>
                   cn(
                     'group relative flex items-center rounded-xl text-sm font-medium transition-all duration-150 ease-out outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
-                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'gap-3 px-3 py-2',
+                    collapsed ? 'h-10 w-10 justify-center mx-auto' : 'gap-2.5 px-2.5 py-1.5',
                     isActive
-                      ? 'bg-primary-50/90 text-primary-700 font-semibold shadow-xs dark:bg-primary-500/15 dark:text-primary-200'
+                      ? 'bg-gradient-to-r from-primary-50 to-cyan-50/70 text-primary-800 font-semibold shadow-xs dark:from-primary-500/15 dark:to-cyan-500/10 dark:text-primary-200'
                       : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-100'
                   )
                 }
@@ -47,13 +47,13 @@ export function NavMain({ title, items, collapsed = false }) {
                     {Icon ? (
                       <span
                         className={cn(
-                          'flex h-5 w-5 shrink-0 items-center justify-center transition-colors duration-150',
+                          'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors duration-150',
                           isActive
-                            ? 'text-primary-600 dark:text-primary-400'
+                            ? 'bg-gradient-to-br from-primary-500 to-cyan-500 text-white shadow-sm shadow-primary-500/30'
                             : 'text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-300'
                         )}
                       >
-                        <Icon className="h-4.5 w-4.5" />
+                        <Icon className="h-4 w-4" />
                       </span>
                     ) : null}
 

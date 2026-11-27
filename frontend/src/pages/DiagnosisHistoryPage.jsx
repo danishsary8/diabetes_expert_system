@@ -44,9 +44,9 @@ function getConfidenceBarClass() {
 // The hero colour follows urgency only.
 function getHeroGradient(_percent, isUrgent) {
   if (isUrgent) {
-    return 'bg-rose-800 dark:bg-rose-950 dark:ring-1 dark:ring-rose-900'
+    return 'bg-gradient-to-br from-rose-700 via-rose-800 to-orange-800 dark:from-rose-950 dark:via-rose-950 dark:to-rose-900 dark:ring-1 dark:ring-rose-900'
   }
-  return 'bg-primary-900 dark:bg-night-elevated dark:ring-1 dark:ring-night-border'
+  return 'patient-hero'
 }
 
 function getUrgencyMeta(result, t) {
@@ -141,7 +141,7 @@ function OnboardingEmptyState({ t }) {
 
   return (
     <section className="surface mx-auto flex max-w-2xl flex-col items-center rounded-3xl border border-slate-200/80 p-8 text-center shadow-sm dark:border-slate-800 sm:p-12">
-      <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-50 text-primary-600 dark:bg-primary-950/50 dark:text-primary-300">
+      <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 text-white shadow-lg shadow-emerald-500/30">
         <ClipboardList className="h-8 w-8" aria-hidden />
       </span>
       <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
@@ -323,6 +323,8 @@ export function DiagnosisHistoryPage() {
               value={`${latestPercent}%`}
               tone={latestUrgency.tone}
               icon={Activity}
+              vivid
+              accent="primary"
               hint={latest ? `${latestUrgency.label} · ${getRelativeCheckAge(latest.created_at, t) || ''}` : null}
             />
             <StatCard
@@ -330,6 +332,8 @@ export function DiagnosisHistoryPage() {
               value={results.length}
               tone="default"
               icon={ClipboardList}
+              vivid
+              accent="default"
               hint={t('myResults.stats.trackedOverTime', 'Tracked in history')}
             />
             <StatCard
@@ -337,6 +341,8 @@ export function DiagnosisHistoryPage() {
               value={`${reviewedCount}`}
               tone={reviewedCount > 0 ? 'primary' : 'default'}
               icon={Stethoscope}
+              vivid
+              accent="indigo"
               hint={reviewedCount > 0 ? t('myResults.stats.reviewedNotes', 'Doctor notes attached') : t('myResults.stats.awaitingReview', 'Awaiting doctor review')}
             />
             <StatCard
@@ -344,6 +350,8 @@ export function DiagnosisHistoryPage() {
               value={trendLabel}
               tone={scoreDiff !== null ? (scoreDiff > 0 ? 'warning' : 'success') : 'default'}
               icon={scoreDiff !== null && scoreDiff < 0 ? TrendingDown : TrendingUp}
+              vivid
+              accent={scoreDiff !== null && scoreDiff > 0 ? 'warning' : 'success'}
               hint={previous ? t('myResults.stats.vsPrevious', 'vs previous') : t('myResults.stats.firstAssessment', 'Baseline established')}
             />
           </div>

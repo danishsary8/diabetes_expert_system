@@ -1,15 +1,22 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import {
+  Apple,
   ArrowLeft,
-  Bot,
+  BookOpen,
+  CalendarCheck,
   Check,
   ChevronRight,
   Copy,
   GripHorizontal,
   HeartPulse,
   Languages,
+  Layers,
+  Microscope,
   RotateCcw,
   ShieldCheck,
+  Siren,
+  Sparkles,
+  Thermometer,
   X,
 } from 'lucide-react'
 import { ASSISTANT_COPY, DIABETES_QUESTIONS } from './diabetesQuestions'
@@ -117,41 +124,50 @@ function readStoredConversation() {
 }
 
 /**
- * Typewriter writing animation for bot messages.
+ * Typewriter writing animation for bot messages. Completion fires exactly
+ * once per message, even if the parent re-renders mid-stream.
  */
 function StreamingMessageContent({ text, isStreaming, onStreamingComplete, onScrollToBottom }) {
   const [displayedLength, setDisplayedLength] = useState(isStreaming ? 0 : text.length)
   const isDone = displayedLength >= text.length
+  const completeRef = useRef(onStreamingComplete)
+  const scrollRef = useRef(onScrollToBottom)
+  const firedRef = useRef(!isStreaming)
+  completeRef.current = onStreamingComplete
+  scrollRef.current = onScrollToBottom
+
+  const finish = useCallback(() => {
+    if (firedRef.current) return
+    firedRef.current = true
+    completeRef.current?.()
+  }, [])
 
   useEffect(() => {
     if (!isStreaming) {
       setDisplayedLength(text.length)
-      return
+      return undefined
     }
 
-    setDisplayedLength(0)
     // Snappy, natural pacing without being slow
     const stepSize = Math.max(1, Math.floor(text.length / 85))
+    let shown = 0
     const interval = setInterval(() => {
-      setDisplayedLength((prev) => {
-        const next = prev + stepSize
-        if (next >= text.length) {
-          clearInterval(interval)
-          if (onStreamingComplete) onStreamingComplete()
-          return text.length
-        }
-        if (onScrollToBottom) onScrollToBottom()
-        return next
-      })
+      shown = Math.min(text.length, shown + stepSize)
+      setDisplayedLength(shown)
+      scrollRef.current?.()
+      if (shown >= text.length) {
+        clearInterval(interval)
+        finish()
+      }
     }, 16)
 
     return () => clearInterval(interval)
-  }, [text, isStreaming, onStreamingComplete, onScrollToBottom])
+  }, [text, isStreaming, finish])
 
   const handleClickToSkip = () => {
     if (!isDone) {
       setDisplayedLength(text.length)
-      if (onStreamingComplete) onStreamingComplete()
+      finish()
     }
   }
 
@@ -169,8 +185,25 @@ function StreamingMessageContent({ text, isStreaming, onStreamingComplete, onScr
   )
 }
 
+/** Round bot avatar with a gradient ring. */
+function BotAvatar({ size = 'sm' }) {
+  return (
+    <span
+      className={[
+        'assistant-avatar relative flex shrink-0 items-center justify-center rounded-full',
+        size === 'lg' ? 'h-11 w-11 p-[2px]' : 'h-8 w-8 p-[2px]',
+      ].join(' ')}
+      aria-hidden="true"
+    >
+      <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white p-0.5 dark:bg-slate-900">
+        <img src="/images/dr-bot.png" alt="" className="h-full w-full object-contain" />
+      </span>
+    </span>
+  )
+}
+
 /**
- * Minimal, clean message bubbles with Copy and Translate actions.
+ * Message bubbles with Copy and Translate actions.
  */
 function ChatMessage({ message, onStreamingComplete, onScrollToBottom }) {
   const isUser = message.sender === 'user'
@@ -194,27 +227,16 @@ function ChatMessage({ message, onStreamingComplete, onScrollToBottom }) {
   }
 
   return (
-    <div className={`flex items-end gap-2 duration-150 ${isUser ? 'justify-end' : 'justify-start'}`}>
-      {!isUser && (
-        <span
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 overflow-hidden p-0.5 mb-0.5"
-          aria-hidden="true"
-        >
-          <img
-            src="/images/dr-bot.png"
-            alt="Dr. Bot"
-            className="h-full w-full object-contain"
-          />
-        </span>
-      )}
+    <div className={`assistant-msg-in flex items-end gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
+      {!isUser && <BotAvatar />}
 
-      <div className="max-w-[85%] sm:max-w-[80%]">
+      <div className={isUser ? 'max-w-[80%]' : 'max-w-[86%]'}>
         <div
           className={[
-            'relative px-3.5 py-2 sm:px-4 sm:py-2.5 text-left text-[13px] sm:text-sm leading-relaxed',
+            'relative px-4 py-2.5 text-left text-[13px] leading-relaxed sm:text-sm',
             isUser
-              ? 'rounded-[18px] rounded-br-[4px] bg-[#007aff] dark:bg-blue-600 text-white font-normal'
-              : 'rounded-[18px] rounded-bl-[4px] bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-slate-800 dark:text-slate-100 shadow-2xs',
+              ? 'assistant-bubble-user rounded-[20px] rounded-br-md font-medium text-white'
+              : 'rounded-[20px] rounded-bl-md border border-slate-200/70 bg-white text-slate-800 shadow-[0_6px_20px_-12px_rgba(15,23,42,0.25)] dark:border-slate-700/70 dark:bg-slate-800 dark:text-slate-100',
           ].join(' ')}
         >
           {isUser ? (
@@ -228,30 +250,31 @@ function ChatMessage({ message, onStreamingComplete, onScrollToBottom }) {
                 onScrollToBottom={onScrollToBottom}
               />
 
-              {/* Action Icons inside bubble */}
               {!message.isStreaming && (
-                <div className="flex items-center justify-end gap-1 mt-1.5 -mb-0.5 select-none">
+                <div className="-mb-1 mt-2 flex select-none items-center justify-end gap-1 border-t border-slate-100 pt-1.5 dark:border-slate-700/60">
                   {hasTranslation && (
                     <button
                       type="button"
                       onClick={handleToggleTranslate}
                       className={[
-                        'flex items-center justify-center h-6 w-6 rounded transition-colors',
+                        'inline-flex h-7 items-center gap-1 rounded-full px-2 text-[11px] font-semibold transition-colors',
                         isTranslated
-                          ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50'
-                          : 'text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60',
+                          ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300'
+                          : 'text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700/60 dark:hover:text-slate-200',
                       ].join(' ')}
                       title={isTranslated ? 'Show English' : 'បកប្រែជាភាសាខ្មែរ (Translate to Khmer)'}
                       aria-label="Translate message"
+                      aria-pressed={isTranslated}
                     >
                       <Languages className="h-3.5 w-3.5" />
+                      <span>{isTranslated ? 'EN' : 'ខ្មែរ'}</span>
                     </button>
                   )}
 
                   <button
                     type="button"
                     onClick={handleCopy}
-                    className="flex items-center justify-center h-6 w-6 rounded text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors"
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700/60 dark:hover:text-slate-200"
                     title={copied ? 'Copied' : 'Copy message'}
                     aria-label="Copy message"
                   >
@@ -271,34 +294,34 @@ function ChatMessage({ message, onStreamingComplete, onScrollToBottom }) {
   )
 }
 
-/**
- * Minimal 3-dot typing bubble matching standard messaging apps.
- */
+/** Three-dot typing bubble. */
 function AiTypingIndicator() {
   return (
-    <div className="flex items-end gap-2 justify-start duration-150">
-      <span
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 overflow-hidden p-0.5 mb-0.5"
-        aria-hidden="true"
-      >
-        <img
-          src="/images/dr-bot.png"
-          alt="Dr. Bot"
-          className="h-full w-full object-contain"
-        />
-      </span>
-
-      <div className="rounded-[18px] rounded-bl-[4px] bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-3.5 py-2.5 flex items-center gap-1 shadow-2xs">
-        <span className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500 animate-bounce [animation-delay:-0.3s]" />
-        <span className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500 animate-bounce [animation-delay:-0.15s]" />
-        <span className="h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-slate-500 animate-bounce" />
+    <div className="assistant-msg-in flex items-end justify-start gap-2" aria-label="Assistant is typing">
+      <BotAvatar />
+      <div className="flex items-center gap-1.5 rounded-[20px] rounded-bl-md border border-slate-200/70 bg-white px-4 py-3 shadow-[0_6px_20px_-12px_rgba(15,23,42,0.25)] dark:border-slate-700/70 dark:bg-slate-800">
+        <span className="h-2 w-2 animate-bounce rounded-full bg-teal-400 [animation-delay:-0.3s]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-cyan-400 [animation-delay:-0.15s]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-sky-400" />
       </div>
     </div>
   )
 }
 
+// Icon and colour for each suggested topic.
+const TOPIC_STYLE = {
+  'what-is-diabetes': { icon: BookOpen, tone: 'bg-sky-100 text-sky-600 dark:bg-sky-950/60 dark:text-sky-300' },
+  symptoms: { icon: Thermometer, tone: 'bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300' },
+  'diabetes-types': { icon: Layers, tone: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300' },
+  diagnosis: { icon: Microscope, tone: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300' },
+  prevention: { icon: ShieldCheck, tone: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300' },
+  'healthy-eating': { icon: Apple, tone: 'bg-lime-100 text-lime-700 dark:bg-lime-950/60 dark:text-lime-300' },
+  'daily-management': { icon: CalendarCheck, tone: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300' },
+  'urgent-help': { icon: Siren, tone: 'bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-300' },
+}
+
 /**
- * Minimal interactive buttons: matching height, clean spacing, aligned with chat.
+ * Quick replies (Yes / No) and the suggested-topic grid.
  */
 function ChatOptions({ stage, onChooseIntro, onChooseQuestion, onChooseFollowUp, onBack, disabled = false }) {
   const { language } = useLanguage()
@@ -309,47 +332,48 @@ function ChatOptions({ stage, onChooseIntro, onChooseQuestion, onChooseFollowUp,
     const onSelect = isIntro ? onChooseIntro : onChooseFollowUp
 
     return (
-      <div className="pl-9 animate-in fade-in duration-200">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => onSelect(true)}
-            className="h-9 min-w-[84px] px-4 rounded-full bg-[#007aff] hover:bg-blue-600 active:scale-95 text-white text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
-          >
-            <Check className="h-3.5 w-3.5" />
-            <span>Yes</span>
-          </button>
+      <div className="assistant-msg-in flex flex-wrap items-center justify-end gap-2">
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onSelect(true)}
+          className="assistant-bubble-user inline-flex h-10 min-w-[96px] items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-300/50"
+        >
+          <Check className="h-4 w-4" />
+          <span>Yes</span>
+        </button>
 
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => onSelect(false)}
-            className="h-9 min-w-[84px] px-4 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
-          >
-            <X className="h-3.5 w-3.5 text-slate-400" />
-            <span>No</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => onSelect(false)}
+          className="inline-flex h-10 min-w-[96px] items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:scale-95 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-300/50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600"
+        >
+          <X className="h-4 w-4 text-slate-400" />
+          <span>No</span>
+        </button>
       </div>
     )
   }
 
   if (stage === CONVERSATION_STAGES.TOPICS) {
     return (
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850 p-3 animate-in fade-in duration-200">
-        <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 dark:border-slate-800">
-          <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-            {isKhmer ? 'ប្រធានបទដែលបានណែនាំ' : 'Suggested Topics'}
+      <div className="assistant-msg-in rounded-3xl border border-slate-200/70 bg-white/90 p-3 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.3)] backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/90">
+        <div className="mb-2 flex items-center justify-between px-1.5 pt-0.5">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-100">
+            <Sparkles className="h-3.5 w-3.5 text-teal-500" />
+            {isKhmer ? 'ប្រធានបទដែលបានណែនាំ' : 'Suggested topics'}
           </span>
-          <span className="text-[11px] text-slate-400">
+          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
             {DIABETES_QUESTIONS.length} {isKhmer ? 'ប្រធានបទ' : 'topics'}
           </span>
         </div>
 
-        <div className="space-y-1">
-          {DIABETES_QUESTIONS.map((item, index) => {
+        <div className="grid grid-cols-1 gap-1.5 min-[420px]:grid-cols-2">
+          {DIABETES_QUESTIONS.map((item) => {
             const isUrgent = item.id === 'urgent-help'
+            const style = TOPIC_STYLE[item.id] || { icon: HeartPulse, tone: 'bg-teal-100 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300' }
+            const TopicIcon = style.icon
             const questionTitle = isKhmer ? item.displayQuestionKm || item.displayQuestion : item.displayQuestion || item.question
 
             return (
@@ -358,20 +382,18 @@ function ChatOptions({ stage, onChooseIntro, onChooseQuestion, onChooseFollowUp,
                 type="button"
                 disabled={disabled}
                 onClick={() => onChooseQuestion(item)}
-                className="group flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                className={[
+                  'group flex min-h-[52px] w-full items-center gap-2.5 rounded-2xl border px-2.5 py-2 text-left text-xs font-semibold transition-all hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-300/50',
+                  isUrgent
+                    ? 'border-red-200 bg-red-50/70 text-red-800 hover:border-red-300 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200'
+                    : 'border-slate-200/70 bg-white text-slate-700 hover:border-teal-300 dark:border-slate-700/70 dark:bg-slate-800/70 dark:text-slate-200 dark:hover:border-teal-700',
+                ].join(' ')}
               >
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                    {index + 1}
-                  </span>
-                  <span className="truncate font-normal">{questionTitle}</span>
-                  {isUrgent && (
-                    <span className="shrink-0 text-[10px] font-medium text-red-600 bg-red-50 dark:bg-red-950/50 px-1.5 py-0.5 rounded">
-                      {isKhmer ? 'បន្ទាន់' : 'Urgent'}
-                    </span>
-                  )}
-                </div>
-                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${style.tone}`}>
+                  <TopicIcon className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1 leading-snug">{questionTitle}</span>
+                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-500 dark:text-slate-600" />
               </button>
             )
           })}
@@ -381,7 +403,7 @@ function ChatOptions({ stage, onChooseIntro, onChooseQuestion, onChooseFollowUp,
           type="button"
           disabled={disabled}
           onClick={onBack}
-          className="mt-2 w-full py-1.5 text-center text-xs font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 flex items-center justify-center gap-1.5 transition-colors"
+          className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>{isKhmer ? 'ត្រឡប់ក្រោយ' : 'Back'}</span>
@@ -394,6 +416,8 @@ function ChatOptions({ stage, onChooseIntro, onChooseQuestion, onChooseFollowUp,
 }
 
 export function DiabetesAssistant() {
+  const { language } = useLanguage()
+  const isKhmer = language === 'km'
   const isDesktopViewport = typeof window !== 'undefined' && window.matchMedia(DESKTOP_MEDIA_QUERY).matches
   const [isOpen, setIsOpen] = useState(false)
   const [conversation, setConversation] = useState(readStoredConversation)
@@ -655,67 +679,55 @@ export function DiabetesAssistant() {
     }, 400)
   }
 
+  // Mirror of the conversation for callbacks that must not run inside a
+  // state updater (React may call updaters more than once).
+  const conversationRef = useRef(conversation)
+  conversationRef.current = conversation
+  const completedIdsRef = useRef(new Set())
+
   const handleStreamingComplete = useCallback(
-    (messageIndex) => {
-      setConversation((prev) => {
-        const updatedMessages = prev.messages.map((m, idx) =>
-          idx === messageIndex ? { ...m, isStreaming: false } : m
-        )
+    (messageId) => {
+      if (completedIdsRef.current.has(messageId)) return
+      completedIdsRef.current.add(messageId)
 
-        const currentMsg = prev.messages[messageIndex]
-        let nextStage = prev.stage
+      const currentMsg = conversationRef.current.messages.find((m) => m.id === messageId)
+      const text = currentMsg?.text
+      const isTopicAnswer =
+        currentMsg?.sender === 'bot' && DIABETES_QUESTIONS.some((q) => q.answer === text || q.answerKm === text)
 
-        // If the answer to a topic just finished, trigger the follow-up prompt
-        if (
-          currentMsg &&
-          currentMsg.sender === 'bot' &&
-          DIABETES_QUESTIONS.some((q) => q.answer === currentMsg.text || q.answerKm === currentMsg.text)
-        ) {
+      let nextStage = null
+      if (isTopicAnswer) nextStage = CONVERSATION_STAGES.ANSWERING
+      else if (text === ASSISTANT_COPY.followUp.en || text === ASSISTANT_COPY.followUp.km) nextStage = CONVERSATION_STAGES.FOLLOW_UP
+      else if (text === ASSISTANT_COPY.topicPrompt.en || text === ASSISTANT_COPY.topicPrompt.km) nextStage = CONVERSATION_STAGES.TOPICS
+      else if (
+        text === ASSISTANT_COPY.initialDecline.en ||
+        text === ASSISTANT_COPY.initialDecline.km ||
+        text === ASSISTANT_COPY.finished.en ||
+        text === ASSISTANT_COPY.finished.km
+      ) nextStage = CONVERSATION_STAGES.COMPLETE
+      else if (text === ASSISTANT_COPY.welcome.en || text === ASSISTANT_COPY.welcome.km) nextStage = CONVERSATION_STAGES.INTRO
+
+      setConversation((prev) => ({
+        ...prev,
+        stage: nextStage || prev.stage,
+        messages: prev.messages.map((m) => (m.id === messageId ? { ...m, isStreaming: false } : m)),
+      }))
+
+      // After a topic answer, ask whether they have another question.
+      if (isTopicAnswer) {
+        scheduleTimeout(() => {
+          setIsAiTyping(true)
           scheduleTimeout(() => {
-            setIsAiTyping(true)
-            scheduleTimeout(() => {
-              setIsAiTyping(false)
-              appendSingleMessage(
-                createMessage('bot', ASSISTANT_COPY.followUp.en, {
-                  translation: ASSISTANT_COPY.followUp.km,
-                  isStreaming: true,
-                })
-              )
-            }, 450)
-          }, 300)
-          return { ...prev, messages: updatedMessages, stage: CONVERSATION_STAGES.ANSWERING }
-        }
-
-        if (
-          currentMsg?.text === ASSISTANT_COPY.followUp.en ||
-          currentMsg?.text === ASSISTANT_COPY.followUp.km
-        ) {
-          nextStage = CONVERSATION_STAGES.FOLLOW_UP
-        } else if (
-          currentMsg?.text === ASSISTANT_COPY.topicPrompt.en ||
-          currentMsg?.text === ASSISTANT_COPY.topicPrompt.km
-        ) {
-          nextStage = CONVERSATION_STAGES.TOPICS
-        } else if (
-          currentMsg?.text === ASSISTANT_COPY.initialDecline.en ||
-          currentMsg?.text === ASSISTANT_COPY.initialDecline.km ||
-          currentMsg?.text === ASSISTANT_COPY.finished.en ||
-          currentMsg?.text === ASSISTANT_COPY.finished.km
-        ) {
-          nextStage = CONVERSATION_STAGES.COMPLETE
-        } else if (
-          currentMsg?.text === ASSISTANT_COPY.welcome.en ||
-          currentMsg?.text === ASSISTANT_COPY.welcome.km
-        ) {
-          nextStage = CONVERSATION_STAGES.INTRO
-        }
-
-        return {
-          ...prev,
-          messages: updatedMessages,
-          stage: nextStage,
-        }
-      })
+            setIsAiTyping(false)
+            appendSingleMessage(
+              createMessage('bot', ASSISTANT_COPY.followUp.en, {
+                translation: ASSISTANT_COPY.followUp.km,
+                isStreaming: true,
+              })
+            )
+          }, 450)
+        }, 300)
+      }
     },
     [scheduleTimeout]
   )
@@ -984,7 +996,7 @@ export function DiabetesAssistant() {
         aria-hidden={!isOpen}
         style={isDesktopViewport && panelPosition ? { left: panelPosition.x, top: panelPosition.y } : undefined}
         className={[
-          'fixed bottom-[7.75rem] right-3 flex h-[min(44rem,calc(100dvh-8.5rem))] max-h-[86dvh] w-[calc(100vw-1.5rem)] origin-bottom-right flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl transition-[opacity,transform,left,top] ease-out sm:w-[26rem] sm:max-w-[calc(100vw-3rem)] md:bottom-[7.75rem] md:right-6',
+          'assistant-panel fixed bottom-[7.75rem] right-3 flex h-[min(44rem,calc(100dvh-8.5rem))] max-h-[86dvh] w-[calc(100vw-1.5rem)] origin-bottom-right flex-col overflow-hidden rounded-[28px] border border-white/60 bg-white transition-[opacity,transform,left,top] ease-out sm:w-[27rem] sm:max-w-[calc(100vw-3rem)] md:bottom-[7.75rem] md:right-6 dark:border-slate-700/60 dark:bg-slate-900',
           panelPosition ? 'md:bottom-auto md:right-auto' : '',
           isDragging ? 'duration-0' : 'duration-200',
           isOpen
@@ -992,71 +1004,95 @@ export function DiabetesAssistant() {
             : 'invisible pointer-events-none translate-y-2 scale-[0.98] opacity-0',
         ].join(' ')}
       >
-        {/* Simple, flat header: solid blue, no gradient, no glow */}
+        {/* Header: colourful gradient with avatar, status and actions */}
         <header
-          className="relative flex shrink-0 items-center justify-between gap-3 bg-[#007aff] dark:bg-blue-600 px-4 py-3 text-white md:cursor-grab md:select-none md:active:cursor-grabbing select-none"
+          className="assistant-header relative shrink-0 select-none overflow-hidden px-4 pb-4 pt-3.5 text-white md:cursor-grab md:active:cursor-grabbing"
           onPointerDown={handleDragStart}
           onPointerMove={handleDragMove}
           onPointerUp={finishDrag}
           onPointerCancel={finishDrag}
           title="Drag to move the assistant"
         >
+          <span aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-40 w-40 rounded-full bg-white/10" />
+          <span aria-hidden="true" className="pointer-events-none absolute -bottom-16 left-10 h-32 w-32 rounded-full bg-emerald-300/20 blur-2xl" />
           <GripHorizontal className="pointer-events-none absolute left-1/2 top-1 hidden h-3.5 w-3.5 -translate-x-1/2 text-white/40 md:block" aria-hidden="true" />
 
-          <div className="flex min-w-0 items-center gap-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20 p-1 overflow-hidden">
-              <img
-                src="/images/dr-bot.png"
-                alt="Dr. Bot"
-                className="h-full w-full object-contain"
-              />
+          <div className="relative flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="relative">
+                <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-white/95 p-1 shadow-lg shadow-teal-950/20">
+                  <img src="/images/dr-bot.png" alt="" className="h-full w-full object-contain" />
+                </span>
+                <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-teal-600 bg-emerald-400" aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <h2 className="truncate font-display text-base font-bold text-white">
+                  {isKhmer ? 'ជំនួយការជំងឺទឹកនោមផ្អែម' : ASSISTANT_COPY.title}
+                </h2>
+                <p className="mt-0.5 flex items-center gap-1.5 text-xs font-medium text-white/85">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-70 motion-reduce:animate-none" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300" />
+                  </span>
+                  {isKhmer ? 'អនឡាញ · ការអប់រំអ្នកជំងឺ' : 'Online · Patient education'}
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h2 className="truncate text-sm font-semibold text-white">
-                {ASSISTANT_COPY.title}
-              </h2>
-              <p className="text-[11px] text-blue-100 font-normal">
-                Patient education
-              </p>
-            </div>
-          </div>
 
-          <div className="flex shrink-0 items-center gap-1">
-            <button
-              type="button"
-              onClick={restartConversation}
-              className="flex h-7 items-center justify-center gap-1 rounded-md px-2 text-[11px] font-medium text-white/90 hover:bg-white/15 transition-colors"
-              aria-label="Restart conversation"
-              title="Restart conversation"
-            >
-              <RotateCcw className="h-3 w-3" />
-              <span className="hidden min-[380px]:inline">Restart</span>
-            </button>
-            <button
-              type="button"
-              onClick={closeAssistant}
-              className="flex h-7 w-7 items-center justify-center rounded-md text-white/90 hover:bg-white/15 transition-colors"
-              aria-label="Close Diabetes Assistant"
-              title="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <button
+                type="button"
+                onClick={restartConversation}
+                onPointerDown={(event) => event.stopPropagation()}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-inset ring-white/20 transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                aria-label="Restart conversation"
+                title="Restart conversation"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={closeAssistant}
+                onPointerDown={(event) => event.stopPropagation()}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-inset ring-white/20 transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                aria-label="Close Diabetes Assistant"
+                title="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </header>
 
-        {/* Minimal clean chat scroll area */}
+        {/* Conversation */}
         <div
           role="log"
           aria-live="polite"
           aria-relevant="additions"
-          className="assistant-chat-scroll flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-slate-50/50 dark:bg-slate-900/50 px-3.5 py-4 sm:p-4"
+          className="assistant-chat-scroll assistant-chat-bg -mt-3 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain rounded-t-[24px] px-3.5 pb-4 pt-5 sm:px-4"
         >
-          <div className="space-y-3">
-            {conversation.messages.map((message, index) => (
+          {/* Intro card */}
+          <div className="mb-4 flex flex-col items-center text-center">
+            <BotAvatar size="lg" />
+            <p className="mt-2 text-sm font-bold text-slate-800 dark:text-slate-100">
+              {isKhmer ? 'វេជ្ជបណ្ឌិតបូត' : 'Dr. Bot'}
+            </p>
+            <p className="mt-0.5 max-w-[16rem] text-xs leading-5 text-slate-500 dark:text-slate-400">
+              {isKhmer
+                ? 'ចម្លើយសាមញ្ញអំពីជំងឺទឹកនោមផ្អែម ជាភាសាអង់គ្លេស និងខ្មែរ។'
+                : 'Simple, trusted answers about diabetes — in English and Khmer.'}
+            </p>
+            <span className="mt-3 rounded-full bg-white/80 px-3 py-1 text-[11px] font-semibold text-slate-400 shadow-sm ring-1 ring-slate-200/70 dark:bg-slate-800/80 dark:ring-slate-700">
+              {isKhmer ? 'ថ្ងៃនេះ' : 'Today'}
+            </span>
+          </div>
+
+          <div className="space-y-3.5">
+            {conversation.messages.map((message) => (
               <ChatMessage
                 key={message.id}
                 message={message}
-                onStreamingComplete={() => handleStreamingComplete(index)}
+                onStreamingComplete={() => handleStreamingComplete(message.id)}
                 onScrollToBottom={scrollToBottom}
               />
             ))}
@@ -1064,11 +1100,9 @@ export function DiabetesAssistant() {
             {isAiTyping && <AiTypingIndicator />}
           </div>
 
-          <div ref={messageEndRef} />
-
           {/* Quick choices / Questions */}
           {conversation.stage !== CONVERSATION_STAGES.COMPLETE && (
-            <div className="mt-3.5">
+            <div className="mt-4">
               <ChatOptions
                 stage={conversation.stage}
                 disabled={isAiTyping}
@@ -1080,12 +1114,31 @@ export function DiabetesAssistant() {
             </div>
           )}
 
-          {/* Minimal disclaimer */}
-          <footer className="mt-5 pt-3 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500 text-center">
-            <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
-            <span>Educational purposes only. Does not replace medical advice.</span>
-          </footer>
+          {conversation.stage === CONVERSATION_STAGES.COMPLETE && (
+            <div className="assistant-msg-in mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={restartConversation}
+                className="inline-flex h-10 items-center gap-2 rounded-full border border-teal-200 bg-white px-4 text-sm font-semibold text-teal-700 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-teal-800 dark:bg-slate-800 dark:text-teal-300"
+              >
+                <RotateCcw className="h-4 w-4" />
+                {isKhmer ? 'ចាប់ផ្តើមការសន្ទនាថ្មី' : 'Start a new chat'}
+              </button>
+            </div>
+          )}
+
+          <div ref={messageEndRef} />
         </div>
+
+        {/* Disclaimer */}
+        <footer className="flex shrink-0 items-center justify-center gap-1.5 border-t border-slate-100 bg-white px-4 py-2.5 text-center text-[11px] font-medium text-slate-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-500">
+          <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+          <span>
+            {isKhmer
+              ? 'សម្រាប់ការអប់រំប៉ុណ្ណោះ។ មិនជំនួសដំបូន្មានវេជ្ជសាស្ត្រទេ។'
+              : 'Educational purposes only. Does not replace medical advice.'}
+          </span>
+        </footer>
       </section>
 
       {/* Floating Mascot Trigger Button */}
