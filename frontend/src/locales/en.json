@@ -550,7 +550,28 @@
       "weight": "Please enter a weight between 20 and 400 kg.",
       "waist": "Please enter a waist between 40 and 200 cm.",
       "save": "Could not save your profile. Please try again."
-    }
+    },
+    "brandTag": "Health profile setup",
+    "panelTitle": "Your assessments, personalised from the start",
+    "statusDone": "Completed",
+    "statusCurrent": "In progress",
+    "statusNext": "Up next",
+    "summaryTitle": "Your profile so far",
+    "summaryAge": "Age",
+    "summaryBmi": "BMI",
+    "summaryRisks": "Risk factors",
+    "unitCm": "cm",
+    "unitKg": "kg",
+    "bmiTitle": "Body Mass Index",
+    "bmiAuto": "Calculated automatically in every assessment.",
+    "bmiEmpty": "Enter your height and weight to see it here.",
+    "bmiUnder": "Underweight",
+    "bmiHealthy": "Healthy",
+    "bmiOver": "Overweight",
+    "bmiObese": "Obese",
+    "riskPrompt": "Tap everything that applies to you",
+    "riskSelected": "{{count}} selected",
+    "riskNone": "None selected"
   },
   "profilePage": {
     "title": "Your profile",
@@ -1760,8 +1781,7 @@
       "lowRiskAlert": "Low / Normal Risk (< 5 points)",
       "noUrgentFlags": "No acute warning signs",
       "urgentWarningPresent": "Urgent / DKA Warning signs detected",
-      "hypoWarningPresent": "Hypoglycemia risk signs reported",
-      "currentUser": "Current user"
+      "hypoWarningPresent": "Hypoglycemia risk signs reported"
     },
     "footer": {
       "continueHint": "Answer each section, then continue.",
