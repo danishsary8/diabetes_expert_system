@@ -80,7 +80,7 @@ export function AppLayout() {
 
         <main
           key={location.pathname}
-          className="custom-scrollbar page-open-motion min-w-0 flex-1 overflow-y-auto px-3 py-4 sm:px-6 sm:py-6 flex flex-col"
+          className="custom-scrollbar page-open-motion min-w-0 flex-1 overflow-y-auto px-4 pb-28 pt-4 sm:px-6 sm:py-6 flex flex-col"
         >
           <div className="mx-auto w-full max-w-[100rem] flex-1 flex flex-col">
             {/* Suspense here keeps the sidebar/topbar shell mounted while a lazy page chunk loads */}

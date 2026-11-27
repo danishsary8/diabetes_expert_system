@@ -251,7 +251,7 @@ export function CarePlanPage() {
       {/* ==================================================================== */}
       {/* 1. HERO — matches the pine "today" panel on the patient home page    */}
       {/* ==================================================================== */}
-      <section className="relative overflow-hidden rounded-[28px] bg-primary-900 p-6 text-white shadow-lift sm:p-8 lg:p-10 dark:bg-night-elevated dark:ring-1 dark:ring-night-border">
+      <section className="relative overflow-hidden rounded-[28px] bg-primary-900 p-5 text-white shadow-lift sm:p-8 lg:p-10 dark:bg-night-elevated dark:ring-1 dark:ring-night-border">
         <svg viewBox="0 0 1200 160" preserveAspectRatio="none" aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-32 w-full text-primary-700/70 dark:text-primary-900/80">
           <path d="M0 120 C 120 120, 160 60, 260 70 S 400 140, 520 110 S 680 30, 800 60 S 980 130, 1080 100 S 1160 80, 1200 84" fill="none" stroke="currentColor" strokeWidth="2" />
         </svg>
@@ -288,21 +288,21 @@ export function CarePlanPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab('Treatment Plan')}
-                className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-5 py-3 text-sm font-bold text-navy-deep shadow-[0_8px_24px_-10px_rgba(247,165,62,0.9)] transition-transform hover:-translate-y-0.5 hover:bg-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-300 px-5 py-3 sm:w-auto text-sm font-bold text-navy-deep shadow-[0_8px_24px_-10px_rgba(247,165,62,0.9)] transition-transform hover:-translate-y-0.5 hover:bg-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
               >
                 <Stethoscope className="h-4.5 w-4.5" />
                 {t('carePlanHero.treatmentPlan', 'See my doctor’s plan')}
               </button>
               <Link
                 to={latestResult?.id ? `/diagnosis/result?diagnosis_result_id=${latestResult.id}` : '/my-results'}
-                className="inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white ring-1 ring-inset ring-white/25 transition-colors hover:bg-white/10"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white ring-1 sm:w-auto ring-inset ring-white/25 transition-colors hover:bg-white/10"
               >
                 <FileText className="h-4 w-4" />
                 {t('carePlanHero.report', 'Open my report')}
               </Link>
               <Link
                 to="/diagnosis"
-                className="inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white/85 transition-colors hover:bg-white/10 hover:text-white"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white/85 sm:w-auto transition-colors hover:bg-white/10 hover:text-white"
               >
                 <PlusCircle className="h-4 w-4" />
                 {t('carePlanHero.newCheck', 'New health check')}
@@ -322,7 +322,7 @@ export function CarePlanPage() {
       {/* ==================================================================== */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-0.5">
         {/* Navigation Tab Pills styled like Dashboard */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        <div className="no-scrollbar -mx-4 flex items-center gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
           {TABS.map((tab) => {
             const isActive = activeTab === tab
             return (
@@ -331,7 +331,7 @@ export function CarePlanPage() {
                 type="button"
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  'rounded-xl px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap transition-all',
+                  'min-h-9 shrink-0 rounded-xl px-3.5 py-2 text-[13px] font-semibold whitespace-nowrap transition-all sm:min-h-0 sm:py-1.5 sm:text-xs',
                   isActive
                     ? 'bg-primary-800 text-white shadow-sm dark:bg-primary-400 dark:text-navy-deep'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200'

@@ -315,7 +315,7 @@ export function DiagnosisHistoryPage() {
       ) : !results.length ? (
         <OnboardingEmptyState t={t} />
       ) : (
-        <>
+        <div className="flex flex-col gap-6">
           {/* ── Stat Summary Cards ── */}
           <div className="grid min-w-0 grid-cols-2 gap-3.5 lg:grid-cols-4">
             <StatCard
@@ -350,7 +350,7 @@ export function DiagnosisHistoryPage() {
 
           {/* ── Featured Latest Assessment Hero ── */}
           {latest && (
-            <div className={cn('relative overflow-hidden rounded-3xl p-6 text-white shadow-xl sm:p-8', getHeroGradient(latestPercent, latest.is_urgent))}>
+            <div className={cn('relative order-first overflow-hidden rounded-3xl p-5 text-white shadow-xl sm:p-8 lg:order-none', getHeroGradient(latestPercent, latest.is_urgent))}>
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.22),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.12),transparent_35%)]" />
               
               <div className="relative grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1.2fr)] lg:items-center">
@@ -662,7 +662,7 @@ export function DiagnosisHistoryPage() {
               </div>
             )}
           </div>
-        </>
+        </div>
       )}
     </div>
   )

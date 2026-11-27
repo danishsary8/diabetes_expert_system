@@ -105,9 +105,18 @@ export function CarePlanGoals({ t }) {
           return (
             <div
               key={goal.id}
+              role="button"
+              tabIndex={0}
+              aria-pressed={isDone}
               onClick={() => toggleGoal(goal.id)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  toggleGoal(goal.id)
+                }
+              }}
               className={cn(
-                'group flex cursor-pointer items-center justify-between gap-3.5 py-3.5 px-3 rounded-xl transition-all duration-150',
+                'group flex cursor-pointer items-center justify-between gap-3 rounded-xl px-2 py-3.5 transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-500 sm:gap-3.5 sm:px-3',
                 isDone
                   ? 'bg-slate-50/40 hover:bg-slate-50/80 dark:bg-slate-800/20 dark:hover:bg-slate-800/40'
                   : 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40'
@@ -134,7 +143,7 @@ export function CarePlanGoals({ t }) {
                 <div className="min-w-0">
                   <h3
                     className={cn(
-                      'text-sm font-bold tracking-tight truncate transition-colors',
+                      'text-sm font-bold leading-snug tracking-tight transition-colors sm:truncate',
                       isDone
                         ? 'text-slate-600 dark:text-slate-300'
                         : 'text-slate-900 dark:text-slate-100'
@@ -154,13 +163,13 @@ export function CarePlanGoals({ t }) {
               {/* Right: Status Pill Button (Clean, no harsh thick borders) */}
               <div className="shrink-0">
                 {isDone ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 transition-colors dark:bg-emerald-950/50 dark:text-emerald-300">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 p-1.5 text-xs font-semibold text-emerald-700 sm:px-3 sm:py-1 transition-colors dark:bg-emerald-950/50 dark:text-emerald-300">
                     <Check className="h-3.5 w-3.5 stroke-[2.5]" />
-                    <span>{t('carePlanCards.completed', 'Completed')}</span>
+                    <span className="sr-only sm:not-sr-only">{t('carePlanCards.completed', 'Completed')}</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 transition-colors group-hover:bg-slate-200/80 dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-slate-700/80">
-                    <span>{t('carePlanCards.scheduled', 'Scheduled')}</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 p-1.5 text-xs font-medium text-slate-600 sm:px-3 sm:py-1 transition-colors group-hover:bg-slate-200/80 dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-slate-700/80">
+                    <span className="sr-only sm:not-sr-only">{t('carePlanCards.scheduled', 'Scheduled')}</span>
                     <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
                   </span>
                 )}

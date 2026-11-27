@@ -215,18 +215,18 @@ export function DiabetesGuidePage() {
 
       {/* ── Tab Switcher ── */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4 dark:border-slate-800">
-        <div className="flex items-center gap-2 rounded-2xl bg-slate-100 p-1.5 dark:bg-slate-900">
+        <div className="grid w-full grid-cols-2 gap-1.5 rounded-2xl bg-slate-100 p-1.5 sm:flex sm:w-auto sm:items-center sm:gap-2 dark:bg-slate-900">
           <button
             type="button"
             onClick={() => setActiveTab('types')}
             className={cn(
-              'flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all sm:text-sm',
+              'flex items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-[13px] font-bold transition-all sm:px-4 sm:text-sm',
               activeTab === 'types'
                 ? 'bg-white text-primary-900 shadow-xs dark:bg-slate-800 dark:text-white'
                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
             )}
           >
-            <Dna className="h-4 w-4" />
+            <Dna className="hidden h-4 w-4 sm:block" />
             <span>{t('diabetesGuide.tabs.types', 'Types of Diabetes')}</span>
           </button>
 
@@ -234,13 +234,13 @@ export function DiabetesGuidePage() {
             type="button"
             onClick={() => setActiveTab('symptoms')}
             className={cn(
-              'flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all sm:text-sm',
+              'flex items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-[13px] font-bold transition-all sm:px-4 sm:text-sm',
               activeTab === 'symptoms'
                 ? 'bg-white text-primary-900 shadow-xs dark:bg-slate-800 dark:text-white'
                 : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
             )}
           >
-            <Activity className="h-4 w-4" />
+            <Activity className="hidden h-4 w-4 sm:block" />
             <span>{t('diabetesGuide.tabs.symptoms', 'Symptoms Directory')}</span>
             <span className="rounded-full bg-primary-100 px-2 py-0.5 text-[11px] font-bold text-primary-700 dark:bg-primary-900/60 dark:text-primary-300">
               {SYMPTOMS_DIRECTORY.length}
@@ -250,7 +250,7 @@ export function DiabetesGuidePage() {
 
         <Link
           to="/diagnosis"
-          className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-primary-700 active:scale-[0.99]"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-bold text-white shadow-sm sm:w-auto sm:py-2.5 sm:text-xs transition hover:bg-primary-700 active:scale-[0.99]"
         >
           <Microscope className="h-4 w-4" />
           <span>{t('assessment.interview.startSelfCheck', 'Start Assessment')}</span>

@@ -205,16 +205,16 @@ export function Topbar({
               </nav>
             )}
 
-            <h1 className="truncate text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">
+            <h1 className="line-clamp-2 text-[15px] font-bold leading-tight tracking-tight text-slate-900 sm:truncate sm:text-lg sm:leading-none dark:text-white">
               {page.title}
             </h1>
 
             {page.subtitle && (
               <>
-                <span className="hidden text-slate-300 dark:text-slate-700 sm:inline select-none text-xs">
+                <span className="hidden text-slate-300 dark:text-slate-700 lg:inline select-none text-xs">
                   •
                 </span>
-                <p className="hidden truncate text-xs font-normal text-slate-400 dark:text-slate-500 sm:inline leading-none">
+                <p className="hidden truncate text-xs font-normal text-slate-400 dark:text-slate-500 lg:inline leading-none">
                   {page.subtitle}
                 </p>
               </>

@@ -455,7 +455,7 @@ export function PatientDashboardPage() {
       >
         <GlucoseWave className="pointer-events-none absolute inset-x-0 bottom-0 h-40 w-full text-primary-700/70 dark:text-primary-900/80" />
 
-        <div className="relative grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-10 lg:p-10">
+        <div className="relative grid gap-7 p-5 sm:gap-8 sm:p-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-10 lg:p-10">
           <div className="flex min-w-0 flex-col">
             <div className="flex flex-wrap items-center gap-2.5 text-sm text-primary-100/80">
               <span>{formattedToday}</span>
@@ -489,10 +489,10 @@ export function PatientDashboardPage() {
               {diagnosticNote}
             </p>
 
-            <div className="mt-auto flex flex-wrap items-center gap-3 pt-8">
+            <div className="mt-auto flex flex-wrap items-center gap-3 pt-7 sm:pt-8">
               <Link
                 to="/diagnosis"
-                className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-5 py-3 text-sm font-bold text-navy-deep shadow-[0_8px_24px_-10px_rgba(247,165,62,0.9)] transition-transform hover:-translate-y-0.5 hover:bg-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200 active:translate-y-0"
+                className="inline-flex w-full items-center justify-center gap-2 sm:w-auto rounded-full bg-amber-300 px-5 py-3 text-sm font-bold text-navy-deep shadow-[0_8px_24px_-10px_rgba(247,165,62,0.9)] transition-transform hover:-translate-y-0.5 hover:bg-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200 active:translate-y-0"
               >
                 <PlusCircle className="h-4.5 w-4.5" />
                 {hasResult
@@ -501,7 +501,7 @@ export function PatientDashboardPage() {
               </Link>
               <Link
                 to={reportHref}
-                className="inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-white ring-1 ring-inset ring-white/25 transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                className="inline-flex w-full items-center justify-center gap-2 sm:w-auto rounded-full px-4 py-3 text-sm font-semibold text-white ring-1 ring-inset ring-white/25 transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 <FileText className="h-4 w-4" />
                 {hasResult
@@ -557,63 +557,64 @@ export function PatientDashboardPage() {
         </div>
       </section>
 
+      {/* Vitals: a swipeable strip on phones, three columns from sm up */}
+      <div className="no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-4 -mb-3 sm:mx-0 sm:mb-0 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0">
+        <VitalCard
+          icon={Activity}
+          label={t('patientHome.vitals.hba1c', 'HbA1c')}
+          value={a1c.toFixed(1)}
+          preset={RANGE_PRESETS.hba1c}
+          rawValue={a1c}
+          caption={t('patientHome.vitals.hba1cTarget', 'Normal is below 5.7%')}
+          sample={!hasResult || rawA1c === null}
+          t={t}
+          tr={tr}
+        />
+        {waist !== null ? (
+          <VitalCard
+            icon={Ruler}
+            label={t('patientHome.vitals.waist', 'Waist size')}
+            value={Math.round(waist)}
+            preset={waistPreset}
+            rawValue={waist}
+            caption={isFemale
+              ? t('patientHome.vitals.waistTargetF', 'Lower risk is under 80 cm')
+              : t('patientHome.vitals.waistTargetM', 'Lower risk is under 94 cm')}
+            sample={false}
+            t={t}
+            tr={tr}
+          />
+        ) : (
+          <VitalCard
+            icon={Droplets}
+            label={t('patientHome.vitals.fastingGlucose', 'Fasting glucose')}
+            value={glucose}
+            preset={RANGE_PRESETS.fastingGlucose}
+            rawValue={glucose}
+            caption={t('patientHome.vitals.glucoseTarget', 'Normal is 70–99 mg/dL')}
+            sample={!hasResult || rawGlucose === null}
+            t={t}
+            tr={tr}
+          />
+        )}
+        <VitalCard
+          icon={Scale}
+          label={t('patientHome.vitals.bmi', 'Body mass index')}
+          value={bmi.toFixed(1)}
+          preset={RANGE_PRESETS.bmi}
+          rawValue={bmi}
+          caption={t('patientHome.vitals.bmiTarget', 'Healthy is 18.5–24.9')}
+          sample={rawBmi === null}
+          t={t}
+          tr={tr}
+        />
+      </div>
+
       <div className="mt-6 grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_25rem]">
         {/* ============================================================== */}
-        {/* LEFT: readings, weekly trend, risk factors, latest assessment   */}
+        {/* LEFT: weekly trend, risk factors, latest assessment              */}
         {/* ============================================================== */}
         <div className="min-w-0 space-y-6">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <VitalCard
-              icon={Activity}
-              label={t('patientHome.vitals.hba1c', 'HbA1c')}
-              value={a1c.toFixed(1)}
-              preset={RANGE_PRESETS.hba1c}
-              rawValue={a1c}
-              caption={t('patientHome.vitals.hba1cTarget', 'Normal is below 5.7%')}
-              sample={!hasResult || rawA1c === null}
-              t={t}
-              tr={tr}
-            />
-            {waist !== null ? (
-              <VitalCard
-                icon={Ruler}
-                label={t('patientHome.vitals.waist', 'Waist size')}
-                value={Math.round(waist)}
-                preset={waistPreset}
-                rawValue={waist}
-                caption={isFemale
-                  ? t('patientHome.vitals.waistTargetF', 'Lower risk is under 80 cm')
-                  : t('patientHome.vitals.waistTargetM', 'Lower risk is under 94 cm')}
-                sample={false}
-                t={t}
-                tr={tr}
-              />
-            ) : (
-              <VitalCard
-                icon={Droplets}
-                label={t('patientHome.vitals.fastingGlucose', 'Fasting glucose')}
-                value={glucose}
-                preset={RANGE_PRESETS.fastingGlucose}
-                rawValue={glucose}
-                caption={t('patientHome.vitals.glucoseTarget', 'Normal is 70–99 mg/dL')}
-                sample={!hasResult || rawGlucose === null}
-                t={t}
-                tr={tr}
-              />
-            )}
-            <VitalCard
-              icon={Scale}
-              label={t('patientHome.vitals.bmi', 'Body mass index')}
-              value={bmi.toFixed(1)}
-              preset={RANGE_PRESETS.bmi}
-              rawValue={bmi}
-              caption={t('patientHome.vitals.bmiTarget', 'Healthy is 18.5–24.9')}
-              sample={rawBmi === null}
-              t={t}
-              tr={tr}
-            />
-          </div>
-
           {/* Weekly trend */}
           <section className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -689,7 +690,7 @@ export function PatientDashboardPage() {
         {/* ============================================================== */}
         <aside
           aria-labelledby="patient-plan-heading"
-          className="min-w-0 rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface"
+          className="order-first min-w-0 rounded-3xl xl:order-none border border-slate-200/80 bg-white p-5 shadow-lift sm:p-6 dark:border-night-border dark:bg-night-surface"
         >
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -891,7 +892,7 @@ const STATUS_CHIP = {
 function VitalCard({ icon: Icon, label, value, preset, rawValue, caption, sample, t, tr }) {
   const segment = getRangeSegment(preset, rawValue)
   return (
-    <div className="flex flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift dark:border-night-border dark:bg-night-surface">
+    <div className="flex w-[80%] shrink-0 snap-start flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lift sm:w-auto dark:border-night-border dark:bg-night-surface">
       <div className="flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300">
           <Icon className="h-4 w-4 text-primary-600 dark:text-primary-400" aria-hidden="true" />
