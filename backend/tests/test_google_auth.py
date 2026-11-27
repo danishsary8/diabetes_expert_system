@@ -21,6 +21,26 @@ def configure_google_client_id(app):
         service.google_client_id = original_client_id
 
 
+class _FakeGoogleResponse:
+    def __init__(self, payload, status_code=200):
+        self._payload = payload
+        self.status_code = status_code
+
+    def json(self):
+        return self._payload
+
+
+def _fake_google_api(tokeninfo, userinfo):
+    """Route requests.get calls to Google's tokeninfo / userinfo endpoints."""
+    def fake_get(url, *args, **kwargs):
+        if "tokeninfo" in url:
+            return tokeninfo
+        if "userinfo" in url:
+            return userinfo
+        raise AssertionError(f"Unexpected URL requested: {url}")
+    return fake_get
+
+
 def test_google_login_missing_credential(client):
     response = client.post("/api/auth/google", json={})
     assert response.status_code == 400
@@ -207,12 +227,10 @@ def test_google_login_with_access_token_success(client, app):
         "name": "OAuth User",
         "picture": "https://example.com/avatar.jpg",
     }
-    class MockResponse:
-        status_code = 200
-        def json(self):
-            return userinfo_claims
+    tokeninfo = _FakeGoogleResponse({"aud": MOCK_CLIENT_ID, "azp": MOCK_CLIENT_ID, "expires_in": "3500"})
+    userinfo = _FakeGoogleResponse(userinfo_claims)
 
-    with patch("requests.get", return_value=MockResponse()):
+    with patch("requests.get", side_effect=_fake_google_api(tokeninfo, userinfo)):
         response = client.post("/api/auth/google", json={"credential": "ya29.mock-access-token"})
         assert response.status_code == 200
         body = response.get_json()
@@ -220,3 +238,34 @@ def test_google_login_with_access_token_success(client, app):
         assert body["data"]["user"]["email"] == "oauthuser@example.com"
         assert body["data"]["user"]["name"] == "OAuth User"
 
+
+
+def test_google_access_token_issued_to_another_app_is_rejected(client):
+    """A token minted for some other site must not log anyone in here."""
+    tokeninfo = _FakeGoogleResponse({
+        "aud": "some-other-app.apps.googleusercontent.com",
+        "azp": "some-other-app.apps.googleusercontent.com",
+        "sub": "google-sub-victim",
+        "email": "victim@example.com",
+        "email_verified": "true",
+        "expires_in": "3500",
+    })
+    userinfo = _FakeGoogleResponse({
+        "sub": "google-sub-victim",
+        "email": "victim@example.com",
+        "email_verified": True,
+        "name": "Victim",
+    })
+    with patch("requests.get", side_effect=_fake_google_api(tokeninfo, userinfo)):
+        response = client.post("/api/auth/google", json={"credential": "ya29.token-from-another-app"})
+    assert response.status_code == 401
+    body = response.get_json()
+    assert body["success"] is False
+
+
+def test_google_access_token_rejected_when_tokeninfo_fails(client):
+    tokeninfo = _FakeGoogleResponse({"error": "invalid_token"}, status_code=400)
+    userinfo = _FakeGoogleResponse({}, status_code=401)
+    with patch("requests.get", side_effect=_fake_google_api(tokeninfo, userinfo)):
+        response = client.post("/api/auth/google", json={"credential": "ya29.expired"})
+    assert response.status_code == 401

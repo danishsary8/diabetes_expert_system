@@ -202,6 +202,21 @@ class AuthService:
             try:
                 import requests
 
+                # An access token proves nothing about *which* app it was
+                # issued to. Ask Google, and only accept tokens minted for
+                # this app's client ID — otherwise any site the user signed
+                # into with Google could replay its token here.
+                tokeninfo_resp = requests.get(
+                    "https://oauth2.googleapis.com/tokeninfo",
+                    params={"access_token": credential},
+                    timeout=10,
+                )
+                if tokeninfo_resp.status_code != 200:
+                    raise UnauthorizedError("Failed to verify Google access token with Google API.")
+                token_info = tokeninfo_resp.json() or {}
+                if client_id not in (token_info.get("aud"), token_info.get("azp")):
+                    raise UnauthorizedError("Google access token was not issued for this application.")
+
                 userinfo_resp = requests.get(
                     "https://www.googleapis.com/oauth2/v3/userinfo",
                     headers={"Authorization": f"Bearer {credential}"},
