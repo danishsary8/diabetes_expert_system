@@ -90,7 +90,21 @@
     "orDivider": "ឬ",
     "signInWithGoogle": "ចូលប្រើប្រាស់តាម Google",
     "signUpWithGoogle": "ចុះឈ្មោះតាម Google",
-    "errorGoogleLoginFailed": "ការចូលប្រើតាម Google បានបរាជ័យ។ សូមព្យាយាមម្តងទៀត។"
+    "errorGoogleLoginFailed": "ការចូលប្រើតាម Google បានបរាជ័យ។ សូមព្យាយាមម្តងទៀត។",
+    "trustSecure": "ឯកជន និងមានសុវត្ថិភាព",
+    "trustBilingual": "English & ខ្មែរ",
+    "trustReviewed": "ពិនិត្យដោយវេជ្ជបណ្ឌិត",
+    "showcaseTitle": "ការថែទាំជំងឺទឹកនោមផ្អែមកាន់តែឆ្លាតវៃ ជាភាសារបស់អ្នក",
+    "showcaseCopy": "ពិនិត្យហានិភ័យ អនុវត្តផែនការថែទាំផ្ទាល់ខ្លួន និងសួរសំណួរបានគ្រប់ពេល — ដោយមានវេជ្ជបណ្ឌិតចូលរួម។",
+    "showcaseRisk": "ពិនិត្យហានិភ័យក្នុង ៥ នាទី",
+    "showcaseAssistant": "ជំនួយការជំងឺទឹកនោមផ្អែមដ៏រួសរាយ",
+    "showcaseGuide": "ការណែនាំដែលអាចទុកចិត្តបាន",
+    "regSubTitle": "ចូលរួមដើម្បីប្រើឧបករណ៍វាយតម្លៃ កំណត់ត្រាអ្នកជំងឺ និងការតាមដានការថែទាំ។",
+    "fullNameLabel": "ឈ្មោះពេញ",
+    "namePlaceholder": "សុខ ចាន់ដារា",
+    "confirmPasswordLabel": "បញ្ជាក់ពាក្យសម្ងាត់",
+    "passwordMinPlaceholder": "យ៉ាងតិច ៦ តួ",
+    "repeatPlaceholder": "វាយម្តងទៀត"
   },
   "roles": {
     "user": "អ្នកប្រើប្រាស់",

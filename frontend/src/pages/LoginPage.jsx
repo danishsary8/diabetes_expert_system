@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
-import { AlertCircle, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, LockKeyhole, Mail, LogIn, Languages, ShieldCheck, Stethoscope } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import api, { getApiData, getApiErrorMessage, setAuthTokens } from '../api/client'
 import { useAuth } from '@/contexts/AuthContext'
@@ -94,7 +94,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="h-screen h-[100dvh] max-h-[100dvh] w-full flex flex-col lg:flex-row overflow-hidden bg-slate-50 dark:bg-slate-950 font-sans selection:bg-blue-500/20">
+    <div className="h-screen h-[100dvh] max-h-[100dvh] w-full flex flex-col lg:flex-row overflow-hidden bg-slate-50 dark:bg-slate-950 font-sans selection:bg-teal-500/20">
       <style>{`
 
 
@@ -158,13 +158,13 @@ export function LoginPage() {
 
         @media (min-height: 600px) {
           .auth-form-column {
-            overflow-y: hidden !important;
+            overflow-y: auto !important;
           }
         }
       `}</style>
 
       {/* ── LEFT HALF: Sign In Form ── */}
-      <div className="auth-form-column w-full lg:w-1/2 h-full max-h-[100dvh] flex flex-col justify-between px-6 py-4 sm:px-10 sm:py-5 lg:px-12 lg:py-6 relative overflow-y-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200/80 dark:border-slate-800">
+      <div className="auth-form-column w-full lg:w-1/2 h-full max-h-[100dvh] flex flex-col justify-between px-6 py-4 sm:px-10 sm:py-5 lg:px-12 lg:py-6 relative overflow-y-auto auth-form-bg">
         {/* Header bar: Logo & Language Switcher */}
         <div className="flex items-center justify-between gap-4 w-full shrink-0">
           <Link to="/" className="inline-flex items-center gap-2.5 group transition-opacity hover:opacity-90">
@@ -190,16 +190,20 @@ export function LoginPage() {
         </div>
 
         {/* Center Form Container */}
-        <div className={`w-full max-w-[400px] mx-auto my-auto py-2 sm:py-3 ${formAnimationClass}`}>
+        <div className={`w-full max-w-[440px] mx-auto my-auto py-4 ${formAnimationClass}`}>
+          <div className="rounded-[28px] border border-white/80 bg-white/85 p-6 shadow-2xl shadow-slate-900/[0.08] ring-1 ring-slate-900/[0.03] backdrop-blur-xl sm:p-8 dark:border-slate-800 dark:bg-slate-900/85 dark:ring-white/5">
+          <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500 via-emerald-500 to-cyan-500 text-white shadow-lg shadow-teal-500/30" aria-hidden="true">
+            <LogIn className="h-5 w-5" />
+          </span>
 
           {/* Eyebrow badge */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200/70 dark:border-blue-800/60 text-[11px] font-semibold text-blue-600 dark:text-blue-400 mb-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200/70 dark:border-teal-800/60 text-[11px] font-semibold text-teal-700 dark:text-teal-300 mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-500 dark:bg-teal-400 animate-pulse" />
             <span>{t('auth.accentEyebrow', 'Diabetes Expert System')}</span>
           </div>
 
           <h1
-            className="auth-heading text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight"
+            className="auth-heading text-2xl sm:text-[28px] font-extrabold text-slate-900 dark:text-white tracking-tight"
             style={{ fontFamily: 'var(--font-latin-display)' }}
           >
             {t('auth.loginPageTitle', 'Sign In')}
@@ -220,12 +224,12 @@ export function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-3" style={{ fontFamily: 'var(--font-latin-sans)' }}>
             {/* Email Field */}
-            <div className="space-y-1">
-              <label htmlFor="email" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="block text-[13px] font-semibold text-slate-700 dark:text-slate-300">
                 {t('auth.emailLabel', 'Email')}
               </label>
               <div className="relative flex items-center">
-                <span className="absolute left-3 text-slate-400 dark:text-slate-500 pointer-events-none">
+                <span className="absolute left-4 text-slate-400 dark:text-slate-500 pointer-events-none">
                   <Mail size={16} />
                 </span>
                 <input
@@ -235,7 +239,7 @@ export function LoginPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full pl-9 pr-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+                  className="w-full pl-11 pr-3.5 min-h-12 py-3 text-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-teal-500/15 focus:border-teal-500 transition-all"
                   placeholder={t('auth.emailPlaceholder', 'Email address')}
                   autoComplete="username"
                 />
@@ -243,12 +247,12 @@ export function LoginPage() {
             </div>
 
             {/* Password Field */}
-            <div className="space-y-1">
-              <label htmlFor="password" className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="block text-[13px] font-semibold text-slate-700 dark:text-slate-300">
                 {t('auth.passwordLabel', 'Password')}
               </label>
               <div className="relative flex items-center">
-                <span className="absolute left-3 text-slate-400 dark:text-slate-500 pointer-events-none">
+                <span className="absolute left-4 text-slate-400 dark:text-slate-500 pointer-events-none">
                   <LockKeyhole size={16} />
                 </span>
                 <input
@@ -258,14 +262,14 @@ export function LoginPage() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full pl-9 pr-10 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
+                  className="w-full pl-11 pr-10 min-h-12 py-3 text-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-sm hover:border-slate-300 dark:hover:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-teal-500/15 focus:border-teal-500 transition-all"
                   placeholder={t('auth.passwordPlaceholder', 'Password')}
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-2.5 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  className="absolute right-3 rounded-lg p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -281,7 +285,7 @@ export function LoginPage() {
                   type="checkbox"
                   checked={formData.rememberMe}
                   onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
-                  className="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  className="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-700 text-teal-600 accent-teal-600 focus:ring-teal-500 cursor-pointer"
                 />
                 <span className="text-[12px]">{t('auth.rememberMe', 'Remember me')}</span>
               </label>
@@ -291,7 +295,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={loading || !isValid}
-              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 via-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-blue-500/20 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+              className="group w-full min-h-12 py-3 px-4 rounded-2xl bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 text-white font-semibold text-sm shadow-lg shadow-teal-600/30 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-teal-600/35 hover:brightness-105 active:translate-y-0 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:shadow-none transition-all duration-200 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-500/30 motion-reduce:hover:translate-y-0"
               style={{ fontFamily: 'var(--font-latin-display)' }}
             >
               {loading ? (
@@ -339,12 +343,29 @@ export function LoginPage() {
               <Link
                 to="/sign-up"
                 state={{ authTransition: 'to-register' }}
-                className="font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline ml-1"
+                className="font-bold text-teal-700 hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200 hover:underline ml-1"
               >
                 {t('auth.signUp', 'Create Account')}
               </Link>
             </p>
           </form>
+          </div>
+
+          {/* Trust badges */}
+          <ul className="mt-5 flex flex-wrap items-center justify-center gap-2 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+            <li className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 shadow-sm ring-1 ring-slate-200/70 dark:bg-slate-900/70 dark:ring-slate-700">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+              {t('auth.trustSecure', 'Private & secure')}
+            </li>
+            <li className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 shadow-sm ring-1 ring-slate-200/70 dark:bg-slate-900/70 dark:ring-slate-700">
+              <Languages className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" aria-hidden="true" />
+              {t('auth.trustBilingual', 'English & ខ្មែរ')}
+            </li>
+            <li className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 shadow-sm ring-1 ring-slate-200/70 dark:bg-slate-900/70 dark:ring-slate-700">
+              <Stethoscope className="h-3.5 w-3.5 text-rose-500 dark:text-rose-400" aria-hidden="true" />
+              {t('auth.trustReviewed', 'Reviewed by doctors')}
+            </li>
+          </ul>
         </div>
 
         {/* Footer: Disclaimer / Status */}

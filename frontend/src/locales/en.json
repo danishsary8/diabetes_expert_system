@@ -90,7 +90,21 @@
     "orDivider": "OR",
     "signInWithGoogle": "Sign in with Google",
     "signUpWithGoogle": "Sign up with Google",
-    "errorGoogleLoginFailed": "Google sign-in failed. Please try again."
+    "errorGoogleLoginFailed": "Google sign-in failed. Please try again.",
+    "trustSecure": "Private & secure",
+    "trustBilingual": "English & ខ្មែរ",
+    "trustReviewed": "Reviewed by doctors",
+    "showcaseTitle": "Smarter diabetes care, in your language",
+    "showcaseCopy": "Check your risk, follow a personal care plan and ask questions any time — with doctors in the loop.",
+    "showcaseRisk": "Risk check in 5 minutes",
+    "showcaseAssistant": "Friendly diabetes assistant",
+    "showcaseGuide": "Guides you can trust",
+    "regSubTitle": "Join to access diagnostic tools, patient records, and follow-up care.",
+    "fullNameLabel": "Full Name",
+    "namePlaceholder": "Dr. John Doe",
+    "confirmPasswordLabel": "Confirm",
+    "passwordMinPlaceholder": "Min 6 chars",
+    "repeatPlaceholder": "Repeat"
   },
   "roles": {
     "user": "User",
