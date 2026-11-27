@@ -15,9 +15,9 @@ export function AppLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [theme, setTheme] = useState(() => {
     if (typeof window === 'undefined') return 'light'
-    const stored = window.localStorage.getItem('theme')
+    const stored = window.localStorage.getItem('app-theme')
     if (stored === 'light' || stored === 'dark') return stored
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    return 'light' // light by default; dark only when the user picks it
   })
   const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -34,7 +34,7 @@ export function AppLayout() {
   useEffect(() => {
     const root = document.documentElement
     root.classList.toggle('dark', theme === 'dark')
-    window.localStorage.setItem('theme', theme)
+    window.localStorage.setItem('app-theme', theme)
   }, [theme])
 
   const navItems = useMemo(() => getVisibleNavItems(user, language), [language, user])

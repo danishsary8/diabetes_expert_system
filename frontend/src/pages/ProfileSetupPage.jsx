@@ -72,9 +72,8 @@ export function ProfileSetupPage() {
   // This page renders outside AppLayout, which normally applies the saved
   // light / dark preference, so apply it here too.
   useEffect(() => {
-    const stored = window.localStorage.getItem('theme')
-    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches
-    document.documentElement.classList.toggle('dark', stored ? stored === 'dark' : Boolean(prefersDark))
+    // Light by default; dark only when the user has chosen it.
+    document.documentElement.classList.toggle('dark', window.localStorage.getItem('app-theme') === 'dark')
   }, [])
   const [profile, setProfile] = useState({
     gender: '',
